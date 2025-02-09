@@ -22,13 +22,13 @@ export default function Header() {
                 >
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
-                <span className='text-[#00ffcc] font-black text-4xl' style={{ fontFamily: "'Lucida Handwriting', cursive" }}>AccuTrack</span>
+                <span className='text-[#00ffcc] font-black text-4xl' style={{ fontFamily: "Calibri" }}>AccuTrack</span>
 
             </div>
             {isSignedIn ?
                 <div className='flex gap-4 items-center'>
-                    <Link href="/">
-                        <Button className="bg-gray-800/50 text-[#bbbbbb] font-bold hover:bg-gray-700/50 transition-all duration-200 px-6">
+                    <Link href="/dashboard">
+                        <Button className="bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 transition-all duration-200 px-6">
                             Dashboard
                         </Button>
                     </Link>
@@ -50,34 +50,16 @@ export default function Header() {
                     </div>
                 </div> : 
                 <div className='flex gap-4 items-center'>
-                    <Link href="/">
-                        <Button className="bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 transition-all duration-200 px-6">
-                            Register
-                        </Button>
-                    </Link>
-
-
-                    <Link href="/">
-                        <Button className="bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 transition-all duration-200 px-6">
-                            Home
-                        </Button>
-                    </Link>
-
-                    <Link href="/features">
-                        <Button className="bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 transition-all duration-200 px-6">
-                            Features
-                        </Button>
-                    </Link>
-
-                    <Link href="/">
-                    <Button className="bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 transition-all duration-200 px-6">
-                            Contact Us
-                        </Button>
-                    </Link>
-
                     <Link href="/sign-in">
+                        <Button className="bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 transition-all duration-200 px-6">
+                            Dashboard
+                        </Button>
+                    </Link>
+
+
+                    <Link href="/sign-up">
                         <Button className="bg-blue-500/20 text-blue-300 font-bold hover:bg-blue-500/30 transition-all duration-200 px-6">
-                            Login
+                            Get Started
                         </Button>
                     </Link>
                 </div>}

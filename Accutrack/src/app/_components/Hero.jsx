@@ -1,5 +1,4 @@
-"use client"; // Ensures this is a Client Component
-
+"use client"; 
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { BentoGrid, BentoGridItem } from '@/components/ui/bento-grid';

@@ -1,10 +1,10 @@
 import React from "react";
 import Header from "../../_components/Header";
 
-function Features() {
+function Dashboard() {
     return (
         <Header />
     )
 }
 
-export default Features;
+export default Dashboard;
