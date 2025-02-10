@@ -71,3 +71,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.sign-up-container {
+  margin-top: 30px; /* Adjust this value based on your spacing needs */
+}
+
