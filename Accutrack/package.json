@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "update-db": "npx prisma db push"
+    "update-db": "npx prisma db push",
+    "build-run": "next build && next start"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.11.0",

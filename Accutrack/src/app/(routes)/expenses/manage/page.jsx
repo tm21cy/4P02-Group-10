@@ -4,34 +4,50 @@ import React, { useEffect, useState } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
-import { getExpenses } from "@/lib/db";
+import { useClerk, useSession, useUser } from "@clerk/nextjs";
+import { deleteExpenses, getExpenses, patchExpenses } from "@/lib/db";
 
 function ManageExpenses() {
+    const { isSignedIn, user, isLoaded } = useUser()
+    const clerk = useClerk()
     const [expenses, setExpenses] = useState(null);
-    const clerkUser = useUser();
     const [editingExpense, setEditingExpense] = useState(null);
 
     useEffect(() => {
-        getExpenses(clerkUser.id).then(data => {
+        if (!isLoaded) return console.error("User not loaded.")
+        if (!user) return console.error("No valid session.")
+        updateEntries()
+    }, [isLoaded, user])
+
+    const updateEntries = () => {
+        console.log(user.id)
+        getExpenses(user.id).then(data => {
+            console.log(data)
             setExpenses(data)
         })
-    }, [])
+    }
 
     const handleEdit = (expense) => {
         setEditingExpense(expense);
     };
 
     const handleDelete = (id) => {
-        setExpenses(expenses.filter(expense => expense.id !== id));
+        deleteExpenses(user.id, id).then(() => {
+            updateEntries()
+        })
     };
 
     const handleSave = (e) => {
         e.preventDefault();
-        setExpenses(expenses.map(exp =>
-            exp.id === editingExpense.id ? editingExpense : exp
-        ));
-        setEditingExpense(null);
+        patchExpenses(user.id, editingExpense.id, {
+            amount: editingExpense.amount,
+            description: editingExpense.description,
+            tag: editingExpense.tag,
+            date: editingExpense.date
+        }).then(() => {
+            updateEntries()
+            setEditingExpense(null);
+        })
     };
 
     return (
@@ -51,8 +67,10 @@ function ManageExpenses() {
                 <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6">
                     <div className="overflow-x-auto">
                         {/* Show loading message if no expenses */}
-                        {!expenses || expenses.length === 0 ? (
+                        {!isLoaded ? (
                             <p className="text-gray-300 text-center py-4">Loading expense data...</p>
+                        ) : !expenses || expenses.length === 0 ? (
+                                <p className="text-gray-300 text-center py-4">No expenses to track.</p>
                         ) : (
                             <table className="w-full">
                                 <thead>
@@ -100,6 +118,65 @@ function ManageExpenses() {
                     </div>
                 </div>
             </div>
+            {editingExpense && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                    <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
+                        <h2 className="text-xl font-bold text-white mb-4">Edit Expense</h2>
+                        <form onSubmit={handleSave} className="space-y-4">
+                            {/* Form fields for editing */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Amount
+                                </label>
+                                <input
+                                    type="number"
+                                    step="0.01"
+                                    value={editingExpense.amount}
+                                    onChange={e => setEditingExpense({ ...editingExpense, amount: parseFloat(e.target.value) })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Description
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editingExpense.description}
+                                    onChange={e => setEditingExpense({ ...editingExpense, description: e.target.value })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editingExpense.date}
+                                    onChange={e => setEditingExpense({ ...editingExpense, date: e.target.value })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2 pt-4">
+                                <Button
+                                    type="button"
+                                    onClick={() => setEditingExpense(null)}
+                                    className="bg-gray-700 text-white hover:bg-gray-600"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="bg-teal-500 hover:bg-teal-600 text-white"
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
