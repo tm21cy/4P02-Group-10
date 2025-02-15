@@ -16,7 +16,22 @@ async function postNewIncome({amount, description, tag, date, userId}) {
 			userId
 		}
 	})
-	console.log(result)
+}
+
+async function postNewExpense({amount, description, tag, date, userId}) {
+	const resolvedDate = new Date(date)
+	if (isNaN(resolvedDate.getDate())) {
+		throw new Error("Date string is not properly formatted.")
+	}
+	const result = await prismaDb.expense.create({
+		data: {
+			amount,
+			description,
+			tag,
+			date: resolvedDate,
+			userId
+		}
+	})
 }
 
 async function getIncome(user) {
@@ -33,4 +48,18 @@ async function getIncome(user) {
 	})
 }
 
-export { postNewIncome, getIncome }
+async function getExpenses(user) {
+	return prismaDb.expense.findMany({
+		select: {
+			date: true,
+			description: true,
+			amount: true,
+			tag: true
+		},
+		where: {
+			userId: user
+		}
+	})
+}
+
+export { postNewIncome, getIncome, postNewExpense, getExpenses }

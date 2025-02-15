@@ -29,7 +29,7 @@ model expense {
   amount      Decimal
   description String
   tag         String? 
-  date        String
+  date        DateTime
   tagName     tag? @relation(fields: [tag], references: [name], onDelete: SetNull)
 }
 
