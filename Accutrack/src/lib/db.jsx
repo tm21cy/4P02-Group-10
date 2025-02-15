@@ -103,4 +103,43 @@ async function deleteExpenses(user, id) {
 	})
 }
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses }
+async function patchIncome(user, id, { amount, description, tag, date }) {
+	console.log(id)
+	console.log(user)
+	const result = await prismaDb.income.findFirst({
+		where: {
+			AND: {
+				id,
+				userId: user
+			}
+		}
+	})
+	if (!result) throw new Error("Could not locate income entry.")
+	const resolvedDate = new Date(date)
+	if (isNaN(resolvedDate.getDate())) {
+		throw new Error("Date string is not properly formatted.")
+	}
+	else await prismaDb.income.update({
+		where: {
+			id,
+			userId: user
+		},
+		data: {
+			amount,
+			description,
+			tag,
+			date: resolvedDate
+		}
+	})
+}
+
+async function deleteIncome(user, id) {
+	return prismaDb.income.delete({
+		where: {
+			id,
+			userId: user
+		}
+	})
+}
+
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome }

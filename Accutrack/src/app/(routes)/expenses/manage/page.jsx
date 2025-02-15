@@ -9,7 +9,6 @@ import { deleteExpenses, getExpenses, patchExpenses } from "@/lib/db";
 
 function ManageExpenses() {
     const { isSignedIn, user, isLoaded } = useUser()
-    const clerk = useClerk()
     const [expenses, setExpenses] = useState(null);
     const [editingExpense, setEditingExpense] = useState(null);
 
@@ -20,9 +19,7 @@ function ManageExpenses() {
     }, [isLoaded, user])
 
     const updateEntries = () => {
-        console.log(user.id)
         getExpenses(user.id).then(data => {
-            console.log(data)
             setExpenses(data)
         })
     }
