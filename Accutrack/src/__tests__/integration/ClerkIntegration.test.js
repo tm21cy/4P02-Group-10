@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import fetch from "node-fetch"; // Ensure node-fetch v2 is used
+import fetch from "node-fetch"; 
 
 dotenv.config();
 
@@ -10,7 +10,7 @@ console.log("Using Clerk Secret Key:", CLERK_SECRET_KEY);
 
 describe("Clerk Authentication - Sign Up", () => {
   it("should successfully create a new user", async () => {
-    // Generate a unique email to avoid duplicate conflicts
+    
     const uniqueEmail = `testuser-${Date.now()}@example.com`;
 
     const response = await fetch(API_URL, {
@@ -21,8 +21,8 @@ describe("Clerk Authentication - Sign Up", () => {
         "Accept": "application/json",
       },
       body: JSON.stringify({
-        email_address: [uniqueEmail], // ✅ FIX: email_address should be an ARRAY
-        password: "Hungerhanger_123", // ✅ Ensure strong password
+        email_address: [uniqueEmail],
+        password: "Hungerhanger_123", 
       }),
     });
 
@@ -40,14 +40,14 @@ describe("Clerk Authentication - Sign Up", () => {
       throw new Error("Invalid JSON response from Clerk API");
     }
 
-    // Clerk should return 200 or 201 for successful user creation
+    
     expect([200, 201]).toContain(response.status);
     expect(data.id).toBeDefined();
     expect(data.email_addresses[0].email_address).toBe(uniqueEmail);
   });
 
   it("should fail for already registered email", async () => {
-    const existingEmail = "sangmitra.m06@gmail.com"; // Ensure this email exists in Clerk
+    const existingEmail = "sangmitra.m06@gmail.com"; 
 
     const response = await fetch(API_URL, {
       method: "POST",
@@ -57,8 +57,8 @@ describe("Clerk Authentication - Sign Up", () => {
         "Accept": "application/json",
       },
       body: JSON.stringify({
-        email_address: [existingEmail], // ✅ FIX: email_address should be an ARRAY
-        password: "SecurePass123!", // ✅ Ensure strong password
+        email_address: [existingEmail], 
+        password: "SecurePass123!", 
       }),
     });
 
@@ -76,7 +76,7 @@ describe("Clerk Authentication - Sign Up", () => {
       throw new Error("Invalid JSON response from Clerk API");
     }
 
-    // Instead of checking for 422, check for Clerk's error message indicating duplicate email
+    
     const errorMessage = data.errors?.[0]?.message || "";
 
     expect(errorMessage.toLowerCase()).toContain("that email address is taken. please try another.");
