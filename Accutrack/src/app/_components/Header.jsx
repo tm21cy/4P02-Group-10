@@ -15,7 +15,7 @@ export default function Header() {
     };
 
     return (
-        <div className='p-5 flex justify-between items-center shadow-lg bg-[#1c2230] backdrop-blur-sm'>
+        <div className='p-5 flex justify-between items-center shadow-lg bg-[#1c2230] backdrop-blur-sm z-40 relative'>
             {/* Logo */}
             <div className="flex flex-row items-center gap-2">
                 <svg 
@@ -46,7 +46,7 @@ export default function Header() {
             </button>
 
             {/* Navigation Links */}
-            <div className={`absolute top-16 right-5 bg-[#1c2230] shadow-lg rounded-lg p-4 space-y-6 md:hidden ${menuOpen ? 'block' : 'hidden'}`}>
+            <div className={`absolute top-16 right-5 bg-[#1c2230] shadow-lg rounded-lg p-4 space-y-6 md:hidden z-50 ${menuOpen ? 'block' : 'hidden'}`}>
                 {isSignedIn ? (
                     <>
                         <Link href="/dashboard">

@@ -68,54 +68,94 @@ function ManageIncome() {
                     <div className="text-gray-300">Loading income data...</div>
                 ) : (
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6">
-                        <div className="overflow-x-auto">
-                                {!isLoaded ? (
-                                    <p className="text-gray-300 text-center py-4">Loading income data...</p>
-                                ) : !incomes || incomes.length === 0 ? (
-                                        <p className="text-gray-300 text-center py-4">No income to track.</p>
-                                ) : (
-                                <table className="w-full">
-                                    <thead>
-                                        <tr className="border-b border-gray-700">
-                                            <th className="text-left p-4 text-gray-300">Date</th>
-                                            <th className="text-left p-4 text-gray-300">Description</th>
-                                            <th className="text-left p-4 text-gray-300">Amount</th>
-                                            <th className="text-left p-4 text-gray-300">Category</th>
-                                            <th className="text-right p-4 text-gray-300">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {incomes.map(income => (
-                                            <tr key={income.id} className="border-b border-gray-800 hover:bg-gray-800/30">
-                                                <td className="p-4 text-gray-300">{income.date.toISOString().split("T")[0]}</td>
-                                                <td className="p-4 text-gray-300">{income.description}</td>
-                                                <td className="p-4 text-blue-300">${income.amount || "0.00"}</td>
-                                                <td className="p-4">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-medium
-                                                ${income.tag === "Salary" ? 'bg-green-500/20 text-green-300' :
-                                                            income.tag === "Freelance" ? 'bg-blue-500/20 text-blue-300' :
+                        <div className="w-full">
+                            {!isLoaded ? (
+                                <p className="text-gray-300 text-center py-4">Loading income data...</p>
+                            ) : !incomes || incomes.length === 0 ? (
+                                <p className="text-gray-300 text-center py-4">No income to track.</p>
+                            ) : (
+                                <>
+                                    {/* Table for larger screens */}
+                                    <div className="hidden md:block">
+                                        <table className="w-full">
+                                            <thead>
+                                                <tr className="border-b border-gray-700">
+                                                    <th className="text-left p-4 text-gray-300">Date</th>
+                                                    <th className="text-left p-4 text-gray-300">Description</th>
+                                                    <th className="text-left p-4 text-gray-300">Amount</th>
+                                                    <th className="text-left p-4 text-gray-300">Category</th>
+                                                    <th className="text-right p-4 text-gray-300">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {incomes.map(income => (
+                                                    <tr key={income.id} className="border-b border-gray-800 hover:bg-gray-800/30">
+                                                        <td className="p-4 text-gray-300">{income.date.toISOString().split("T")[0]}</td>
+                                                        <td className="p-4 text-gray-300">{income.description}</td>
+                                                        <td className="p-4 text-blue-300">${income.amount || "0.00"}</td>
+                                                        <td className="p-4">
+                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium
+                                                                ${income.tag === "Salary" ? 'bg-green-500/20 text-green-300' :
+                                                                income.tag === "Freelance" ? 'bg-blue-500/20 text-blue-300' :
                                                                 'bg-purple-500/20 text-purple-300'}`}>
+                                                                {income.tag}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-4 text-right space-x-2">
+                                                            <Button
+                                                                onClick={() => handleEdit(income)}
+                                                                className="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30"
+                                                            >
+                                                                Edit
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => handleDelete(income.id)}
+                                                                className="bg-red-500/20 text-red-300 hover:bg-red-500/30"
+                                                            >
+                                                                Delete
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Card view for mobile screens */}
+                                    <div className="md:hidden space-y-4">
+                                        {incomes.map(income => (
+                                            <div key={income.id} className="bg-gray-800/30 rounded-lg p-4 space-y-3">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="space-y-1">
+                                                        <p className="text-gray-300 text-sm">{income.date.toISOString().split("T")[0]}</p>
+                                                        <p className="text-white font-medium">{income.description}</p>
+                                                        <p className="text-blue-300 text-lg font-semibold">${income.amount || "0.00"}</p>
+                                                    </div>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-medium
+                                                        ${income.tag === "Salary" ? 'bg-green-500/20 text-green-300' :
+                                                        income.tag === "Freelance" ? 'bg-blue-500/20 text-blue-300' :
+                                                        'bg-purple-500/20 text-purple-300'}`}>
                                                         {income.tag}
                                                     </span>
-                                                </td>
-                                                <td className="p-4 text-right space-x-2">
+                                                </div>
+                                                <div className="flex gap-2 pt-2">
                                                     <Button
                                                         onClick={() => handleEdit(income)}
-                                                        className="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30"
+                                                        className="flex-1 bg-blue-500/20 text-blue-300 hover:bg-blue-500/30"
                                                     >
                                                         Edit
                                                     </Button>
                                                     <Button
                                                         onClick={() => handleDelete(income.id)}
-                                                        className="bg-red-500/20 text-red-300 hover:bg-red-500/30"
+                                                        className="flex-1 bg-red-500/20 text-red-300 hover:bg-red-500/30"
                                                     >
                                                         Delete
                                                     </Button>
-                                                </td>
-                                            </tr>
+                                                </div>
+                                            </div>
                                         ))}
-                                    </tbody>
-                                </table>
+                                    </div>
+                                </>
                             )}
                         </div>
                     </div>
