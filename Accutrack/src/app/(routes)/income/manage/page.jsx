@@ -97,7 +97,14 @@ function ManageIncome() {
                                                             <span className={`px-3 py-1 rounded-full text-xs font-medium
                                                                 ${income.tag === "Salary" ? 'bg-green-500/20 text-green-300' :
                                                                 income.tag === "Freelance" ? 'bg-blue-500/20 text-blue-300' :
-                                                                'bg-purple-500/20 text-purple-300'}`}>
+                                                                income.tag === "Investment" ? 'bg-purple-500/20 text-purple-300' :
+                                                                income.tag === "Business" ? 'bg-orange-500/20 text-orange-300' :
+                                                                income.tag === "Rental" ? 'bg-pink-500/20 text-pink-300' :
+                                                                income.tag === "Dividends" ? 'bg-yellow-500/20 text-yellow-300' :
+                                                                income.tag === "Commission" ? 'bg-indigo-500/20 text-indigo-300' :
+                                                                income.tag === "Bonus" ? 'bg-teal-500/20 text-teal-300' :
+                                                                income.tag === "Royalties" ? 'bg-cyan-500/20 text-cyan-300' :
+                                                                'bg-gray-500/20 text-gray-300'}`}>
                                                                 {income.tag}
                                                             </span>
                                                         </td>
@@ -134,7 +141,14 @@ function ManageIncome() {
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium
                                                         ${income.tag === "Salary" ? 'bg-green-500/20 text-green-300' :
                                                         income.tag === "Freelance" ? 'bg-blue-500/20 text-blue-300' :
-                                                        'bg-purple-500/20 text-purple-300'}`}>
+                                                        income.tag === "Investment" ? 'bg-purple-500/20 text-purple-300' :
+                                                        income.tag === "Business" ? 'bg-orange-500/20 text-orange-300' :
+                                                        income.tag === "Rental" ? 'bg-pink-500/20 text-pink-300' :
+                                                        income.tag === "Dividends" ? 'bg-yellow-500/20 text-yellow-300' :
+                                                        income.tag === "Commission" ? 'bg-indigo-500/20 text-indigo-300' :
+                                                        income.tag === "Bonus" ? 'bg-teal-500/20 text-teal-300' :
+                                                        income.tag === "Royalties" ? 'bg-cyan-500/20 text-cyan-300' :
+                                                        'bg-gray-500/20 text-gray-300'}`}>
                                                         {income.tag}
                                                     </span>
                                                 </div>
@@ -201,6 +215,46 @@ function ManageIncome() {
                                                 className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                             />
                                         </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                Category
+                                            </label>
+                                            <select
+                                                name="tag"
+                                                required
+                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white mb-2"
+                                                onChange={e => setEditingIncome({ ...editingIncome, tag: e.target.value })}
+                                                value={editingIncome.tag}
+                                            >
+                                                <option value="">Select a category</option>
+                                                <option value="Salary">Salary</option>
+                                                <option value="Freelance">Freelance</option>
+                                                <option value="Investment">Investment</option>
+                                                <option value="Business">Business</option>
+                                                <option value="Rental">Rental Income</option>
+                                                <option value="Dividends">Dividends</option>
+                                                <option value="Commission">Commission</option>
+                                                <option value="Bonus">Bonus</option>
+                                                <option value="Royalties">Royalties</option>
+                                                <option value="Other">+ Add Custom Category</option>
+                                            </select>
+                                        </div>
+                                        {editingIncome.tag === "Other" && (
+                                            <div className="space-y-2">
+                                                <input
+                                                    type="text"
+                                                    name="customTag"
+                                                    required
+                                                    placeholder="Enter custom category name"
+                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
+                                                    onChange={e => setEditingIncome({ ...editingIncome, customTag: e.target.value })}
+                                                    value={editingIncome.customTag || ""}
+                                                />
+                                                <p className="text-sm text-gray-400">
+                                                    This category will be saved for future use
+                                                </p>
+                                            </div>
+                                        )}
                                         <div className="flex justify-end gap-2 pt-4">
                                             <Button
                                                 type="button"

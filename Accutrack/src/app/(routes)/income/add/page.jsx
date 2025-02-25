@@ -13,6 +13,7 @@ function AddIncome() {
         amount: "", // Empty string to avoid input issues
         description: "",
         tag: "",
+        customTag: "",
         date: new Date().toISOString().split("T")[0], // Default to today (YYYY-MM-DD)
         userId: ""
     });
@@ -28,16 +29,34 @@ function AddIncome() {
             ...prevData,
             [name]: name === "amount" ? parseFloat(value) || "" : 
             value,
+            // Reset customTag when tag changes to non-Other
+            customTag: name === "tag" && value !== "Other" ? "" : prevData.customTag
         }));
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         setLoading(true);
-        formData.userId = user.id
+        setMessage("");
+        
+        const updatedFormData = { 
+            ...formData, 
+            userId: user.id,
+            // Use customTag if "Other" is selected, otherwise use selected tag
+            tag: formData.tag === "Other" ? formData.customTag : formData.tag
+        };
+
         try {
-            await postNewIncome(formData); // Send the object, not spread values
+            await postNewIncome(updatedFormData);
             setMessage("Income added successfully!");
+            setFormData({
+                amount: "",
+                description: "",
+                tag: "",
+                customTag: "",
+                date: new Date().toISOString().split("T")[0],
+                userId: ""
+            });
         } catch (e) {
             console.log(e);
             setMessage("Error adding income.");
@@ -97,19 +116,41 @@ function AddIncome() {
                                 Category
                             </label>
                             <select
-                                required
                                 name="tag"
-                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
+                                required
+                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white mb-2"
                                 onChange={handleChange}
                                 value={formData.tag}
                             >
                                 <option value="">Select a category</option>
                                 <option value="Salary">Salary</option>
                                 <option value="Freelance">Freelance</option>
-                                <option value="Investments">Investments</option>
+                                <option value="Investment">Investment</option>
                                 <option value="Business">Business</option>
-                                <option value="Other">Other</option>
+                                <option value="Rental">Rental Income</option>
+                                <option value="Dividends">Dividends</option>
+                                <option value="Commission">Commission</option>
+                                <option value="Bonus">Bonus</option>
+                                <option value="Royalties">Royalties</option>
+                                <option value="Other">+ Add Custom Category</option>
                             </select>
+                            
+                            {formData.tag === "Other" && (
+                                <div className="space-y-2">
+                                    <input
+                                        type="text"
+                                        name="customTag"
+                                        required
+                                        placeholder="Enter custom category name"
+                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
+                                        onChange={handleChange}
+                                        value={formData.customTag}
+                                    />
+                                    <p className="text-sm text-gray-400">
+                                        This category will be saved for future use
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <div>
