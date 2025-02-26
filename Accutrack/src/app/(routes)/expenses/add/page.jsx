@@ -19,15 +19,60 @@ function AddExpense() {
         userId: ""
     });
 
+    // Separate state for inventory fields
+    const [inventoryData, setInventoryData] = useState({
+        addToInventory: false,
+        inventoryItemId: "",
+        inventoryQuantity: ""
+    });
+
+    // Add state for sales tax
+    const [salesTaxData, setSalesTaxData] = useState({
+        hasSalesTax: false,
+        taxRate: 13, // Default to 13%
+        taxAmount: 0
+    });
+
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
+    // Add helper function for formatting amounts
+    const formatAmount = (amount) => {
+        const num = parseFloat(amount);
+        return isNaN(num) ? "0.00" : num.toFixed(2);
+    };
+
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
+
+        if (name === "amount") {
+            setFormData(prev => {
+                const newAmount = parseFloat(value) || 0;
+                // Update tax amount if sales tax is enabled
+                if (salesTaxData.hasSalesTax) {
+                    setSalesTaxData(prev => ({
+                        ...prev,
+                        taxAmount: newAmount * (prev.taxRate / 100)
+                    }));
+                }
+                return { ...prev, [name]: newAmount };
+            });
+            return;
+        }
+
+        // Handle inventory-related fields separately
+        if (name === "addToInventory" || name === "inventoryItemId" || name === "inventoryQuantity") {
+            setInventoryData(prev => ({
+                ...prev,
+                [name]: type === "checkbox" ? checked : value
+            }));
+            return;
+        }
+
+        // Handle original form fields
         setFormData((prevData) => ({
             ...prevData,
-            [name]: name === "amount" ? parseFloat(value) || "" : value,
-            // Reset customTag when tag changes to non-Other
+            [name]: value,
             customTag: name === "tag" && value !== "Other" ? "" : prevData.customTag
         }));
     };
@@ -40,13 +85,13 @@ function AddExpense() {
         const updatedFormData = { 
             ...formData, 
             userId: user.id,
-            // Use customTag if "Other" is selected, otherwise use selected tag
             tag: formData.tag === "Other" ? formData.customTag : formData.tag
         };
 
         try {
             await postNewExpense(updatedFormData);
             setMessage("Expense added successfully!");
+            // Reset form data
             setFormData({
                 amount: "",
                 description: "",
@@ -54,6 +99,12 @@ function AddExpense() {
                 customTag: "",
                 date: new Date().toISOString().split("T")[0],
                 userId: ""
+            });
+            // Reset inventory data
+            setInventoryData({
+                addToInventory: false,
+                inventoryItemId: "",
+                inventoryQuantity: ""
             });
         } catch (e) {
             console.log(e);
@@ -108,6 +159,56 @@ function AddExpense() {
                                         value={formData.description}
                                     />
                                 </div>
+                                <div className="flex items-center space-x-2 mb-4">
+                                    <input
+                                        type="checkbox"
+                                        name="addToInventory"
+                                        id="addToInventory"
+                                        className="w-4 h-4 text-teal-500 bg-gray-800/50 border-gray-700 rounded focus:ring-teal-500"
+                                        onChange={handleChange}
+                                        checked={inventoryData.addToInventory}
+                                    />
+                                    <label htmlFor="addToInventory" className="text-sm font-medium text-gray-300">
+                                        This expense adds to inventory
+                                    </label>
+                                </div>
+                                {inventoryData.addToInventory && (
+                                    <div className="space-y-4 mb-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                                        <h3 className="text-lg font-medium text-white">Inventory Details</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Item ID
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="inventoryItemId"
+                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                                    placeholder="Enter inventory item ID"
+                                                    onChange={handleChange}
+                                                    value={inventoryData.inventoryItemId || ""}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Quantity
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="inventoryQuantity"
+                                                    min="1"
+                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                                    placeholder="Enter quantity"
+                                                    onChange={handleChange}
+                                                    value={inventoryData.inventoryQuantity || ""}
+                                                />
+                                            </div>
+                                        </div>
+                                        <p className="text-sm text-gray-400">
+                                            This will update the inventory quantity for the specified item
+                                        </p>
+                                    </div>
+                                )}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">Category</label>
                                     <select
@@ -158,6 +259,75 @@ function AddExpense() {
                                         onChange={handleChange}
                                         value={formData.date}
                                     />
+                                </div>
+                                <div className="space-y-4 mb-4">
+                                    <div className="flex items-center space-x-2">
+                                        <input
+                                            type="checkbox"
+                                            id="hasSalesTax"
+                                            checked={salesTaxData.hasSalesTax}
+                                            onChange={(e) => {
+                                                setSalesTaxData(prev => ({
+                                                    ...prev,
+                                                    hasSalesTax: e.target.checked,
+                                                    taxAmount: e.target.checked ? (formData.amount * (prev.taxRate / 100)) : 0
+                                                }));
+                                            }}
+                                            className="w-4 h-4 text-blue-500 bg-gray-800/50 border-gray-700 rounded"
+                                        />
+                                        <label htmlFor="hasSalesTax" className="text-sm font-medium text-gray-300">
+                                            Sales tax was paid
+                                        </label>
+                                    </div>
+
+                                    {salesTaxData.hasSalesTax && (
+                                        <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                                            <h3 className="text-lg font-medium text-white">Sales Tax Details</h3>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                        Tax Rate (%)
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        max="100"
+                                                        step="0.1"
+                                                        value={salesTaxData.taxRate}
+                                                        onChange={(e) => {
+                                                            const newRate = parseFloat(e.target.value) || 0;
+                                                            setSalesTaxData(prev => ({
+                                                                ...prev,
+                                                                taxRate: newRate,
+                                                                taxAmount: formData.amount * (newRate / 100)
+                                                            }));
+                                                        }}
+                                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+                                                        placeholder="Enter tax rate"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                        Tax Amount
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        value={formatAmount(salesTaxData.taxAmount)}
+                                                        readOnly
+                                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white cursor-not-allowed"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex justify-between text-sm">
+                                                <span className="text-gray-300">Subtotal:</span>
+                                                <span className="text-white">${formatAmount(formData.amount)}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm font-medium">
+                                                <span className="text-gray-300">Total with Tax:</span>
+                                                <span className="text-white">${formatAmount(parseFloat(formData.amount) + salesTaxData.taxAmount)}</span>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="flex justify-end gap-4 pt-4">
                                     <Link href="/expenses">

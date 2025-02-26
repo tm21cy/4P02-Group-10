@@ -52,6 +52,9 @@ export default function Header() {
                         <Link href="/dashboard">
                             <Button className="w-full bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 mb-2">Dashboard</Button>
                         </Link>
+                        <Link href="/inventory">
+                            <Button className="w-full bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/30 mb-2 py-2">Inventory</Button>
+                        </Link>
                         <Link href="/expenses">
                             <Button className="w-full bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 mb-2">Expenses</Button>
                         </Link>
@@ -81,6 +84,12 @@ export default function Header() {
                         <Link href="/dashboard">
                             <Button className="bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 transition-all duration-200 px-6">
                                 Dashboard
+                            </Button>
+                        </Link>
+
+                        <Link href="/inventory">
+                            <Button className="bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/30 transition-all duration-200 px-6 py-2">
+                                Inventory
                             </Button>
                         </Link>
 
