@@ -17,12 +17,12 @@ export default function Header() {
     return (
         <div className='p-5 flex justify-between items-center shadow-lg bg-[#1c2230] backdrop-blur-sm z-40 relative'>
             {/* Logo */}
-            <div className="flex flex-row items-center gap-2">
+            <Link href="/" className="flex flex-row items-center gap-2">
                 <svg 
                     width="40" 
                     height="40" 
                     viewBox="0 0 24 24" 
-                    className="text-[#00ffcc]"
+                        className="text-[#00ffcc]"
                     fill="none" 
                     stroke="currentColor" 
                     strokeWidth="2"
@@ -30,7 +30,7 @@ export default function Header() {
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                 </svg>
                 <span className='text-[#00ffcc] font-black text-4xl' style={{ fontFamily: "Calibri" }}>AccuTrack</span>
-            </div>
+            </Link>
 
             {/* Hamburger Icon */}
             <button className="md:hidden text-white" onClick={toggleMenu}>
