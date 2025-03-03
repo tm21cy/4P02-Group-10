@@ -124,7 +124,7 @@ function ManageIncome() {
                 </div>
 
                 {/* Show loading UI if incomes data is not ready */}
-                {!incomes || incomes.length === 0 ? (
+                {!incomes ? (
                     <div className="text-gray-300">Loading income data...</div>
                 ) : (
                     <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6">
