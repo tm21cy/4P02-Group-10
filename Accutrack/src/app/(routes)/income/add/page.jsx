@@ -1,10 +1,10 @@
 "use client"
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getInventoryItemBySkuId, postNewIncome, postNewTagIfNotExists } from "@/lib/db";
+import { getInventoryItemBySkuId, getValidTags, postNewIncome, postNewTagIfNotExists } from "@/lib/db";
 import { useUser } from "@clerk/nextjs";
 
 function AddIncome() {
@@ -34,13 +34,27 @@ function AddIncome() {
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [tags, setTags] = useState([])
 
     // Add helper function for formatting amounts
     const formatAmount = (amount) => {
         const num = parseFloat(amount);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
+    useEffect(() => {
+        console.log(`isLoaded: ${isLoaded}`)
+        console.log(`user: ${user}`)
+        if (!isLoaded) return console.error("User not loaded.")
+        if (!user) return console.error("No valid session.")
+        updateEntries()
+    }, [isLoaded, user])
 
+    const updateEntries = () => {
+        getValidTags(user.id).then(data => {
+            const filtered = data.map(e => e.name)
+            setTags(filtered)
+        })
+    }
     const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
@@ -250,15 +264,11 @@ function AddIncome() {
                                 value={formData.tag}
                             >
                                 <option value="">Select a category</option>
-                                <option value="Salary">Salary</option>
-                                <option value="Freelance">Freelance</option>
-                                <option value="Investment">Investment</option>
-                                <option value="Business">Business</option>
-                                <option value="Rental">Rental Income</option>
-                                <option value="Dividends">Dividends</option>
-                                <option value="Commission">Commission</option>
-                                <option value="Bonus">Bonus</option>
-                                <option value="Royalties">Royalties</option>
+                                {tags.map(tag => {
+                                    return <option key={tag} value={tag}>
+                                        {tag}
+                                    </option>
+                                })}
                                 <option value="Other">+ Add Custom Category</option>
                             </select>
                             

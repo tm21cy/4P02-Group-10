@@ -39,7 +39,7 @@ async function postNewExpense({amount, description, tag, date, userId}) {
 	})
 }
 
-async function postNewTagIfNotExists(tagName, userId) {
+async function postNewTagIfNotExists(tagName, userId, expense = 0) {
 	return prismaDb.tag.upsert({
 		where: {
 			name_userId: {
@@ -50,7 +50,8 @@ async function postNewTagIfNotExists(tagName, userId) {
 		update: {},
 		create: {
 			userId,
-			name: tagName
+			name: tagName,
+			expenseTag: expense
 		}
 	})
 }
@@ -90,14 +91,24 @@ async function getExpenses(user) {
 async function getValidTags(userId) {
 	return prismaDb.tag.findMany({
 		where: {
-			userId: {
-				OR: [
-					{ equals: userId },
-					{ equals: null }
-				]
-			}
+			OR: [
+				{ userId: userId },
+				{ userId: "global" }
+			]
 		}
-	})
+	});
+}
+
+async function getValidExpenseTags(userId) {
+	return prismaDb.tag.findMany({
+		where: {
+			OR: [
+				{ userId: userId },
+				{ userId: "global" }
+			],
+			expenseTag: 1
+		}
+	});
 }
 
 async function getInventoryItemBySkuId(skuId) {
@@ -218,4 +229,4 @@ async function deleteIncome(user, id) {
 
 /// FILE EXPORTS ///
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId }
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags }

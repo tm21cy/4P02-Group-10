@@ -33,6 +33,7 @@ model expense {
 model tag {  
   name     String    
   userId   String    @default("global")
+  expenseTag Int     @default(0)
   @@id([name, userId])
 }
 
