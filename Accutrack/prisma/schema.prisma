@@ -38,7 +38,12 @@ model tag {
 }
 
 model inventory {
-  skuId  Int    @id(map: "inventory_pk")
+  id     Int    @id @default(autoincrement())
+  skuId  Int   
+  userId String
   name   String
+  description String
   amount Int
+  unitPrice Decimal
+  category String
 }

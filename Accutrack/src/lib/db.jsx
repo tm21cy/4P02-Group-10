@@ -4,7 +4,7 @@ import prismaDb from './prisma'
 
 /// POST ROUTES ///
 
-async function postNewIncome({amount, description, tag, date, userId, deductFromInventory, inventoryItemId, inventoryQuantity}) {
+async function postNewIncome({ amount, description, tag, date, userId, deductFromInventory, inventoryItemId, inventoryQuantity }) {
 	const resolvedDate = new Date(date)
 	if (isNaN(resolvedDate.getDate())) {
 		throw new Error("Date string is not properly formatted.")
@@ -23,7 +23,7 @@ async function postNewIncome({amount, description, tag, date, userId, deductFrom
 	})
 }
 
-async function postNewExpense({amount, description, tag, date, userId}) {
+async function postNewExpense({ amount, description, tag, date, userId }) {
 	const resolvedDate = new Date(date)
 	if (isNaN(resolvedDate.getDate())) {
 		throw new Error("Date string is not properly formatted.")
@@ -52,6 +52,20 @@ async function postNewTagIfNotExists(tagName, userId, expense = 0) {
 			userId,
 			name: tagName,
 			expenseTag: expense
+		}
+	})
+}
+
+async function postNewInventoryItem(skuId, userId, name, description, amount, unitPrice, category) {
+	return prismaDb.inventory.create({
+		data: {
+			skuId,
+			userId,
+			name,
+			description,
+			amount,
+			unitPrice,
+			category
 		}
 	})
 }
@@ -111,7 +125,7 @@ async function getValidExpenseTags(userId) {
 	});
 }
 
-async function getInventoryItemBySkuId(skuId) {
+async function getInventoryItemBySkuId(skuId, userId) {
 	return prismaDb.inventory.findFirst({
 		where: {
 			skuId
@@ -121,7 +135,7 @@ async function getInventoryItemBySkuId(skuId) {
 
 /// PATCH ROUTES ///
 
-async function patchExpenses(user, id, {amount, description, tag, date}) {
+async function patchExpenses(user, id, { amount, description, tag, date }) {
 	console.log(id)
 	console.log(user)
 	const result = await prismaDb.expense.findFirst({
@@ -181,27 +195,29 @@ async function patchIncome(user, id, { amount, description, tag, date }) {
 	})
 }
 
-async function patchInventoryAmountSell(skuId) {
+async function patchInventoryAmountSell(skuId, userId, amount) {
 	return prismaDb.inventory.update({
 		where: {
-			skuId
+			skuId,
+			userId
 		},
 		data: {
 			amount: {
-				increment: -1
+				increment: -(amount)
 			}
 		}
 	})
 }
 
-async function patchInventoryAmountBuy(skuId) {
+async function patchInventoryAmountBuy(skuId, userId, amount) {
 	return prismaDb.inventory.update({
 		where: {
-			skuId
+			skuId,
+			userId
 		},
 		data: {
 			amount: {
-				increment: 1
+				increment: amount
 			}
 		}
 	})
@@ -229,4 +245,4 @@ async function deleteIncome(user, id) {
 
 /// FILE EXPORTS ///
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags }
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell }

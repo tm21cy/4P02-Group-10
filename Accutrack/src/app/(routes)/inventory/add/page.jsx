@@ -5,6 +5,7 @@ import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { postNewInventoryItem, postNewTagIfNotExists } from "@/lib/db";
 
 function AddInventory() {
     const { isSignedIn, user, isLoaded } = useUser();
@@ -25,18 +26,42 @@ function AddInventory() {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: type === "checkbox" ? checked : 
-                    (name === "quantity" || name === "unitPrice") ? parseFloat(value) || "" : value,
-            customCategory: name === "category" && value !== "Other" ? "" : prevData.customCategory
-        }));
+
+        setFormData(prevData => {
+            const updated = {
+                ...prevData,
+                [name]: type === "checkbox"
+                    ? checked
+                    : (name === "quantity" || name === "unitPrice")
+                        ? parseFloat(value) || ""
+                        : value
+            };
+
+            // Only reset customCategory if the category is being changed
+            if (name === "category" && value !== "Other") {
+                updated.customCategory = "";
+            }
+
+            return updated;
+        });
     };
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        // Frontend validation only
-        setMessage("Frontend ready for backend integration");
+        if (parseInt(formData.quantity) <= 0) return setMessage("You can't add negative/zero items to your inventory!")
+        if (parseFloat(formData.unitPrice) <= 0) return setMessage("Inventory items must have a positive, non-zero price!")
+        if (formData.itemId.length == 0
+            || formData.name.length == 0
+            || formData.description.length == 0
+            || formData.quantity.length == 0
+            || (formData.category.length == 0 && formData.customCategory.length == 0)
+        ) return setMessage("Missing fields - please fully fill out the form!")
+        let category = formData.category
+        if (formData.customCategory.length > 0) category = formData.customCategory
+        if (formData.customCategory.length > 0) await postNewTagIfNotExists(formData.customCategory, user.id, 2)
+        await postNewInventoryItem(parseInt(formData.itemId), user.id, formData.name, formData.description, parseInt(formData.quantity), parseFloat(formData.unitPrice), category)
+        return setMessage("Added inventory item!")
     };
 
     return (

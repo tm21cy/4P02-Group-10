@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getInventoryItemBySkuId, getValidTags, postNewIncome, postNewTagIfNotExists } from "@/lib/db";
+import { getInventoryItemBySkuId, getValidTags, patchInventoryAmountSell, postNewIncome, postNewTagIfNotExists } from "@/lib/db";
 import { useUser } from "@clerk/nextjs";
 
 function AddIncome() {
@@ -119,16 +119,15 @@ function AddIncome() {
         await postNewTagIfNotExists(updatedFormData.tag, user.id)
         try {
             let mergedData = {}
-            if (inventoryData.deductFromInventory) mergedData = { ...formData, ...inventoryData }
-            else mergedData = {
-                ...formData,
-                deductFromInventory: false,
-                inventoryItemId: null,
-                inventoryQuantity: null
+            if (inventoryData.deductFromInventory) {
+                mergedData = { ...formData, ...inventoryData }
+                const invItem = await getInventoryItemBySkuId(inventoryData.inventoryItemId, user.id)
+                if (!invItem) return setMessage("Inventory item not found")
+                else if (invItem.amount <= 0) return setMessage("No remaining inventory to deduct!")
+                else if (invItem.amount < inventoryData.inventoryQuantity) return setMessage("You don't have enough of this item to sell!")
+                else await patchInventoryAmountSell(invItem.skuId, invItem.userId, inventoryData.inventoryQuantity)
             }
-            const invItem = await getInventoryItemBySkuId()
-            if (inventoryData.deductFromInventory && !invItem) setMessage("Inventory item not found")
-            else if (inventoryData.deductFromInventory && invItem.amount <= 0) setMessage("No remaining inventory to deduct!")
+            
             await postNewIncome(updatedFormData);
             setMessage("Income added successfully!");
             // Reset form data
