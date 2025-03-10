@@ -128,7 +128,16 @@ async function getValidExpenseTags(userId) {
 async function getInventoryItemBySkuId(skuId, userId) {
 	return prismaDb.inventory.findFirst({
 		where: {
-			skuId
+			skuId,
+			userId
+		}
+	})
+}
+
+async function getInventoryByUser(userId) {
+	return prismaDb.inventory.findMany({
+		where: {
+			userId
 		}
 	})
 }
@@ -245,4 +254,4 @@ async function deleteIncome(user, id) {
 
 /// FILE EXPORTS ///
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell }
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser }

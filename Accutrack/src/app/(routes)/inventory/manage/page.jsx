@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { getInventoryByUser } from "@/lib/db";
 
 function ManageInventory() {
     const { isSignedIn, user, isLoaded } = useUser();
@@ -12,6 +13,20 @@ function ManageInventory() {
     const [editingItem, setEditingItem] = useState(null);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("")
+
+    useEffect(() => {
+            console.log(`isLoaded: ${isLoaded}`)
+            console.log(`user: ${user}`)
+            if (!isLoaded) return console.error("User not loaded.")
+            if (!user) return console.error("No valid session.")
+            updateEntries()
+        }, [isLoaded, user])
+    
+    const updateEntries = () => {
+        getInventoryByUser(user.id).then(data => {
+            setInventory(data)
+        })
+    }
 
     const handleEdit = (item) => {
         setEditingItem({
@@ -69,7 +84,7 @@ function ManageInventory() {
                                         <tbody>
                                             {inventory.map(item => (
                                                 <tr key={item.id} className="border-b border-gray-800 hover:bg-gray-800/30">
-                                                    <td className="p-4 text-gray-300">{item.itemId}</td>
+                                                    <td className="p-4 text-gray-300">{item.skuId}</td>
                                                     <td className="p-4 text-gray-300">{item.name}</td>
                                                     <td className="p-4">
                                                         <span className={`px-3 py-1 rounded-full text-xs font-medium
@@ -82,7 +97,7 @@ function ManageInventory() {
                                                             {item.category}
                                                         </span>
                                                     </td>
-                                                    <td className="p-4 text-gray-300">{item.quantity}</td>
+                                                    <td className="p-4 text-gray-300">{item.amount}</td>
                                                     <td className="p-4 text-purple-300">${item.unitPrice}</td>
                                                     <td className="p-4 text-right space-x-2">
                                                         <Button
@@ -113,7 +128,7 @@ function ManageInventory() {
                                                     <p className="text-gray-300 text-sm">ID: {item.itemId}</p>
                                                     <p className="text-white font-medium">{item.name}</p>
                                                     <p className="text-purple-300 text-lg font-semibold">
-                                                        ${item.unitPrice} × {item.quantity}
+                                                        ${item.unitPrice} × {item.amount}
                                                     </p>
                                                 </div>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium
@@ -187,7 +202,7 @@ function ManageInventory() {
                                     <input
                                         type="number"
                                         min="0"
-                                        value={editingItem.quantity}
+                                        value={editingItem.amount}
                                         onChange={e => setEditingItem({ ...editingItem, quantity: parseFloat(e.target.value) })}
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                     />
