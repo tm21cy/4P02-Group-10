@@ -125,6 +125,22 @@ async function getValidExpenseTags(userId) {
 	});
 }
 
+async function getValidInventoryTags(userId) {
+	return prismaDb.tag.findMany({
+		where: {
+			OR: [
+				{
+					userId: userId
+				},
+				{
+					userId: "global"
+				}
+			],
+			expenseTag: 2
+		}
+	})
+}
+
 async function getInventoryItemBySkuId(skuId, userId) {
 	return prismaDb.inventory.findFirst({
 		where: {
@@ -232,6 +248,23 @@ async function patchInventoryAmountBuy(skuId, userId, amount) {
 	})
 }
 
+async function patchInventoryItemDetails(id, skuId, userId, name, description, amount, unitPrice, category) {
+	return prismaDb.inventory.update({
+		where: {
+			id
+		},
+		data: {
+			skuId,
+			userId,
+			name,
+			description,
+			amount,
+			unitPrice,
+			category
+		}
+	})
+}
+
 /// DELETE ROUTES ///
 
 async function deleteExpenses(user, id) {
@@ -252,6 +285,14 @@ async function deleteIncome(user, id) {
 	})
 }
 
+async function deleteInventoryItem(id) {
+	return prismaDb.inventory.delete({
+		where: {
+			id
+		}
+	})
+}
+
 /// FILE EXPORTS ///
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser }
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser, patchInventoryItemDetails, deleteInventoryItem, getValidInventoryTags }

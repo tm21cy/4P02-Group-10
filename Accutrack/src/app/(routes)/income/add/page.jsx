@@ -122,9 +122,18 @@ function AddIncome() {
             if (inventoryData.deductFromInventory) {
                 mergedData = { ...formData, ...inventoryData }
                 const invItem = await getInventoryItemBySkuId(parseInt(inventoryData.inventoryItemId), user.id)
-                if (!invItem) return setMessage("Inventory item not found")
-                else if (invItem.amount <= 0) return setMessage("No remaining inventory to deduct!")
-                else if (invItem.amount < inventoryData.inventoryQuantity) return setMessage("You don't have enough of this item to sell!")
+                if (!invItem) {
+                    setLoading(false)
+                    return setMessage("Inventory item not found.")
+                }
+                else if (invItem.amount <= 0) {
+                    setLoading(false)
+                    return setMessage("No remaining inventory to deduct!")
+                }
+                else if (invItem.amount < inventoryData.inventoryQuantity) {
+                    setLoading(false)
+                    return setMessage("You don't have enough of this item to sell!")
+                }
                 else await patchInventoryAmountSell(invItem.skuId, invItem.userId, inventoryData.inventoryQuantity)
             }
             
