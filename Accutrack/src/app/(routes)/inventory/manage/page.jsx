@@ -11,6 +11,7 @@ function ManageInventory() {
     const [inventory, setInventory] = useState([]); // Will be populated by backend
     const [editingItem, setEditingItem] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("")
 
     const handleEdit = (item) => {
         setEditingItem({

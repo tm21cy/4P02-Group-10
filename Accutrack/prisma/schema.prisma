@@ -8,13 +8,16 @@ datasource db {
 }
 
 model income {
-  id          Int      @id @default(autoincrement())
-  userId      String
-  amount      Decimal
-  description String
-  tag         String?
-  date        DateTime
-  tagName     tag?     @relation(fields: [tag], references: [name])
+  id                    Int      @id @default(autoincrement())
+  userId                String
+  amount                Decimal
+  description           String
+  tag                   String?
+  date                  DateTime
+  deduct_from_inventory Boolean  @default(false)
+  inventory_skuId       Int?
+  inventory_qty         Int?
+  tagName               String?
 }
 
 model expense {
@@ -24,19 +27,17 @@ model expense {
   description String
   tag         String?
   date        DateTime
-  tagName     tag?     @relation(fields: [tag], references: [name])
+  tagName     String?
 }
 
-model tag {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  userId   String?
-  expenses expense[]
-  incomes  income[]
+model tag {  
+  name     String    
+  userId   String    @default("global")
+  @@id([name, userId])
 }
 
 model inventory {
-  skuId  Int     @id(map: "inventory_pk")
+  skuId  Int    @id(map: "inventory_pk")
   name   String
   amount Int
 }

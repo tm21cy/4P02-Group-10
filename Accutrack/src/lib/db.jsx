@@ -2,7 +2,9 @@
 
 import prismaDb from './prisma'
 
-async function postNewIncome({amount, description, tag, date, userId}) {
+/// POST ROUTES ///
+
+async function postNewIncome({amount, description, tag, date, userId, deductFromInventory, inventoryItemId, inventoryQuantity}) {
 	const resolvedDate = new Date(date)
 	if (isNaN(resolvedDate.getDate())) {
 		throw new Error("Date string is not properly formatted.")
@@ -13,7 +15,10 @@ async function postNewIncome({amount, description, tag, date, userId}) {
 			description,
 			tag,
 			date: resolvedDate,
-			userId
+			userId,
+			deduct_from_inventory: deductFromInventory,
+			inventory_skuId: inventoryItemId,
+			inventory_qty: inventoryQuantity
 		}
 	})
 }
@@ -33,6 +38,24 @@ async function postNewExpense({amount, description, tag, date, userId}) {
 		}
 	})
 }
+
+async function postNewTagIfNotExists(tagName, userId) {
+	return prismaDb.tag.upsert({
+		where: {
+			name_userId: {
+				userId,
+				name: tagName
+			}
+		},
+		update: {},
+		create: {
+			userId,
+			name: tagName
+		}
+	})
+}
+
+/// GET ROUTES ///
 
 async function getIncome(user) {
 	return prismaDb.income.findMany({
@@ -64,6 +87,29 @@ async function getExpenses(user) {
 	})
 }
 
+async function getValidTags(userId) {
+	return prismaDb.tag.findMany({
+		where: {
+			userId: {
+				OR: [
+					{ equals: userId },
+					{ equals: null }
+				]
+			}
+		}
+	})
+}
+
+async function getInventoryItemBySkuId(skuId) {
+	return prismaDb.inventory.findFirst({
+		where: {
+			skuId
+		}
+	})
+}
+
+/// PATCH ROUTES ///
+
 async function patchExpenses(user, id, {amount, description, tag, date}) {
 	console.log(id)
 	console.log(user)
@@ -90,15 +136,6 @@ async function patchExpenses(user, id, {amount, description, tag, date}) {
 			description,
 			tag,
 			date: resolvedDate
-		}
-	})
-}
-
-async function deleteExpenses(user, id) {
-	return prismaDb.expense.delete({
-		where: {
-			id,
-			userId: user
 		}
 	})
 }
@@ -133,6 +170,43 @@ async function patchIncome(user, id, { amount, description, tag, date }) {
 	})
 }
 
+async function patchInventoryAmountSell(skuId) {
+	return prismaDb.inventory.update({
+		where: {
+			skuId
+		},
+		data: {
+			amount: {
+				increment: -1
+			}
+		}
+	})
+}
+
+async function patchInventoryAmountBuy(skuId) {
+	return prismaDb.inventory.update({
+		where: {
+			skuId
+		},
+		data: {
+			amount: {
+				increment: 1
+			}
+		}
+	})
+}
+
+/// DELETE ROUTES ///
+
+async function deleteExpenses(user, id) {
+	return prismaDb.expense.delete({
+		where: {
+			id,
+			userId: user
+		}
+	})
+}
+
 async function deleteIncome(user, id) {
 	return prismaDb.income.delete({
 		where: {
@@ -142,4 +216,6 @@ async function deleteIncome(user, id) {
 	})
 }
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome }
+/// FILE EXPORTS ///
+
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId }

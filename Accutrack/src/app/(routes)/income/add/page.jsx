@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { postNewIncome } from "@/lib/db";
+import { getInventoryItemBySkuId, postNewIncome, postNewTagIfNotExists } from "@/lib/db";
 import { useUser } from "@clerk/nextjs";
 
 function AddIncome() {
@@ -21,8 +21,8 @@ function AddIncome() {
     // Separate state for inventory fields
     const [inventoryData, setInventoryData] = useState({
         deductFromInventory: false,
-        inventoryItemId: "",
-        inventoryQuantity: ""
+        inventoryItemId: 0,
+        inventoryQuantity: 0
     });
 
     // Add state for sales tax
@@ -42,39 +42,55 @@ function AddIncome() {
     };
 
     const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
+    const { name, value, type, checked } = e.target;
 
-        if (name === "amount") {
-            setFormData(prev => {
-                const newAmount = parseFloat(value) || 0;
-                // Update tax amount if sales tax is enabled
-                if (salesTaxData.hasSalesTax) {
-                    setSalesTaxData(prev => ({
-                        ...prev,
-                        taxAmount: newAmount * (prev.taxRate / 100)
-                    }));
-                }
-                return { ...prev, [name]: newAmount };
-            });
-            return;
-        }
+    if (name === "amount") {
+        setFormData(prev => {
+            const newAmount = parseFloat(value) || 0;
+            if (salesTaxData.hasSalesTax) {
+                setSalesTaxData(prev => ({
+                    ...prev,
+                    taxAmount: newAmount * (prev.taxRate / 100)
+                }));
+            }
+            return { ...prev, [name]: newAmount };
+        });
+        return;
+    }
 
-        // Handle inventory-related fields separately
-        if (name === "deductFromInventory" || name === "inventoryItemId" || name === "inventoryQuantity") {
-            setInventoryData(prev => ({
-                ...prev,
-                [name]: type === "checkbox" ? checked : value
-            }));
-            return;
-        }
-
-        // Handle original form fields
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-            customTag: name === "tag" && value !== "Other" ? "" : prevData.customTag
+    if (name === "deductFromInventory") {
+        // Ensure boolean value for checkbox
+        setInventoryData(prev => ({
+            ...prev,
+            [name]: checked
         }));
-    };
+        return;
+    }
+
+    if (name === "inventoryItemId" || name === "inventoryQuantity") {
+        // Ensure correct data type and default to empty string to avoid null issues
+        setInventoryData(prev => ({
+            ...prev,
+            [name]: value || ""
+        }));
+        return;
+    }
+
+    setFormData(prevData => {
+        const updatedFormData = { ...prevData, [name]: value };
+
+        // Only reset `customTag` if the user selects something other than "Other"
+        if (name === "tag" && value !== "Other") {
+            updatedFormData.customTag = "";
+        }
+
+        return updatedFormData;
+    });
+    console.log(formData)
+    console.log(inventoryData)
+};
+
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -86,8 +102,19 @@ function AddIncome() {
             userId: user.id,
             tag: formData.tag === "Other" ? formData.customTag : formData.tag
         };
-
+        await postNewTagIfNotExists(updatedFormData.tag, user.id)
         try {
+            let mergedData = {}
+            if (inventoryData.deductFromInventory) mergedData = { ...formData, ...inventoryData }
+            else mergedData = {
+                ...formData,
+                deductFromInventory: false,
+                inventoryItemId: null,
+                inventoryQuantity: null
+            }
+            const invItem = await getInventoryItemBySkuId()
+            if (inventoryData.deductFromInventory && !invItem) setMessage("Inventory item not found")
+            else if (inventoryData.deductFromInventory && invItem.amount <= 0) setMessage("No remaining inventory to deduct!")
             await postNewIncome(updatedFormData);
             setMessage("Income added successfully!");
             // Reset form data
@@ -182,7 +209,7 @@ function AddIncome() {
                                             Item ID
                                         </label>
                                         <input
-                                            type="text"
+                                            type="number"
                                             name="inventoryItemId"
                                             className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
                                             placeholder="Enter inventory item ID"
