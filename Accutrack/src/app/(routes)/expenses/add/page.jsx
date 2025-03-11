@@ -5,7 +5,7 @@ import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { getValidExpenseTags, postNewExpense, postNewTagIfNotExists, getInventoryItemBySkuId } from "@/lib/db";
+import { getValidExpenseTags, postNewExpense, postNewTagIfNotExists, getInventoryItemBySkuId, patchInventoryAmountBuy, postNewSalesTax } from "@/lib/db";
 
 // Page for adding new expenses
 function AddExpense() {
@@ -22,8 +22,8 @@ function AddExpense() {
     // Separate state for inventory fields
     const [inventoryData, setInventoryData] = useState({
         addToInventory: false,
-        inventoryItemId: "",
-        inventoryQuantity: ""
+        inventoryItemId: 0,
+        inventoryQuantity: 0
     });
 
     // Add state for sales tax
@@ -75,7 +75,7 @@ function AddExpense() {
             return;
         }
 
-        if (name === "deductFromInventory") {
+        if (name === "addToInventory") {
             // Ensure boolean value for checkbox
             setInventoryData(prev => ({
                 ...prev,
@@ -120,17 +120,19 @@ function AddExpense() {
         await postNewTagIfNotExists(updatedFormData.tag, user.id, 1)
         try {
             let mergedData = {}
-            if (inventoryData.deductFromInventory) mergedData = { ...formData, ...inventoryData }
-            else mergedData = {
-                ...formData,
-                deductFromInventory: false,
-                inventoryItemId: null,
-                inventoryQuantity: null
+            if (inventoryData.addToInventory) {
+                mergedData = { ...formData, ...inventoryData }
+                const invItem = await getInventoryItemBySkuId(parseInt(inventoryData.inventoryItemId), user.id)
+                if (!invItem) {
+                    setLoading(false)
+                    return setMessage("Inventory item not found.")
+                }
+                else await patchInventoryAmountBuy(invItem.skuId, invItem.userId, parseInt(inventoryData.inventoryQuantity))
             }
-            const invItem = await getInventoryItemBySkuId()
-            if (inventoryData.deductFromInventory && !invItem) setMessage("Inventory item not found")
-            else if (inventoryData.deductFromInventory && invItem.amount <= 0) setMessage("No remaining inventory to deduct!")
-            await postNewExpense(updatedFormData);
+            const expense = await postNewExpense(updatedFormData);
+            if (salesTaxData.hasSalesTax) {
+                await postNewSalesTax(user.id, expense.id, salesTaxData.taxRate, salesTaxData.taxAmount, 1)
+            }
             setMessage("Expense added successfully!");
             // Reset form data
             setFormData({
@@ -222,7 +224,7 @@ function AddExpense() {
                                                     Item ID
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name="inventoryItemId"
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                                     placeholder="Enter inventory item ID"

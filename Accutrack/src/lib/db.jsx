@@ -21,6 +21,7 @@ async function postNewIncome({ amount, description, tag, date, userId, deductFro
 			inventory_qty: inventoryQuantity
 		}
 	})
+	return result
 }
 
 async function postNewExpense({ amount, description, tag, date, userId }) {
@@ -37,6 +38,7 @@ async function postNewExpense({ amount, description, tag, date, userId }) {
 			userId
 		}
 	})
+	return result
 }
 
 async function postNewTagIfNotExists(tagName, userId, expense = 0) {
@@ -66,6 +68,18 @@ async function postNewInventoryItem(skuId, userId, name, description, amount, un
 			amount,
 			unitPrice,
 			category
+		}
+	})
+}
+
+async function postNewSalesTax(userId, expenseId, taxRate, taxAmount, expenseFlag = 0) {
+	return prismaDb.salestax.create({
+		data: {
+			userId,
+			expenseId,
+			expenseFlag,
+			taxRate,
+			taxAmount
 		}
 	})
 }
@@ -221,10 +235,11 @@ async function patchIncome(user, id, { amount, description, tag, date }) {
 }
 
 async function patchInventoryAmountSell(skuId, userId, amount) {
+	const invItem = await getInventoryItemBySkuId(skuId, userId)
+	if (!invItem) throw new Error("Could not locate inventory item.")
 	return prismaDb.inventory.update({
 		where: {
-			skuId,
-			userId
+			id: invItem.id
 		},
 		data: {
 			amount: {
@@ -235,10 +250,11 @@ async function patchInventoryAmountSell(skuId, userId, amount) {
 }
 
 async function patchInventoryAmountBuy(skuId, userId, amount) {
+	const invItem = await getInventoryItemBySkuId(skuId, userId)
+	if (!invItem) throw new Error("Could not locate inventory item.")
 	return prismaDb.inventory.update({
 		where: {
-			skuId,
-			userId
+			id: invItem.id
 		},
 		data: {
 			amount: {
@@ -295,4 +311,4 @@ async function deleteInventoryItem(id) {
 
 /// FILE EXPORTS ///
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser, patchInventoryItemDetails, deleteInventoryItem, getValidInventoryTags }
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser, patchInventoryItemDetails, deleteInventoryItem, getValidInventoryTags, postNewSalesTax }
