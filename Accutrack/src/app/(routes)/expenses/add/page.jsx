@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { postNewExpense } from "@/lib/db";
+import { getValidExpenseTags, postNewExpense, postNewTagIfNotExists, getInventoryItemBySkuId, patchInventoryAmountBuy, postNewSalesTax } from "@/lib/db";
 
 // Page for adding new expenses
 function AddExpense() {
@@ -22,8 +22,8 @@ function AddExpense() {
     // Separate state for inventory fields
     const [inventoryData, setInventoryData] = useState({
         addToInventory: false,
-        inventoryItemId: "",
-        inventoryQuantity: ""
+        inventoryItemId: 0,
+        inventoryQuantity: 0
     });
 
     // Add state for sales tax
@@ -35,6 +35,22 @@ function AddExpense() {
 
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [tags, setTags] = useState([])
+
+    useEffect(() => {
+        console.log(`isLoaded: ${isLoaded}`)
+        console.log(`user: ${user}`)
+        if (!isLoaded) return console.error("User not loaded.")
+        if (!user) return console.error("No valid session.")
+        updateEntries()
+    }, [isLoaded, user])
+
+    const updateEntries = () => {
+        getValidExpenseTags(user.id).then(data => {
+            const filtered = data.map(e => e.name)
+            setTags(filtered)
+        })
+    }
 
     // Add helper function for formatting amounts
     const formatAmount = (amount) => {
@@ -48,7 +64,6 @@ function AddExpense() {
         if (name === "amount") {
             setFormData(prev => {
                 const newAmount = parseFloat(value) || 0;
-                // Update tax amount if sales tax is enabled
                 if (salesTaxData.hasSalesTax) {
                     setSalesTaxData(prev => ({
                         ...prev,
@@ -60,21 +75,36 @@ function AddExpense() {
             return;
         }
 
-        // Handle inventory-related fields separately
-        if (name === "addToInventory" || name === "inventoryItemId" || name === "inventoryQuantity") {
+        if (name === "addToInventory") {
+            // Ensure boolean value for checkbox
             setInventoryData(prev => ({
                 ...prev,
-                [name]: type === "checkbox" ? checked : value
+                [name]: checked
             }));
             return;
         }
 
-        // Handle original form fields
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-            customTag: name === "tag" && value !== "Other" ? "" : prevData.customTag
-        }));
+        if (name === "inventoryItemId" || name === "inventoryQuantity") {
+            // Ensure correct data type and default to empty string to avoid null issues
+            setInventoryData(prev => ({
+                ...prev,
+                [name]: value || ""
+            }));
+            return;
+        }
+
+        setFormData(prevData => {
+            const updatedFormData = { ...prevData, [name]: value };
+
+            // Only reset `customTag` if the user selects something other than "Other"
+            if (name === "tag" && value !== "Other") {
+                updatedFormData.customTag = "";
+            }
+
+            return updatedFormData;
+        });
+        console.log(formData)
+        console.log(inventoryData)
     };
 
     const handleSubmit = async (event) => {
@@ -82,14 +112,27 @@ function AddExpense() {
         setLoading(true);
         setMessage("");
 
-        const updatedFormData = { 
-            ...formData, 
+        const updatedFormData = {
+            ...formData,
             userId: user.id,
             tag: formData.tag === "Other" ? formData.customTag : formData.tag
         };
-
+        await postNewTagIfNotExists(updatedFormData.tag, user.id, 1)
         try {
-            await postNewExpense(updatedFormData);
+            let mergedData = {}
+            if (inventoryData.addToInventory) {
+                mergedData = { ...formData, ...inventoryData }
+                const invItem = await getInventoryItemBySkuId(parseInt(inventoryData.inventoryItemId), user.id)
+                if (!invItem) {
+                    setLoading(false)
+                    return setMessage("Inventory item not found.")
+                }
+                else await patchInventoryAmountBuy(invItem.skuId, invItem.userId, parseInt(inventoryData.inventoryQuantity))
+            }
+            const expense = await postNewExpense(updatedFormData);
+            if (salesTaxData.hasSalesTax) {
+                await postNewSalesTax(user.id, expense.id, salesTaxData.taxRate, salesTaxData.taxAmount, 1)
+            }
             setMessage("Expense added successfully!");
             // Reset form data
             setFormData({
@@ -102,7 +145,7 @@ function AddExpense() {
             });
             // Reset inventory data
             setInventoryData({
-                addToInventory: false,
+                deductFromInventory: false,
                 inventoryItemId: "",
                 inventoryQuantity: ""
             });
@@ -181,7 +224,7 @@ function AddExpense() {
                                                     Item ID
                                                 </label>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name="inventoryItemId"
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                                     placeholder="Enter inventory item ID"
@@ -219,17 +262,11 @@ function AddExpense() {
                                         value={formData.tag}
                                     >
                                         <option value="">Select a category</option>
-                                        <option value="Groceries">Groceries</option>
-                                        <option value="Transport">Transport</option>
-                                        <option value="Bills">Bills</option>
-                                        <option value="Entertainment">Entertainment</option>
-                                        <option value="Food">Food</option>
-                                        <option value="Shopping">Shopping</option>
-                                        <option value="Healthcare">Healthcare</option>
-                                        <option value="Education">Education</option>
-                                        <option value="Housing">Housing</option>
-                                        <option value="Utilities">Utilities</option>
-                                        <option value="Insurance">Insurance</option>
+                                        {tags.map(tag => {
+                                            return <option key={tag} value={tag}>
+                                                {tag}
+                                            </option>
+                                        })}
                                         <option value="Other">+ Add Custom Category</option>
                                     </select>
                                     

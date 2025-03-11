@@ -1,16 +1,37 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { deleteInventoryItem, getInventoryByUser, getValidInventoryTags, patchInventoryItemDetails } from "@/lib/db";
 
 function ManageInventory() {
     const { isSignedIn, user, isLoaded } = useUser();
     const [inventory, setInventory] = useState([]); // Will be populated by backend
     const [editingItem, setEditingItem] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("")
+    const [tags, setTags] = useState([])
+
+    useEffect(() => {
+            console.log(`isLoaded: ${isLoaded}`)
+            console.log(`user: ${user}`)
+            if (!isLoaded) return console.error("User not loaded.")
+            if (!user) return console.error("No valid session.")
+            updateEntries()
+        }, [isLoaded, user])
+    
+    const updateEntries = () => {
+        getValidInventoryTags(user.id).then(data => {
+            const filtered = data.map(e => e.name)
+            setTags(filtered)
+        })
+        getInventoryByUser(user.id).then(data => {
+            setInventory(data)
+        })
+    }
 
     const handleEdit = (item) => {
         setEditingItem({
@@ -20,14 +41,17 @@ function ManageInventory() {
     };
 
     const handleDelete = async (id) => {
-        // Frontend only - backend integration will be done by others
-        console.log("Delete item:", id);
+        await deleteInventoryItem(id)
+        updateEntries()
+        setEditingItem(null)
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
-        // Frontend only - backend integration will be done by others
-        setEditingItem(null);
+        await patchInventoryItemDetails(editingItem.id, editingItem.skuId, user.id, editingItem.name, editingItem.description, editingItem.amount, editingItem.unitPrice, editingItem.category)
+        setMessage("Updated successfully!")
+        updateEntries()
+        setEditingItem(null)
     };
 
     return (
@@ -68,7 +92,7 @@ function ManageInventory() {
                                         <tbody>
                                             {inventory.map(item => (
                                                 <tr key={item.id} className="border-b border-gray-800 hover:bg-gray-800/30">
-                                                    <td className="p-4 text-gray-300">{item.itemId}</td>
+                                                    <td className="p-4 text-gray-300">{item.skuId}</td>
                                                     <td className="p-4 text-gray-300">{item.name}</td>
                                                     <td className="p-4">
                                                         <span className={`px-3 py-1 rounded-full text-xs font-medium
@@ -81,7 +105,7 @@ function ManageInventory() {
                                                             {item.category}
                                                         </span>
                                                     </td>
-                                                    <td className="p-4 text-gray-300">{item.quantity}</td>
+                                                    <td className="p-4 text-gray-300">{item.amount}</td>
                                                     <td className="p-4 text-purple-300">${item.unitPrice}</td>
                                                     <td className="p-4 text-right space-x-2">
                                                         <Button
@@ -112,7 +136,7 @@ function ManageInventory() {
                                                     <p className="text-gray-300 text-sm">ID: {item.itemId}</p>
                                                     <p className="text-white font-medium">{item.name}</p>
                                                     <p className="text-purple-300 text-lg font-semibold">
-                                                        ${item.unitPrice} × {item.quantity}
+                                                        ${item.unitPrice} × {item.amount}
                                                     </p>
                                                 </div>
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium
@@ -186,7 +210,7 @@ function ManageInventory() {
                                     <input
                                         type="number"
                                         min="0"
-                                        value={editingItem.quantity}
+                                        value={editingItem.amount}
                                         onChange={e => setEditingItem({ ...editingItem, quantity: parseFloat(e.target.value) })}
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                     />
@@ -216,12 +240,11 @@ function ManageInventory() {
                                     onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                 >
-                                    <option value="Raw Materials">Raw Materials</option>
-                                    <option value="Finished Goods">Finished Goods</option>
-                                    <option value="Work in Progress">Work in Progress</option>
-                                    <option value="Maintenance">Maintenance Items</option>
-                                    <option value="Office Supplies">Office Supplies</option>
-                                    <option value="Other">Other</option>
+                                    {tags.map(tag => {
+                                        return <option key={tag} value={tag}>
+                                            {tag}
+                                        </option>
+                                    })}
                                 </select>
                             </div>
 
