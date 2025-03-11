@@ -52,14 +52,16 @@ const generatePDF = (data, reportType) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.width;
     
-    // Add header
+    
     doc.setFontSize(20);
     doc.text('AccuTrack Financial Report', pageWidth / 2, 20, { align: 'center' });
     doc.setFontSize(16);
     doc.text(reportType, pageWidth / 2, 30, { align: 'center' });
     doc.setFontSize(12);
     
-    if (data.dateRange) {
+    if (reportType === "Inventory Summary") {
+      doc.text(`Generated on: ${formatDate(data.generationDate)}`, pageWidth / 2, 40, { align: 'center' });
+    } else if (data.dateRange) {
       doc.text(`Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, pageWidth / 2, 40, { align: 'center' });
     }
 
@@ -186,14 +188,27 @@ Net Taxable Income,${data.netIncome}`;
       }));
       break;
     case "Inventory Summary":
-      fields = ['Item Name', 'SKU', 'Quantity', 'Unit Cost', 'Total Value'];
-      csvData = data.inventory.map(item => ({
-        'Item Name': item.name,
-        'SKU': item.skuId,
-        'Quantity': item.quantity,
-        'Unit Cost': item.unitPrice,
-        'Total Value': item.totalValue
-      }));
+      fields = ['Generation Date', 'Item Name', 'SKU', 'Quantity', 'Unit Cost', 'Total Value', 'Category'];
+      csvData = [
+        {
+          'Generation Date': formatDate(data.generationDate),
+          'Item Name': '',
+          'SKU': '',
+          'Quantity': '',
+          'Unit Cost': '',
+          'Total Value': '',
+          'Category': ''
+        },
+        ...data.inventory.map(item => ({
+          'Generation Date': '',
+          'Item Name': item.name,
+          'SKU': item.skuId,
+          'Quantity': item.quantity,
+          'Unit Cost': item.unitPrice,
+          'Total Value': item.totalValue,
+          'Category': item.category || 'Uncategorized'
+        }))
+      ];
       break;
   }
   
@@ -227,7 +242,7 @@ const generateIncomeStatement = (incomeData, expenseData) => {
 const generateTransactionsSummary = (transactions, type) => {
   const total = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
   
-  // Use tag instead of type for categorization
+  // Use tag for categorization
   const processedTransactions = transactions.map(t => ({
     id: t.id,
     date: t.date,
@@ -275,11 +290,13 @@ const generateInventorySummary = (inventoryData) => {
   }));
 
   const total = processedInventory.reduce((sum, item) => sum + item.totalValue, 0);
+  const generationDate = new Date();
 
   return {
     reportType: "Inventory Summary",
     inventory: processedInventory,
     total,
+    generationDate
   };
 };
 
@@ -291,7 +308,7 @@ function ReportsPage() {
   const [sortBy, setSortBy] = useState("date-desc");
   const [category, setCategory] = useState("all");
   const [format, setFormat] = useState("pdf");
-  const [categories, setCategories] = useState({ income: [], expense: [] });
+  const [categories, setCategories] = useState({ income: [], expense: [], inventory: [] });
   const [previewData, setPreviewData] = useState(null);
 
   useEffect(() => {
@@ -303,24 +320,28 @@ function ReportsPage() {
     try {
       const incomeData = await getIncome(user.id);
       const expenseData = await getExpenses(user.id);
+      const inventoryData = await getInventoryByUser(user.id);
 
-      // Extract unique categories from tags
+      // Extract unique categories from tags for income/expense and category for inventory
       const incomeCategories = [...new Set(incomeData.map(inc => inc.tag))].filter(Boolean);
       const expenseCategories = [...new Set(expenseData.map(exp => exp.tag))].filter(Boolean);
+      const inventoryCategories = [...new Set(inventoryData.map(item => item.category))].filter(Boolean);
 
       setCategories({
         income: incomeCategories,
-        expense: expenseCategories
+        expense: expenseCategories,
+        inventory: inventoryCategories
       });
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
   };
 
-  const filterTransactions = (transactions) => {
+  const filterTransactions = (transactions, isInventory = false) => {
     let filtered = [...transactions];
 
-    if (startDate && endDate) {
+    // Only apply date filtering for non-inventory items
+    if (!isInventory && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       end.setHours(23, 59, 59);
@@ -331,25 +352,65 @@ function ReportsPage() {
       });
     }
 
+    // Apply category filtering
     if (category !== "all") {
-      filtered = filtered.filter(t => t.category === category);
+      filtered = filtered.filter(t => 
+        isInventory ? t.category === category : t.tag === category
+      );
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "date-desc":
-          return new Date(b.date) - new Date(a.date);
-        case "date-asc":
-          return new Date(a.date) - new Date(b.date);
-        case "amount-desc":
-          return Number(b.amount) - Number(a.amount);
-        case "amount-asc":
-          return Number(a.amount) - Number(b.amount);
-        case "category":
-          return a.category.localeCompare(b.category);
-        default:
-          return 0;
+      if (!isInventory) {
+        // Existing non-inventory sorting logic
+        switch (sortBy) {
+          case "date-desc":
+            return new Date(b.date) - new Date(a.date);
+          case "date-asc":
+            return new Date(a.date) - new Date(b.date);
+          case "amount-desc":
+            return Number(b.amount) - Number(a.amount);
+          case "amount-asc":
+            return Number(a.amount) - Number(b.amount);
+          case "category":
+            return (a.tag || '').localeCompare(b.tag || '');
+          default:
+            return 0;
+        }
+      } else {
+        // Enhanced inventory sorting logic
+        const [field, direction] = sortBy.split('-');
+        const isAsc = direction === 'asc';
+        
+        switch (field) {
+          case "name":
+            return isAsc ? 
+              (a.name || '').localeCompare(b.name || '') :
+              (b.name || '').localeCompare(a.name || '');
+          
+          case "sku":
+            return isAsc ?
+              (Number(a.skuId) || 0) - (Number(b.skuId) || 0) :
+              (Number(b.skuId) || 0) - (Number(a.skuId) || 0);
+          
+          case "quantity":
+            return isAsc ?
+              (Number(a.amount) || 0) - (Number(b.amount) || 0) :
+              (Number(b.amount) || 0) - (Number(a.amount) || 0);
+          
+          case "value":
+            const aValue = (Number(a.amount) || 0) * (Number(a.unitPrice) || 0);
+            const bValue = (Number(b.amount) || 0) * (Number(b.unitPrice) || 0);
+            return isAsc ? aValue - bValue : bValue - aValue;
+          
+          case "category":
+            return isAsc ?
+              (a.category || '').localeCompare(b.category || '') :
+              (b.category || '').localeCompare(a.category || '');
+          
+          default:
+            return 0;
+        }
       }
     });
 
@@ -401,28 +462,8 @@ function ReportsPage() {
           break;
         case "inventory-summary":
           const inventoryData = await getInventoryByUser(user.id);
-          let sortedInventory = [...inventoryData];
-          
-          // Apply sorting
-          switch (sortBy) {
-            case "name":
-              sortedInventory.sort((a, b) => a.name.localeCompare(b.name));
-              break;
-            case "sku":
-              sortedInventory.sort((a, b) => a.skuId - b.skuId);
-              break;
-            case "quantity":
-              sortedInventory.sort((a, b) => b.amount - a.amount);
-              break;
-            case "value":
-              sortedInventory.sort((a, b) => 
-                (Number(b.amount) * Number(b.unitPrice)) - 
-                (Number(a.amount) * Number(a.unitPrice))
-              );
-              break;
-          }
-          
-          reportData = generateInventorySummary(sortedInventory);
+          let filteredInventory = filterTransactions(inventoryData, true);
+          reportData = generateInventorySummary(filteredInventory);
           break;
       }
 
@@ -497,24 +538,28 @@ function ReportsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">Start Date</label>
-                <input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-gray-400 mb-1">End Date</label>
-                <input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
-                />
-              </div>
+              {reportType !== "inventory-summary" && (
+                <>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-1">Start Date</label>
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-400 mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
+                    />
+                  </div>
+                </>
+              )}
             </div>
 
             {reportType !== "income-statement" && (
@@ -526,7 +571,11 @@ function ReportsPage() {
                   className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
                 >
                   <option key="all" value="all">All Categories</option>
-                  {categories[reportType === "income-summary" ? "income" : "expense"].map((cat) => (
+                  {categories[
+                    reportType === "income-summary" ? "income" : 
+                    reportType === "expense-summary" ? "expense" : 
+                    "inventory"
+                  ].map((cat) => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
                 </select>
@@ -540,19 +589,26 @@ function ReportsPage() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
               >
-                <option key="date-desc" value="date-desc">Date (Newest First)</option>
-                <option key="date-asc" value="date-asc">Date (Oldest First)</option>
-                <option key="amount-desc" value="amount-desc">Amount (Highest First)</option>
-                <option key="amount-asc" value="amount-asc">Amount (Lowest First)</option>
-                {reportType !== "income-statement" && (
-                  <option key="category" value="category">Category</option>
-                )}
-                {reportType === "inventory-summary" && (
+                {reportType === "inventory-summary" ? (
                   <>
-                    <option value="name">Item Name</option>
-                    <option value="sku">SKU</option>
-                    <option value="quantity">Quantity</option>
-                    <option value="value">Total Value</option>
+                    <option value="name-asc">Item Name (A-Z)</option>
+                    <option value="name-desc">Item Name (Z-A)</option>
+                    <option value="sku-asc">SKU (Low to High)</option>
+                    <option value="sku-desc">SKU (High to Low)</option>
+                    <option value="quantity-desc">Quantity (High to Low)</option>
+                    <option value="quantity-asc">Quantity (Low to High)</option>
+                    <option value="value-desc">Total Value (High to Low)</option>
+                    <option value="value-asc">Total Value (Low to High)</option>
+                    <option value="category-asc">Category (A-Z)</option>
+                    <option value="category-desc">Category (Z-A)</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="date-desc">Date (Newest First)</option>
+                    <option value="date-asc">Date (Oldest First)</option>
+                    <option value="amount-desc">Amount (Highest First)</option>
+                    <option value="amount-asc">Amount (Lowest First)</option>
+                    <option value="category">Category</option>
                   </>
                 )}
               </select>
