@@ -23,6 +23,7 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
+import Link from "next/link";
 
 const dateRanges = [
   "Week to Date",
@@ -57,7 +58,7 @@ function Dashboard() {
         ...incomeData.map(inc => ({ ...inc, type: 'income' })),
         ...expenseData.map(exp => ({ ...exp, type: 'expense' }))
       ].sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 4);
+        .slice(0, 5);
 
       setTransactions(combinedTransactions);
 
@@ -229,13 +230,15 @@ function Dashboard() {
         </div>
 
         {/* Transactions Button */}
-        <div className="bg-gradient-to-br from-blue-900/50 to-cyan-900/50 p-6 rounded-xl shadow-lg border border-blue-500/20 hover:border-blue-500/40 transition-all">
-          <div className="flex flex-col h-full">
-            <IconClipboardList className="h-8 w-8 text-blue-400 mb-3" />
-            <h2 className="text-xl font-bold text-white mb-2">Transactions</h2>
-            <p className="text-gray-400 text-sm">View all your transactions</p>
+        <Link href="/transactions" className="block">
+          <div className="h-full bg-gradient-to-br from-blue-900/50 to-cyan-900/50 p-6 rounded-xl shadow-lg border border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer">
+            <div className="flex flex-col h-full">
+              <IconClipboardList className="h-8 w-8 text-blue-400 mb-3" />
+              <h2 className="text-xl font-bold text-white mb-2">Transactions</h2>
+              <p className="text-gray-400 text-sm">View all your transactions</p>
+            </div>
           </div>
-        </div>
+        </Link>
 
         {/* Reports Button */}
         <div className="bg-gradient-to-br from-teal-900/50 to-emerald-900/50 p-6 rounded-xl shadow-lg border border-teal-500/20 hover:border-teal-500/40 transition-all">
@@ -250,7 +253,7 @@ function Dashboard() {
       {/* Recent Transactions List */}
       <div className="max-w-7xl mx-auto px-4 mt-8 mb-12">
         <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Transactions</h2>
+          <h2 className="text-xl font-semibold text-white mb-4">Recent Activity</h2>
           {transactions.length === 0 ? (
             <p className="text-gray-400 text-center py-4">No recent transactions</p>
           ) : (
