@@ -13,15 +13,16 @@ import {
   IconChevronDown,
 } from "@tabler/icons-react";
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
+  Legend
 } from 'recharts';
 import Link from "next/link";
 
@@ -41,6 +42,11 @@ function Dashboard() {
   const [graphData, setGraphData] = useState({ 
     areaChart: [],
     barChart: [] 
+  });
+  const [cardsData, setCardsData] = useState({
+    totalIncome: 0,
+    totalExpenses: 0,
+    netCashFlow: 0
   });
 
   useEffect(() => {
@@ -64,6 +70,40 @@ function Dashboard() {
 
       // Process data for graph based on selected range
       processGraphData(incomeData, expenseData);
+
+      // Calculate card data using the selectedRange filter
+      const today = new Date();
+      let cardStartDate = new Date();
+      switch(selectedRange) {
+        case "Week to Date":
+          cardStartDate.setDate(today.getDate() - 7);
+          break;
+        case "Month to Date":
+          cardStartDate.setMonth(today.getMonth() - 1);
+          break;
+        case "Year to Date":
+          cardStartDate.setFullYear(today.getFullYear() - 1);
+          break;
+        // Add additional cases as needed; defaulting to "Month to Date"
+        default:
+          cardStartDate.setMonth(today.getMonth() - 1);
+      }
+      const incomeSum = incomeData.reduce((sum, inc) => {
+        const incDate = new Date(inc.date);
+        return incDate >= cardStartDate ? sum + Number(inc.amount) : sum;
+      }, 0);
+      const expensesSum = expenseData.reduce((sum, exp) => {
+        const expDate = new Date(exp.date);
+        return expDate >= cardStartDate ? sum + Number(exp.amount) : sum;
+      }, 0);
+      const netCashFlow = incomeSum - expensesSum;
+
+      setCardsData({
+        totalIncome: incomeSum,
+        totalExpenses: expensesSum,
+        netCashFlow
+      });
+
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -131,61 +171,75 @@ function Dashboard() {
       
       {/* Welcome Banner */}
       <div className="max-w-7xl mx-auto mt-6 px-4">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-purple-500 bg-clip-text text-transparent">
-          Welcome Back to AccuTrack
-        </h1>
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-purple-500 bg-clip-text text-transparent">
+            Dashboard
+          </h1>
+          <div className="flex gap-2 flex-wrap">
+            {dateRanges.map((range) => (
+              <Button
+                key={range}
+                onClick={() => setSelectedRange(range)}
+                className={`text-xs px-3 py-1 ${
+                  selectedRange === range
+                    ? "bg-blue-500/20 text-blue-300"
+                    : "bg-gray-800 text-gray-400"
+                }`}
+              >
+                {range}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Cards Section */}
+      <div className="max-w-7xl mx-auto mt-6 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+          <h3 className="text-lg font-bold text-white">Total Income</h3>
+          <p className="text-2xl font-semibold text-teal-300">${cardsData.totalIncome.toFixed(2)}</p>
+        </div>
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+          <h3 className="text-lg font-bold text-white">Total Expenses</h3>
+          <p className="text-2xl font-semibold text-rose-300">${cardsData.totalExpenses.toFixed(2)}</p>
+        </div>
+        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+          <h3 className="text-lg font-bold text-white">Net Cash Flow</h3>
+          <p className="text-2xl font-semibold text-green-300">${cardsData.netCashFlow.toFixed(2)}</p>
+        </div>
       </div>
 
       {/* Graphs Section */}
       <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Daily Trends Graph */}
         <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold text-white">Daily Trends</h2>
-            <div className="flex gap-2 flex-wrap">
-              {dateRanges.map((range) => (
-                <Button
-                  key={range}
-                  onClick={() => setSelectedRange(range)}
-                  className={`text-xs px-3 py-1 ${
-                    selectedRange === range
-                      ? "bg-blue-500/20 text-blue-300"
-                      : "bg-gray-800 text-gray-400"
-                  }`}
-                >
-                  {range}
-                </Button>
-              ))}
-            </div>
-          </div>
+          <h2 className="text-xl font-semibold text-white mb-6">Trends</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={graphData.areaChart}>
+              <LineChart data={graphData.areaChart}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="date" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1F2937',
-                    border: '1px solid #374151',
+                    border: "1px solid #374151",
                     borderRadius: '0.5rem'
                   }}
                 />
-                <Area 
+                <Line 
                   type="monotone" 
                   dataKey="income" 
                   stroke="#3B82F6" 
-                  fill="#3B82F6" 
-                  fillOpacity={0.2} 
+                  strokeWidth={2}
                 />
-                <Area 
+                <Line 
                   type="monotone" 
                   dataKey="expenses" 
                   stroke="#10B981" 
-                  fill="#10B981" 
-                  fillOpacity={0.2} 
+                  strokeWidth={2}
                 />
-              </AreaChart>
+              </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -195,9 +249,17 @@ function Dashboard() {
           <h2 className="text-xl font-semibold text-white mb-6">Monthly Comparison</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={graphData.barChart}>
+              <BarChart 
+                data={graphData.barChart}
+                margin={{ top: 10, right: 30, left: 0, bottom: 30 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="month" stroke="#9CA3AF" />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="#9CA3AF"
+                  dy={10}
+                  tick={{ fontSize: 12 }}
+                />
                 <YAxis stroke="#9CA3AF" />
                 <Tooltip 
                   contentStyle={{ 
@@ -206,8 +268,9 @@ function Dashboard() {
                     borderRadius: '0.5rem'
                   }}
                 />
-                <Bar dataKey="income" fill="#3B82F6" fillOpacity={0.8} />
-                <Bar dataKey="expenses" fill="#10B981" fillOpacity={0.8} />
+                <Legend />
+                <Bar dataKey="income" name="Income" stackId="a" fill="#3B82F6" fillOpacity={0.8} />
+                <Bar dataKey="expenses" name="Expenses" stackId="a" fill="#10B981" fillOpacity={0.8} />
               </BarChart>
             </ResponsiveContainer>
           </div>
