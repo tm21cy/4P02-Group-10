@@ -50,16 +50,16 @@ export default function Header() {
                 {isSignedIn ? (
                     <>
                         <Link href="/dashboard">
-                            <Button className="w-full bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 mb-2">Dashboard</Button>
+                            <Button className="w-full bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 mb-2 text-base py-4">Dashboard</Button>
                         </Link>
                         <Link href="/inventory">
-                            <Button className="w-full bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/30 mb-2 py-2">Inventory</Button>
+                            <Button className="w-full bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/30 mb-2 text-base py-4">Inventory</Button>
                         </Link>
                         <Link href="/expenses">
-                            <Button className="w-full bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 mb-2">Expenses</Button>
+                            <Button className="w-full bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 mb-2 text-base py-4">Expenses</Button>
                         </Link>
                         <Link href="/income">
-                            <Button className="w-full bg-blue-500/20 text-blue-300 font-bold hover:bg-blue-500/30 mb-2">Income</Button>
+                            <Button className="w-full bg-blue-500/20 text-blue-300 font-bold hover:bg-blue-500/30 mb-2 text-base py-4">Income</Button>
                         </Link>
                         <div className="w-full mb-2">
                             <UserButton afterSignOutUrl="/" />
@@ -82,25 +82,25 @@ export default function Header() {
                 {isSignedIn ? (
                     <>
                         <Link href="/dashboard">
-                            <Button className="bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 transition-all duration-200 px-6">
+                            <Button className="bg-[#bbbbbb] text-black font-bold hover:bg-gray-100 transition-all duration-200 px-7 py-4 text-base">
                                 Dashboard
                             </Button>
                         </Link>
 
                         <Link href="/inventory">
-                            <Button className="bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/30 transition-all duration-200 px-6 py-2">
+                            <Button className="bg-purple-500/20 text-purple-300 font-bold hover:bg-purple-500/30 transition-all duration-200 px-7 py-4 text-base">
                                 Inventory
                             </Button>
                         </Link>
 
                         <Link href="/expenses">
-                            <Button className="bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 transition-all duration-200 px-6">
+                            <Button className="bg-teal-500/20 text-teal-300 font-bold hover:bg-teal-500/30 transition-all duration-200 px-7 py-4 text-base">
                                 Expenses
                             </Button>
                         </Link>
 
                         <Link href="/income">
-                            <Button className="bg-blue-500/20 text-blue-300 font-bold hover:bg-blue-500/30 transition-all duration-200 px-6">
+                            <Button className="bg-blue-500/20 text-blue-300 font-bold hover:bg-blue-500/30 transition-all duration-200 px-7 py-4 text-base">
                                 Income
                             </Button>
                         </Link>
