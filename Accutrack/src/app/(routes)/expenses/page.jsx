@@ -11,9 +11,9 @@ function Expenses() {
             <div className="container mx-auto p-4">
                 {/* Page header section */}
                 <div className="mt-12 flex flex-col items-center">
-                    <div className="text-center mb-16">
+                    <div className="text-center mb-12">
                         {/* Icon in a circle */}
-                        <div className="flex justify-center mb-6">
+                        <div className="flex justify-center mb-4">
                             <div className="bg-teal-500/20 p-5 rounded-full ring-2 ring-teal-500/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -21,7 +21,7 @@ function Expenses() {
                             </div>
                         </div>
                         {/* Page title with gradient effect */}
-                        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-purple-500 bg-clip-text text-transparent">
+                        <h1 className="text-5xl font-bold mb-2 leading-relaxed bg-gradient-to-r from-teal-400 to-purple-500 bg-clip-text text-transparent">
                             Expense Management
                         </h1>
                         <p className="text-gray-400 text-xl max-w-2xl mx-auto">
