@@ -34,6 +34,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fs": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.474.0",
     "net": "^1.0.2",
     "next": "15.1.6",
