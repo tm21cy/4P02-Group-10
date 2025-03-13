@@ -166,13 +166,15 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1c2230] text-[#bbbbbb]">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
+                    
+                    
       <Header />
       
       {/* Welcome Banner */}
-      <div className="max-w-7xl mx-auto mt-6 px-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-purple-500 bg-clip-text text-transparent">
+      <div className="max-w-7xl mx-auto mt-8 px-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-20">
+          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
             Dashboard
           </h1>
           <div className="flex gap-2 flex-wrap">
@@ -180,10 +182,10 @@ function Dashboard() {
               <Button
                 key={range}
                 onClick={() => setSelectedRange(range)}
-                className={`text-xs px-3 py-1 ${
+                className={`text-xs px-4 py-2 rounded-full transition-all duration-200 ${
                   selectedRange === range
-                    ? "bg-blue-500/20 text-blue-300"
-                    : "bg-gray-800 text-gray-400"
+                    ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                    : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"
                 }`}
               >
                 {range}
@@ -194,27 +196,26 @@ function Dashboard() {
       </div>
 
       {/* Cards Section */}
-      <div className="max-w-7xl mx-auto mt-6 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h3 className="text-lg font-bold text-white">Total Income</h3>
-          <p className="text-2xl font-semibold text-teal-300">${cardsData.totalIncome.toFixed(2)}</p>
+      <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 transition-all duration-200 hover:border-white/20">
+          <h3 className="text-lg font-bold text-gray-200">Total Income</h3>
+          <p className="text-3xl font-bold text-sky-400">${cardsData.totalIncome.toFixed(2)}</p>
         </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h3 className="text-lg font-bold text-white">Total Expenses</h3>
-          <p className="text-2xl font-semibold text-rose-300">${cardsData.totalExpenses.toFixed(2)}</p>
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 transition-all duration-200 hover:border-white/20">
+          <h3 className="text-lg font-bold text-gray-200">Total Expenses</h3>
+          <p className="text-3xl font-bold text-rose-400">${cardsData.totalExpenses.toFixed(2)}</p>
         </div>
-        <div className="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
-          <h3 className="text-lg font-bold text-white">Net Cash Flow</h3>
-          <p className="text-2xl font-semibold text-green-300">${cardsData.netCashFlow.toFixed(2)}</p>
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 transition-all duration-200 hover:border-white/20">
+          <h3 className="text-lg font-bold text-gray-200">Net Cash Flow</h3>
+          <p className="text-3xl font-bold text-emerald-400">${cardsData.netCashFlow.toFixed(2)}</p>
         </div>
       </div>
 
       {/* Graphs Section */}
       <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Daily Trends Graph */}
-        <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-6">Trends</h2>
-          <div className="h-64">
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10">
+          <h2 className="text-xl font-bold text-gray-200 mb-6">Trends</h2>
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={graphData.areaChart}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -244,10 +245,9 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Monthly Comparison Graph */}
-        <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-6">Monthly Comparison</h2>
-          <div className="h-64">
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10">
+          <h2 className="text-xl font-bold text-gray-200 mb-6">Monthly Comparison</h2>
+          <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
                 data={graphData.barChart}
@@ -279,12 +279,11 @@ function Dashboard() {
 
       {/* Action Buttons */}
       <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* AI Assistant Button */}
-        <div className="bg-gradient-to-br from-purple-900/50 to-indigo-900/50 p-6 rounded-xl shadow-lg border border-purple-500/20 hover:border-purple-500/40 transition-all">
+        <div className="group backdrop-blur-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 p-6 rounded-2xl shadow-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
           <div className="flex flex-col h-full">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-3 group-hover:scale-105 transition-transform duration-200">
               <IconMessageChatbot className="h-8 w-8 text-purple-400" />
-              <IconCrown className="h-4 w-4 text-yellow-400" />
+              <IconCrown className="h-4 w-4 text-amber-400" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">AI Assistant</h2>
             <p className="text-gray-400 text-sm mb-2">Get AI-powered financial insights</p>
@@ -292,22 +291,20 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Transactions Button */}
-        <Link href="/transactions" className="block">
-          <div className="h-full bg-gradient-to-br from-blue-900/50 to-cyan-900/50 p-6 rounded-xl shadow-lg border border-blue-500/20 hover:border-blue-500/40 transition-all cursor-pointer">
+        <Link href="/transactions" className="block group">
+          <div className="h-full backdrop-blur-xl bg-gradient-to-br from-sky-500/10 to-blue-500/10 p-6 rounded-2xl shadow-xl border border-sky-500/20 hover:border-sky-500/40 transition-all duration-300">
             <div className="flex flex-col h-full">
-              <IconClipboardList className="h-8 w-8 text-blue-400 mb-3" />
+              <IconClipboardList className="h-8 w-8 text-sky-400 mb-3 group-hover:scale-105 transition-transform duration-200" />
               <h2 className="text-xl font-bold text-white mb-2">Transactions</h2>
               <p className="text-gray-400 text-sm">View all your transactions</p>
             </div>
           </div>
         </Link>
 
-        {/* Reports Button */}
-        <Link href="/reports" className="block">
-          <div className="h-full bg-gradient-to-br from-teal-900/50 to-emerald-900/50 p-6 rounded-xl shadow-lg border border-teal-500/20 hover:border-teal-500/40 transition-all cursor-pointer">
+        <Link href="/reports" className="block group">
+          <div className="h-full backdrop-blur-xl bg-gradient-to-br from-emerald-500/10 to-teal-500/10 p-6 rounded-2xl shadow-xl border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300">
             <div className="flex flex-col h-full">
-              <IconFileText className="h-8 w-8 text-teal-400 mb-3" />
+              <IconFileText className="h-8 w-8 text-emerald-400 mb-3 group-hover:scale-105 transition-transform duration-200" />
               <h2 className="text-xl font-bold text-white mb-2">Reports</h2>
               <p className="text-gray-400 text-sm">Generate financial reports</p>
             </div>
@@ -317,33 +314,34 @@ function Dashboard() {
 
       {/* Recent Transactions List */}
       <div className="max-w-7xl mx-auto px-4 mt-8 mb-12">
-        <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800">
-          <h2 className="text-xl font-semibold text-white mb-4">Recent Activity</h2>
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10">
+          <h2 className="text-xl font-bold text-gray-200 mb-6">Recent Activity</h2>
           {transactions.length === 0 ? (
             <p className="text-gray-400 text-center py-4">No recent transactions</p>
           ) : (
             <div className="space-y-4">
               {transactions.map((transaction) => (
-                <div key={transaction.id} className="flex justify-between items-center p-4 bg-gray-800/50 rounded-lg">
+                <div 
+                  key={transaction.id} 
+                  className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:border-white/20"
+                >
                   <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-full ${
-                      transaction.type === "income" ? "bg-blue-500/20" : "bg-teal-500/20"
+                    <div className={`p-3 rounded-xl ${
+                      transaction.type === "income" 
+                        ? "bg-sky-500/20 text-sky-400" 
+                        : "bg-emerald-500/20 text-emerald-400"
                     }`}>
-                      <div className={`text-sm font-medium ${
-                        transaction.type === "income" ? "text-blue-400" : "text-teal-400"
-                      }`}>
-                        {transaction.type === "income" ? "+" : "-"}
-                      </div>
+                      {transaction.type === "income" ? "+" : "-"}
                     </div>
                     <div>
-                      <p className="text-white font-medium">{transaction.description}</p>
+                      <p className="text-gray-200 font-medium">{transaction.description}</p>
                       <p className="text-gray-400 text-sm">
                         {new Date(transaction.date).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className={`text-lg font-semibold ${
-                    transaction.type === "income" ? "text-blue-400" : "text-teal-400"
+                  <div className={`text-lg font-bold ${
+                    transaction.type === "income" ? "text-sky-400" : "text-emerald-400"
                   }`}>
                     ${Number(transaction.amount).toFixed(2)}
                   </div>
