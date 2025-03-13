@@ -483,7 +483,7 @@ function ReportsPage() {
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-12 space-y-2">
-          <h1 className="text-3xl font-bold text-white">Generate Reports</h1>
+          <h1 className="text-3xl font-bold text-white pt-20">Generate Reports</h1>
           <p className="text-gray-400">Create and download financial reports in PDF or CSV format</p>
         </div>
 

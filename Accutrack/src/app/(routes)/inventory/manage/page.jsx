@@ -55,215 +55,232 @@ function ManageInventory() {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900">
             <Header />
 
-            <div className="mt-8 max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-white">Manage Inventory</h1>
-                    <Link href="/inventory">
-                        <Button className="bg-gray-800/50 text-white hover:bg-gray-700/50">
-                            Back
-                        </Button>
-                    </Link>
-                </div>
+            <div className="container mx-auto px-4 py-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex justify-between items-center mb-8 pt-20">
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Manage Inventory</h1>
+                        <Link href="/inventory">
+                            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                Back
+                            </Button>
+                        </Link>
+                    </div>
 
-                <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6">
-                    <div className="w-full">
-                        {!isLoaded ? (
-                            <p className="text-gray-300 text-center py-4">Loading inventory data...</p>
-                        ) : inventory.length === 0 ? (
-                            <p className="text-gray-300 text-center py-4">No inventory items to display.</p>
-                        ) : (
-                            <>
-                                {/* Table for larger screens */}
-                                <div className="hidden md:block">
-                                    <table className="w-full">
-                                        <thead>
-                                            <tr className="border-b border-gray-700">
-                                                <th className="text-left p-4 text-gray-300">ID</th>
-                                                <th className="text-left p-4 text-gray-300">Name</th>
-                                                <th className="text-left p-4 text-gray-300">Category</th>
-                                                <th className="text-left p-4 text-gray-300">Quantity</th>
-                                                <th className="text-left p-4 text-gray-300">Unit Price</th>
-                                                <th className="text-right p-4 text-gray-300">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {inventory.map(item => (
-                                                <tr key={item.id} className="border-b border-gray-800 hover:bg-gray-800/30">
-                                                    <td className="p-4 text-gray-300">{item.skuId}</td>
-                                                    <td className="p-4 text-gray-300">{item.name}</td>
-                                                    <td className="p-4">
-                                                        <span className={`px-3 py-1 rounded-full text-xs font-medium
-                                                            ${item.category === "Raw Materials" ? 'bg-blue-500/20 text-blue-300' :
-                                                            item.category === "Finished Goods" ? 'bg-green-500/20 text-green-300' :
-                                                            item.category === "Work in Progress" ? 'bg-yellow-500/20 text-yellow-300' :
-                                                            item.category === "Maintenance" ? 'bg-purple-500/20 text-purple-300' :
-                                                            item.category === "Office Supplies" ? 'bg-pink-500/20 text-pink-300' :
-                                                            'bg-gray-500/20 text-gray-300'}`}>
-                                                            {item.category}
-                                                        </span>
-                                                    </td>
-                                                    <td className="p-4 text-gray-300">{item.amount}</td>
-                                                    <td className="p-4 text-purple-300">${item.unitPrice}</td>
-                                                    <td className="p-4 text-right space-x-2">
-                                                        <Button
-                                                            onClick={() => handleEdit(item)}
-                                                            className="bg-purple-500/20 text-purple-300 hover:bg-purple-500/30"
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                        <Button
-                                                            onClick={() => handleDelete(item.id)}
-                                                            className="bg-red-500/20 text-red-300 hover:bg-red-500/30"
-                                                        >
-                                                            Delete
-                                                        </Button>
-                                                    </td>
+                    <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
+                        <div className="w-full">
+                            {!isLoaded ? (
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-purple-500"></div>
+                                </div>
+                            ) : inventory.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <div className="text-gray-400 text-lg mb-4">No inventory items found</div>
+                                    <Link href="/inventory/add">
+                                        <Button className="bg-purple-600 hover:bg-purple-700 text-white transition-colors">
+                                            Add Your First Item
+                                        </Button>
+                                    </Link>
+                                </div>
+                            ) : (
+                                <>
+                                    {/* Table for larger screens */}
+                                    <div className="hidden md:block overflow-hidden">
+                                        <table className="w-full">
+                                            <thead>
+                                                <tr className="border-b border-white/10">
+                                                    <th className="text-center p-5 text-gray-400 font-medium">ID</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Name</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Category</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Quantity</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Unit Price</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {inventory.map(item => (
+                                                    <tr key={item.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                                        <td className="p-5 text-gray-300 text-center">{item.skuId}</td>
+                                                        <td className="p-5 text-white font-medium text-center">{item.name}</td>
+                                                        <td className="p-5 flex justify-center">
+                                                            <span className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center
+                                                                ${item.category === "Raw Materials" ? 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-400/30' :
+                                                                item.category === "Finished Goods" ? 'bg-green-500/10 text-green-400 ring-1 ring-green-400/30' :
+                                                                item.category === "Work in Progress" ? 'bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-400/30' :
+                                                                item.category === "Maintenance" ? 'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30' :
+                                                                item.category === "Office Supplies" ? 'bg-pink-500/10 text-pink-400 ring-1 ring-pink-400/30' :
+                                                                'bg-gray-500/10 text-gray-400 ring-1 ring-gray-400/30'}`}>
+                                                                {item.category}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-5 text-gray-300 text-center">{item.amount}</td>
+                                                        <td className="p-5 text-purple-400 font-medium text-center">${item.unitPrice}</td>
+                                                        <td className="p-5 flex justify-center space-x-2">
+                                                            <Button
+                                                                onClick={() => handleEdit(item)}
+                                                                className="bg-white/10 text-white hover:bg-white/20 transition-colors"
+                                                            >
+                                                                Edit
+                                                            </Button>
+                                                            <Button
+                                                                onClick={() => handleDelete(item.id)}
+                                                                className="bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                                                            >
+                                                                Delete
+                                                            </Button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                                {/* Card view for mobile screens */}
-                                <div className="md:hidden space-y-4">
-                                    {inventory.map(item => (
-                                        <div key={item.id} className="bg-gray-800/30 rounded-lg p-4 space-y-3">
-                                            <div className="flex justify-between items-start">
-                                                <div className="space-y-1">
-                                                    <p className="text-gray-300 text-sm">ID: {item.itemId}</p>
-                                                    <p className="text-white font-medium">{item.name}</p>
-                                                    <p className="text-purple-300 text-lg font-semibold">
-                                                        ${item.unitPrice} × {item.amount}
-                                                    </p>
+                                    {/* Card view for mobile screens */}
+                                    <div className="md:hidden space-y-4 p-4">
+                                        {inventory.map(item => (
+                                            <div key={item.id} className="bg-white/5 backdrop-blur-sm rounded-xl p-5 space-y-4 border border-white/10">
+                                                <div className="flex justify-between items-start">
+                                                    <div className="space-y-2">
+                                                        <p className="text-gray-400 text-sm">SKU: {item.skuId}</p>
+                                                        <p className="text-white font-semibold text-lg">{item.name}</p>
+                                                        <div className="flex items-center space-x-2">
+                                                            <span className="text-purple-400 text-lg font-semibold">${item.unitPrice}</span>
+                                                            <span className="text-gray-400">×</span>
+                                                            <span className="text-gray-300">{item.amount}</span>
+                                                        </div>
+                                                    </div>
+                                                    <span className={`px-3 py-1.5 rounded-full text-xs font-medium
+                                                        ${item.category === "Raw Materials" ? 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-400/30' :
+                                                        item.category === "Finished Goods" ? 'bg-green-500/10 text-green-400 ring-1 ring-green-400/30' :
+                                                        item.category === "Work in Progress" ? 'bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-400/30' :
+                                                        item.category === "Maintenance" ? 'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30' :
+                                                        item.category === "Office Supplies" ? 'bg-pink-500/10 text-pink-400 ring-1 ring-pink-400/30' :
+                                                        'bg-gray-500/10 text-gray-400 ring-1 ring-gray-400/30'}`}>
+                                                        {item.category}
+                                                    </span>
                                                 </div>
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium
-                                                    ${item.category === "Raw Materials" ? 'bg-blue-500/20 text-blue-300' :
-                                                    item.category === "Finished Goods" ? 'bg-green-500/20 text-green-300' :
-                                                    item.category === "Work in Progress" ? 'bg-yellow-500/20 text-yellow-300' :
-                                                    item.category === "Maintenance" ? 'bg-purple-500/20 text-purple-300' :
-                                                    item.category === "Office Supplies" ? 'bg-pink-500/20 text-pink-300' :
-                                                    'bg-gray-500/20 text-gray-300'}`}>
-                                                    {item.category}
-                                                </span>
+                                                <div className="flex gap-2 pt-2">
+                                                    <Button
+                                                        onClick={() => handleEdit(item)}
+                                                        className="flex-1 bg-white/10 text-white hover:bg-white/20 transition-colors"
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => handleDelete(item.id)}
+                                                        className="flex-1 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-2 pt-2">
-                                                <Button
-                                                    onClick={() => handleEdit(item)}
-                                                    className="flex-1 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30"
-                                                >
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handleDelete(item.id)}
-                                                    className="flex-1 bg-red-500/20 text-red-300 hover:bg-red-500/30"
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </>
-                        )}
+                                        ))}
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
-
+            <footer className="mt-auto py-6 text-center text-gray-400">
+                <p>&copy; 2024 AccuTrack. All rights reserved.</p>
+            </footer>
             {/* Edit Modal */}
             {editingItem && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                    <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
-                        <h2 className="text-xl font-bold text-white mb-4">Edit Inventory Item</h2>
-                        <form onSubmit={handleSave} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Item Name
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingItem.name}
-                                    onChange={e => setEditingItem({ ...editingItem, name: e.target.value })}
-                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Description
-                                </label>
-                                <textarea
-                                    value={editingItem.description}
-                                    onChange={e => setEditingItem({ ...editingItem, description: e.target.value })}
-                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
-                                    rows="3"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+                    <div className="bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full border border-white/10">
+                        <div className="p-6">
+                            <h2 className="text-2xl font-bold text-white mb-6">Edit Inventory Item</h2>
+                            <form onSubmit={handleSave} className="space-y-5">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                                        Quantity
+                                        Item Name
                                     </label>
                                     <input
-                                        type="number"
-                                        min="0"
-                                        value={editingItem.amount}
-                                        onChange={e => setEditingItem({ ...editingItem, quantity: parseFloat(e.target.value) })}
+                                        type="text"
+                                        value={editingItem.name}
+                                        onChange={e => setEditingItem({ ...editingItem, name: e.target.value })}
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                                        Unit Price
+                                        Description
                                     </label>
-                                    <input
-                                        type="number"
-                                        step="0.01"
-                                        min="0"
-                                        value={editingItem.unitPrice}
-                                        onChange={e => setEditingItem({ ...editingItem, unitPrice: parseFloat(e.target.value) })}
+                                    <textarea
+                                        value={editingItem.description}
+                                        onChange={e => setEditingItem({ ...editingItem, description: e.target.value })}
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                        rows="3"
                                     />
                                 </div>
-                            </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Category
-                                </label>
-                                <select
-                                    value={editingItem.category}
-                                    onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
-                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
-                                >
-                                    {tags.map(tag => {
-                                        return <option key={tag} value={tag}>
-                                            {tag}
-                                        </option>
-                                    })}
-                                </select>
-                            </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                            Quantity
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={editingItem.amount}
+                                            onChange={e => setEditingItem({ ...editingItem, quantity: parseFloat(e.target.value) })}
+                                            className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                        />
+                                    </div>
 
-                            <div className="flex justify-end gap-2 pt-4">
-                                <Button
-                                    type="button"
-                                    onClick={() => setEditingItem(null)}
-                                    className="bg-gray-700 text-white hover:bg-gray-600"
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="submit"
-                                    className="bg-purple-500 hover:bg-purple-600 text-white"
-                                >
-                                    Save Changes
-                                </Button>
-                            </div>
-                        </form>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                            Unit Price
+                                        </label>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            min="0"
+                                            value={editingItem.unitPrice}
+                                            onChange={e => setEditingItem({ ...editingItem, unitPrice: parseFloat(e.target.value) })}
+                                            className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Category
+                                    </label>
+                                    <select
+                                        value={editingItem.category}
+                                        onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                    >
+                                        {tags.map(tag => {
+                                            return <option key={tag} value={tag}>
+                                                {tag}
+                                            </option>
+                                        })}
+                                    </select>
+                                </div>
+
+                                <div className="flex justify-end gap-3 pt-6">
+                                    <Button
+                                        type="button"
+                                        onClick={() => setEditingItem(null)}
+                                        className="bg-white/10 text-white hover:bg-white/20 transition-colors"
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        className="bg-purple-600 hover:bg-purple-700 text-white transition-colors"
+                                    >
+                                        Save Changes
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             )}
@@ -271,4 +288,4 @@ function ManageInventory() {
     );
 }
 
-export default ManageInventory; 
+export default ManageInventory;

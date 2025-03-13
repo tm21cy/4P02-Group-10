@@ -2,17 +2,18 @@
 
 import React from "react";
 import Header from "../../_components/Header";
+import Footer from "../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 function Inventory() {
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900">
             <Header />
-            <div className="container mx-auto p-4">
+            <main className="flex-grow container mx-auto p-4 pt-20">
                 <div className="mt-12 flex flex-col items-center">
                     <div className="text-center mb-16">
-                        <div className="flex justify-center mb-6">
+                        <div className="flex justify-center mb-6 transition-transform hover:scale-105 duration-300">
                             <div className="bg-purple-500/20 p-5 rounded-full ring-2 ring-purple-500/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -27,12 +28,8 @@ function Inventory() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
-                        {/* Manage Inventory Card */}
-                        <Link 
-                            href="/inventory/manage" 
-                            className="group hover:scale-105 transition-all duration-300 h-full"
-                        >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl">
+                        <Link href="/inventory/manage" className="block h-full transform transition-all duration-300 hover:scale-102">
                             <div className="bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-pink-500/50 transition-colors h-full">
                                 <div className="flex flex-col items-center h-full">
                                     <div className="bg-pink-500/20 p-4 rounded-full mb-6 group-hover:bg-pink-500/30 transition-colors">
@@ -45,11 +42,7 @@ function Inventory() {
                                 </div>
                             </div>
                         </Link>
-                        {/* Add New Inventory Card */}
-                        <Link 
-                            href="/inventory/add" 
-                            className="group hover:scale-105 transition-all duration-300 h-full"
-                        >
+                        <Link href="/inventory/add" className="block h-full transform transition-all duration-300 hover:scale-102">
                             <div className="bg-gray-900/50 backdrop-blur-sm p-8 rounded-2xl shadow-lg border border-gray-800 hover:border-purple-500/50 transition-colors h-full">
                                 <div className="flex flex-col items-center h-full">
                                     <div className="bg-purple-500/20 p-4 rounded-full mb-6 group-hover:bg-purple-500/30 transition-colors">
@@ -64,9 +57,10 @@ function Inventory() {
                         </Link>
                     </div>
                 </div>
-            </div>
+            </main>
+            <Footer />
         </div>
     );
 }
 
-export default Inventory; 
+export default Inventory;

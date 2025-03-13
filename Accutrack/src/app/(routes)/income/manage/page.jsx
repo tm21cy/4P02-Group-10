@@ -110,77 +110,79 @@ function ManageIncome() {
     };
 
     return (
-        <div className="container mx-auto p-4">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
             <Header />
 
-            <div className="mt-8 max-w-4xl mx-auto">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-white">Manage Income</h1>
-                    <Link href="/income">
-                        <Button className="bg-gray-800/50 text-white hover:bg-gray-700/50">
-                            Back
-                        </Button>
-                    </Link>
-                </div>
+            <div className="container mx-auto px-4 py-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex justify-between items-center mb-8 pt-20">
+                        <h1 className="text-3xl font-bold text-white tracking-tight">Manage Income</h1>
+                        <Link href="/income">
+                            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                Back
+                            </Button>
+                        </Link>
+                    </div>
 
-                {/* Show loading UI if incomes data is not ready */}
-                {!incomes ? (
-                    <div className="text-gray-300">Loading income data...</div>
-                ) : (
-                    <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-6">
+                    <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
                         <div className="w-full">
                             {!isLoaded ? (
-                                <p className="text-gray-300 text-center py-4">Loading income data...</p>
+                                <div className="flex items-center justify-center py-8">
+                                    <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-blue-500"></div>
+                                </div>
                             ) : !incomes || incomes.length === 0 ? (
-                                <p className="text-gray-300 text-center py-4">No income to track.</p>
+                                <div className="flex flex-col items-center justify-center py-12">
+                                    <div className="text-gray-400 text-lg mb-4">No income entries found</div>
+                                    <Link href="/income/add">
+                                        <Button className="bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                                            Add Your First Income
+                                        </Button>
+                                    </Link>
+                                </div>
                             ) : (
                                 <>
-                                    {/* Table for larger screens */}
-                                    <div className="hidden md:block">
+                                    <div className="hidden md:block overflow-hidden">
                                         <table className="w-full">
                                             <thead>
-                                                <tr className="border-b border-gray-700">
-                                                    <th className="text-left p-4 text-gray-300">Date</th>
-                                                    <th className="text-left p-4 text-gray-300">Description</th>
-                                                    <th className="text-left p-4 text-gray-300">Amount</th>
-                                                    <th className="text-left p-4 text-gray-300">Category</th>
-                                                    <th className="text-right p-4 text-gray-300">Actions</th>
+                                                <tr className="border-b border-white/10">
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Date</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Description</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Amount</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Category</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {incomes.map(income => (
-                                                    <tr key={income.id} className="border-b border-gray-800 hover:bg-gray-800/30">
-                                                        <td className="p-4 text-gray-300">{income.date.toISOString().split("T")[0]}</td>
-                                                        <td className="p-4 text-gray-300">{income.description}</td>
-                                                        <td className="p-4 text-blue-300">${income.amount || "0.00"}</td>
-                                                        <td className="p-4">
-                                                            <span className={`px-3 py-1 rounded-full text-xs font-medium
-                                                                ${income.tag === "Salary" ? 'bg-green-500/20 text-green-300' :
-                                                                income.tag === "Freelance" ? 'bg-blue-500/20 text-blue-300' :
-                                                                income.tag === "Investment" ? 'bg-purple-500/20 text-purple-300' :
-                                                                income.tag === "Business" ? 'bg-orange-500/20 text-orange-300' :
-                                                                income.tag === "Rental" ? 'bg-pink-500/20 text-pink-300' :
-                                                                income.tag === "Dividends" ? 'bg-yellow-500/20 text-yellow-300' :
-                                                                income.tag === "Commission" ? 'bg-indigo-500/20 text-indigo-300' :
-                                                                income.tag === "Bonus" ? 'bg-teal-500/20 text-teal-300' :
-                                                                income.tag === "Royalties" ? 'bg-cyan-500/20 text-cyan-300' :
-                                                                'bg-gray-500/20 text-gray-300'}`}>
+                                                    <tr key={income.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                                        <td className="p-5 text-gray-300 text-center">{income.date.toISOString().split("T")[0]}</td>
+                                                        <td className="p-5 text-gray-300 text-center">{income.description}</td>
+                                                        <td className="p-5 text-blue-400 font-medium text-center">${income.amount || "0.00"}</td>
+                                                        <td className="p-5 flex justify-center">
+                                                            <span className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center
+                                                                ${income.tag === "Salary" ? 'bg-green-500/10 text-green-400 ring-1 ring-green-400/30' :
+                                                                income.tag === "Freelance" ? 'bg-blue-500/10 text-blue-400 ring-1 ring-blue-400/30' :
+                                                                income.tag === "Investment" ? 'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30' :
+                                                                income.tag === "Business" ? 'bg-orange-500/10 text-orange-400 ring-1 ring-orange-400/30' :
+                                                                'bg-gray-500/10 text-gray-400 ring-1 ring-gray-400/30'}`}>
                                                                 {income.tag}
                                                             </span>
                                                         </td>
-                                                        <td className="p-4 text-right space-x-2">
-                                                            <Button
-                                                                onClick={() => handleEdit(income)}
-                                                                className="bg-blue-500/20 text-blue-300 hover:bg-blue-500/30"
-                                                            >
-                                                                Edit
-                                                            </Button>
-                                                            <Button
-                                                                onClick={() => handleDelete(income.id)}
-                                                                className="bg-red-500/20 text-red-300 hover:bg-red-500/30"
-                                                            >
-                                                                Delete
-                                                            </Button>
+                                                        <td className="p-5">
+                                                            <div className="flex justify-center space-x-2">
+                                                                <Button
+                                                                    onClick={() => handleEdit(income)}
+                                                                    className="bg-white/10 text-white hover:bg-white/20 transition-colors"
+                                                                >
+                                                                    Edit
+                                                                </Button>
+                                                                <Button
+                                                                    onClick={() => handleDelete(income.id)}
+                                                                    className="bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -233,8 +235,11 @@ function ManageIncome() {
                             )}
                         </div>
                     </div>
-                )}
+                </div>
             </div>
+            <footer className="mt-auto py-6 text-center text-gray-400">
+                <p>&copy; 2024 AccuTrack. All rights reserved.</p>
+            </footer>
             {editingIncome && (
                             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
                                 <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
@@ -466,4 +471,4 @@ function ManageIncome() {
     );
 }
 
-export default ManageIncome; 
+export default ManageIncome;

@@ -65,9 +65,9 @@ function AddInventory() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+        <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900">
             <Header />
-            <div className="container mx-auto p-4">
+            <div className="container mx-auto p-4 pt-20">
                 <div className="mt-12 flex flex-col items-center">
                     <div className="text-center mb-16">
                         <div className="flex justify-center mb-6">
