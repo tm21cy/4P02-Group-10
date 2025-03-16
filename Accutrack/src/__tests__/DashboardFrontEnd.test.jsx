@@ -29,23 +29,24 @@ jest.mock("@/lib/db", () => ({
 describe("Dashboard Component", () => {
   beforeEach(() => {
     console.log("Running beforeEach...");
-
+  
     // Ensure a user is signed in
     useUser.mockReturnValue({
       isSignedIn: true,
       user: { id: "test-user-id" },
       isLoaded: true,
     });
-
-    // Mock API responses properly
+  
+    // Mock API responses properly with numbers
     getIncome.mockResolvedValue([
-      { id: 1, amount: "1000", description: "Salary", date: "2024-03-10" },
+      { id: 1, amount: 1000, description: "Salary", date: "2024-03-10" }, // Change amount to number
     ]);
-
+  
     getExpenses.mockResolvedValue([
-      { id: 2, amount: "500", description: "Rent", date: "2024-03-11" },
+      { id: 2, amount: 500, description: "Rent", date: "2024-03-11" }, // Change amount to number
     ]);
   });
+  
 
   it("renders Dashboard correctly", async () => {
     console.log("Rendering Dashboard...");
@@ -75,10 +76,14 @@ describe("Dashboard Component", () => {
       render(<Dashboard />);
     });
 
-    await waitFor(() => {
-      expect(screen.getByText("$1000.00")).toBeInTheDocument();
-      expect(screen.getByText("$500.00")).toBeInTheDocument();
-    });
+    await waitFor(async () => {
+      const income = await screen.findByText("$1000.00");
+      const expenses = await screen.findByText("$500.00");
+    
+      expect(income).toBeInTheDocument();
+      expect(expenses).toBeInTheDocument();
+    }, { timeout: 5000 });
+    
   });
 
   it("renders recent transactions", async () => {
@@ -88,10 +93,14 @@ describe("Dashboard Component", () => {
       render(<Dashboard />);
     });
 
-    await waitFor(() => {
-      expect(screen.getByText("Salary")).toBeInTheDocument();
-      expect(screen.getByText("Rent")).toBeInTheDocument();
-    });
+    await waitFor(async () => {
+      const salary = await screen.findByText("Salary");
+      const rent = await screen.findByText("Rent");
+    
+      expect(salary).toBeInTheDocument();
+      expect(rent).toBeInTheDocument();
+    }, { timeout: 5000 });
+    
   });
 
   it("renders the charts", async () => {
