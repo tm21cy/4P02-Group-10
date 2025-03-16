@@ -51,29 +51,26 @@ function Dashboard() {
 
   useEffect(() => {
     if (!isLoaded || !user) return;
+    console.log("Fetching new data for range: ", selectedRange);
     fetchData();
-  }, [isLoaded, user, selectedRange]);
+  }, [isLoaded, user, selectedRange]);  
+  
 
   const fetchData = async () => {
     try {
       const incomeData = await getIncome(user.id);
       const expenseData = await getExpenses(user.id);
-
-      // Combine and sort transactions
-      const combinedTransactions = [
-        ...incomeData.map(inc => ({ ...inc, type: 'income' })),
-        ...expenseData.map(exp => ({ ...exp, type: 'expense' }))
-      ].sort((a, b) => new Date(b.date) - new Date(a.date))
-        .slice(0, 5);
-
-      setTransactions(combinedTransactions);
-
-      // Process data for graph based on selected range
+  
+      // Ensure the filter is applied correctly
+      console.log("Selected Range: ", selectedRange);
+  
+      // Process data for graphs
       processGraphData(incomeData, expenseData);
-
-      // Calculate card data using the selectedRange filter
+  
+      // Calculate summary card values
       const today = new Date();
       let cardStartDate = new Date();
+  
       switch(selectedRange) {
         case "Week to Date":
           cardStartDate.setDate(today.getDate() - 7);
@@ -84,30 +81,34 @@ function Dashboard() {
         case "Year to Date":
           cardStartDate.setFullYear(today.getFullYear() - 1);
           break;
-        // Add additional cases as needed; defaulting to "Month to Date"
         default:
           cardStartDate.setMonth(today.getMonth() - 1);
       }
+  
       const incomeSum = incomeData.reduce((sum, inc) => {
         const incDate = new Date(inc.date);
         return incDate >= cardStartDate ? sum + Number(inc.amount) : sum;
       }, 0);
+  
       const expensesSum = expenseData.reduce((sum, exp) => {
         const expDate = new Date(exp.date);
         return expDate >= cardStartDate ? sum + Number(exp.amount) : sum;
       }, 0);
-      const netCashFlow = incomeSum - expensesSum;
+  
+      console.log(`Updated Income Sum for "${selectedRange}": `, incomeSum);
+      console.log(`Updated Expenses Sum for "${selectedRange}": `, expensesSum);
 
       setCardsData({
         totalIncome: incomeSum,
         totalExpenses: expensesSum,
-        netCashFlow
+        netCashFlow: incomeSum - expensesSum
       });
-
+  
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  
 
   const processGraphData = (incomeData, expenseData) => {
     // Process data based on selected range
@@ -159,10 +160,11 @@ function Dashboard() {
       }
     });
 
-    setGraphData({
-      areaChart: Object.values(dailyData).sort((a, b) => new Date(a.date) - new Date(b.date)),
-      barChart: Object.values(monthlyData).sort((a, b) => a.month.localeCompare(b.month))
-    });
+    setGraphData(() => ({
+      areaChart: [...Object.values(dailyData)].sort((a, b) => new Date(a.date) - new Date(b.date)),
+      barChart: [...Object.values(monthlyData)].sort((a, b) => a.month.localeCompare(b.month))
+    }));
+    
   };
 
   return (
@@ -180,16 +182,17 @@ function Dashboard() {
           <div className="flex gap-2 flex-wrap">
             {dateRanges.map((range) => (
               <Button
-                key={range}
-                onClick={() => setSelectedRange(range)}
-                className={`text-xs px-4 py-2 rounded-full transition-all duration-200 ${
-                  selectedRange === range
-                    ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
-                    : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"
-                }`}
-              >
-                {range}
-              </Button>
+              key={range}
+              onClick={() => setSelectedRange(range)}
+              className={`text-xs px-4 py-2 rounded-full transition-all duration-200 ${
+                selectedRange === range
+                  ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                  : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"
+              }`}
+            >
+              {range}
+            </Button>
+            
             ))}
           </div>
         </div>
