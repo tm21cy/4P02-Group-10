@@ -103,6 +103,8 @@ function Dashboard() {
         totalExpenses: expensesSum,
         netCashFlow: incomeSum - expensesSum
       });
+      setTransactions([...incomeData, ...expenseData]);
+
   
     } catch (error) {
       console.error("Error fetching data:", error);
