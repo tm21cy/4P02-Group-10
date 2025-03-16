@@ -61,9 +61,6 @@ function Dashboard() {
       const incomeData = await getIncome(user.id);
       const expenseData = await getExpenses(user.id);
   
-      // Ensure the filter is applied correctly
-      console.log("Selected Range: ", selectedRange);
-  
       // Process data for graphs
       processGraphData(incomeData, expenseData);
   
@@ -80,6 +77,15 @@ function Dashboard() {
           break;
         case "Year to Date":
           cardStartDate.setFullYear(today.getFullYear() - 1);
+          break;
+        case "Last 3 Months":
+          cardStartDate.setMonth(today.getMonth() - 3);
+          break;
+        case "Last 6 Months":
+          cardStartDate.setMonth(today.getMonth() - 6);
+          break;
+        case "Whole Year":
+          cardStartDate = new Date(today.getFullYear(), 0, 1); // Start of current year
           break;
         default:
           cardStartDate.setMonth(today.getMonth() - 1);
@@ -103,6 +109,7 @@ function Dashboard() {
         totalExpenses: expensesSum,
         netCashFlow: incomeSum - expensesSum
       });
+      setTransactions([...incomeData, ...expenseData]);
   
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -111,7 +118,6 @@ function Dashboard() {
   
 
   const processGraphData = (incomeData, expenseData) => {
-    // Process data based on selected range
     const today = new Date();
     let startDate = new Date();
     
@@ -125,7 +131,16 @@ function Dashboard() {
       case "Year to Date":
         startDate.setFullYear(today.getFullYear() - 1);
         break;
-      // Add other cases as needed
+      case "Last 3 Months":
+        startDate.setMonth(today.getMonth() - 3);
+        break;
+      case "Last 6 Months":
+        startDate.setMonth(today.getMonth() - 6);
+      case "Whole Year":
+        startDate = new Date(today.getFullYear(), 0, 1); // Start of current year
+        break;
+      default:
+        startDate.setMonth(today.getMonth() - 1);
     }
 
     // Create daily data points for area chart
@@ -225,10 +240,12 @@ function Dashboard() {
                 <XAxis dataKey="date" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
                 <Tooltip 
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
                   contentStyle={{ 
                     backgroundColor: '#1F2937',
                     border: "1px solid #374151",
-                    borderRadius: '0.5rem'
+                    borderRadius: '0.5rem',
+                    color: '#9CA3AF'
                   }}
                 />
                 <Line 
@@ -264,13 +281,20 @@ function Dashboard() {
                   tick={{ fontSize: 12 }}
                 />
                 <YAxis stroke="#9CA3AF" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#1F2937',
-                    border: '1px solid #374151',
-                    borderRadius: '0.5rem'
-                  }}
-                />
+                {graphData.barChart.length > 0 && (
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                    contentStyle={{ 
+                      backgroundColor: '#1F2937',
+                      border: '1px solid #374151',
+                      borderRadius: '0.5rem',
+                      color: '#9CA3AF',
+                    }}
+                    wrapperStyle={{ outline: 'none', pointerEvents: 'auto' }}
+                    isAnimationActive={false}
+                    formatter={(value) => (value > 0 ? value.toFixed(2) : null)}
+                  />
+                )}
                 <Legend />
                 <Bar dataKey="income" name="Income" stackId="a" fill="#3B82F6" fillOpacity={0.8} />
                 <Bar dataKey="expenses" name="Expenses" stackId="a" fill="#10B981" fillOpacity={0.8} />
