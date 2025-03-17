@@ -15,8 +15,8 @@ model income {
   tag                   String?
   date                  DateTime
   deduct_from_inventory Boolean  @default(false)
-  inventory_skuId       Int?
   inventory_qty         Int?
+  inventory_skuId       Int?
   tagName               String?
 }
 
@@ -30,29 +30,30 @@ model expense {
   tagName     String?
 }
 
-model tag {  
-  name     String    
-  userId   String    @default("global")
-  expenseTag Int     @default(0)
+model tag {
+  name       String
+  userId     String @default("global")
+  expenseTag Int    @default(0)
+
   @@id([name, userId])
 }
 
 model inventory {
-  id     Int    @id @default(autoincrement())
-  skuId  Int   
-  userId String
-  name   String
+  id          Int     @id @default(autoincrement())
+  skuId       Int
+  userId      String
+  name        String
+  amount      Int
+  category    String
   description String
-  amount Int
-  unitPrice Decimal
-  category String
+  unitPrice   Decimal
 }
 
 model salestax {
-  id    Int   @id @default(autoincrement())
-  userId  String
-  expenseId Int
+  id          Int     @id @default(autoincrement())
+  userId      String
+  expenseId   Int
   expenseFlag Int
-  taxRate Decimal
-  taxAmount Decimal
+  taxRate     Decimal
+  taxAmount   Decimal
 }
