@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from "@clerk/nextjs";
 import {
   IconChartPie,
   IconBoxSeam,
@@ -33,6 +34,7 @@ function useInView(options = {}) {
 
 function Hero() {
   const router = useRouter();
+  const { isSignedIn } = useUser();
 
   const features = [
     {
@@ -110,7 +112,7 @@ function Hero() {
 
           <div className="flex justify-center gap-4">
             <button
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push(isSignedIn ? '/dashboard' : '/sign-up')}
               className="px-8 py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-medium 
               hover:opacity-90 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/20
               active:scale-95"
