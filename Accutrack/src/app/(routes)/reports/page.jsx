@@ -478,19 +478,21 @@ function ReportsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#1c2230] text-[#bbbbbb]">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-12 space-y-2">
-          <h1 className="text-3xl font-bold text-white pt-20">Generate Reports</h1>
+          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-purple-600 bg-clip-text text-transparent pt-20">
+            Generate Reports
+          </h1>
           <p className="text-gray-400">Create and download financial reports in PDF or CSV format</p>
         </div>
 
-        <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800 mb-8">
+        <div className="backdrop-blur-xl bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 mb-8 transition-all duration-300 hover:border-white/20">
           <div className="space-y-8">
             <div>
-              <h3 className="text-sm font-medium text-gray-400 mb-6">Report Type</h3>
+              <h3 className="text-lg font-bold text-gray-200 mb-6">Report Type</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[
                   {
@@ -521,11 +523,11 @@ function ReportsPage() {
                   <button
                     key={type.id}
                     onClick={() => setReportType(type.id)}
-                    className={`p-6 rounded-lg border ${
+                    className={`p-6 rounded-xl backdrop-blur-sm ${
                       reportType === type.id
-                        ? "border-blue-500 bg-blue-500/10"
-                        : "border-gray-700 bg-gray-800/50"
-                    } hover:border-blue-500/50 transition-colors text-left`}
+                        ? "bg-blue-500/20 border-blue-500/30"
+                        : "bg-white/5 border-white/10"
+                    } border hover:border-blue-500/30 transition-all duration-300`}
                   >
                     {React.createElement(type.icon, {
                       className: "h-8 w-8 mb-3 text-blue-400"
@@ -541,21 +543,21 @@ function ReportsPage() {
               {reportType !== "inventory-summary" && (
                 <>
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1">Start Date</label>
+                    <label className="block text-sm text-gray-300 mb-1">Start Date</label>
                     <input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [color-scheme:dark]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-400 mb-1">End Date</label>
+                    <label className="block text-sm text-gray-300 mb-1">End Date</label>
                     <input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
+                      className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [color-scheme:dark]"
                     />
                   </div>
                 </>
@@ -564,11 +566,11 @@ function ReportsPage() {
 
             {reportType !== "income-statement" && (
               <div>
-                <label className="block text-sm text-gray-400 mb-1">Category</label>
+                <label className="block text-sm text-gray-300 mb-1">Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
                 >
                   <option key="all" value="all">All Categories</option>
                   {categories[
@@ -583,11 +585,11 @@ function ReportsPage() {
             )}
 
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Sort By</label>
+              <label className="block text-sm text-gray-300 mb-1">Sort By</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-md text-gray-200"
+                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
               >
                 {reportType === "inventory-summary" ? (
                   <>
@@ -615,19 +617,27 @@ function ReportsPage() {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Format</label>
+              <label className="block text-sm text-gray-300 mb-1">Format</label>
               <div className="flex gap-4">
                 <Button
                   key="pdf"
                   onClick={() => setFormat("pdf")}
-                  className={format === "pdf" ? "bg-blue-500" : "bg-gray-800"}
+                  className={`transition-all duration-200 ${
+                    format === "pdf"
+                      ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                      : "bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10"
+                  }`}
                 >
                   PDF
                 </Button>
                 <Button
                   key="csv"
                   onClick={() => setFormat("csv")}
-                  className={format === "csv" ? "bg-blue-500" : "bg-gray-800"}
+                  className={`transition-all duration-200 ${
+                    format === "csv"
+                      ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                      : "bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10"
+                  }`}
                 >
                   CSV
                 </Button>
@@ -637,14 +647,14 @@ function ReportsPage() {
             <div className="flex gap-4">
               <Button
                 onClick={() => generateReport(true)}
-                className="bg-gray-800 hover:bg-gray-700"
+                className="bg-white/5 text-gray-300 hover:bg-white/10 border border-white/10 transition-all duration-200"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Preview Report
               </Button>
               <Button
                 onClick={() => generateReport(false)}
-                className="bg-blue-500 hover:bg-blue-600"
+                className="bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20 transition-all duration-200"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Generate Report
@@ -654,9 +664,9 @@ function ReportsPage() {
         </div>
 
         {previewData && (
-          <div className="bg-gray-900/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-gray-800">
-            <h2 className="text-xl font-semibold text-white mb-4">Report Preview</h2>
-            <pre className="bg-gray-800/50 p-4 rounded-lg overflow-x-auto">
+          <div className="backdrop-blur-xl bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 transition-all duration-300 hover:border-white/20">
+            <h2 className="text-xl font-bold text-gray-200 mb-4">Report Preview</h2>
+            <pre className="bg-white/5 p-4 rounded-xl border border-white/10 overflow-x-auto text-gray-300">
               {JSON.stringify(previewData, null, 2)}
             </pre>
           </div>
@@ -668,4 +678,4 @@ function ReportsPage() {
   );
 }
 
-export default ReportsPage; 
+export default ReportsPage;

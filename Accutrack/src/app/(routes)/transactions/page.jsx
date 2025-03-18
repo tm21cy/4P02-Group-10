@@ -88,20 +88,20 @@ function TransactionsPage() {
   }, [filterType, sortOrder, startDate, endDate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1f2c] to-[#1c2230] text-[#bbbbbb]">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent mb-8 pt-20">
+        <h1 className="text-4xl font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-8 pt-20">
           Transactions
         </h1>
 
         {/* Filters Section */}
-        <div className="bg-gray-900/40 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-gray-800/50 mb-8 transition-all duration-300 hover:bg-gray-900/50">
+        <div className="backdrop-blur-xl bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 mb-8 transition-all duration-300 hover:border-white/20">
           <div className="space-y-8">
             {/* Transaction Type Filters */}
             <div>
-              <h3 className="text-sm font-medium text-gray-300 mb-3">Transaction Type</h3>
+              <h3 className="text-lg font-bold text-gray-300 mb-3">Transaction Type</h3>
               <div className="flex gap-3 flex-wrap">
                 {["all", "income", "expense"].map((type) => (
                   <Button
@@ -109,8 +109,8 @@ function TransactionsPage() {
                     onClick={() => setFilterType(type)}
                     className={`${
                       filterType === type
-                        ? "bg-gradient-to-r from-blue-500/20 to-teal-500/20 text-white border border-blue-400/20"
-                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-800/80"
+                        ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                        : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"
                     } transition-all duration-300`}
                   >
                     {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -121,7 +121,7 @@ function TransactionsPage() {
 
             {/* Date Range Filters */}
             <div>
-              <h3 className="text-sm font-medium text-gray-300 mb-3">Date Range</h3>
+              <h3 className="text-lg font-bold text-gray-300 mb-3">Date Range</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
                 <div className="space-y-2">
                   <label className="block text-sm text-gray-400">Start Date</label>
@@ -129,7 +129,7 @@ function TransactionsPage() {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-gray-800/30 border border-gray-700/50 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [color-scheme:dark]"
                   />
                 </div>
                 <div className="space-y-2">
@@ -138,13 +138,13 @@ function TransactionsPage() {
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-gray-800/30 border border-gray-700/50 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
+                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [color-scheme:dark]"
                   />
                 </div>
                 <div>
                   <Button
                     onClick={clearDateFilters}
-                    className="bg-gray-800/50 text-gray-400 hover:bg-gray-800/80 transition-all duration-300"
+                    className="bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30 transition-all duration-300"
                   >
                     Clear Dates
                   </Button>
@@ -154,7 +154,7 @@ function TransactionsPage() {
 
             {/* Sort Options */}
             <div>
-              <h3 className="text-sm font-medium text-gray-300 mb-3">Sort By</h3>
+              <h3 className="text-lg font-bold text-gray-300 mb-3">Sort By</h3>
               <div className="flex gap-3 flex-wrap">
                 {[
                   { value: "newest", label: "Newest" },
@@ -167,8 +167,8 @@ function TransactionsPage() {
                     onClick={() => setSortOrder(sort.value)}
                     className={`${
                       sortOrder === sort.value
-                        ? "bg-gradient-to-r from-blue-500/20 to-teal-500/20 text-white border border-blue-400/20"
-                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-800/80"
+                        ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
+                        : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"
                     } transition-all duration-300`}
                   >
                     {sort.label}
@@ -180,7 +180,7 @@ function TransactionsPage() {
         </div>
 
         {/* Transactions List */}
-        <div className="bg-gray-900/40 backdrop-blur-md p-8 rounded-2xl shadow-xl border border-gray-800/50">
+        <div className="backdrop-blur-xl bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10">
           {filteredTransactions.length === 0 ? (
             <p className="text-gray-400 text-center py-6">No transactions found</p>
           ) : (
@@ -188,17 +188,15 @@ function TransactionsPage() {
               {filteredTransactions.map((transaction) => (
                 <div 
                   key={transaction.id} 
-                  className="flex justify-between items-center p-5 bg-gray-800/30 rounded-xl hover:bg-gray-800/50 transition-all duration-300 border border-gray-700/30 hover:border-gray-700/50 group"
+                  className="flex justify-between items-center p-5 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-300 hover:border-white/20 group"
                 >
                   <div className="flex items-center gap-5">
-                    <div className={`p-3 rounded-full ${
+                    <div className={`p-3 rounded-xl ${
                       transaction.type === "income" 
-                        ? "bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/20" 
-                        : "bg-gradient-to-br from-teal-500/20 to-teal-600/20 border border-teal-500/20"
+                        ? "bg-sky-500/20 text-sky-400" 
+                        : "bg-emerald-500/20 text-emerald-400"
                     } transition-all duration-300 group-hover:scale-110`}>
-                      <div className={`text-lg font-medium ${
-                        transaction.type === "income" ? "text-blue-400" : "text-teal-400"
-                      }`}>
+                      <div className="text-lg font-medium">
                         {transaction.type === "income" ? "+" : "-"}
                       </div>
                     </div>
@@ -213,8 +211,8 @@ function TransactionsPage() {
                   </div>
                   <div className={`text-xl font-semibold ${
                     transaction.type === "income" 
-                      ? "text-blue-400 group-hover:text-blue-300" 
-                      : "text-teal-400 group-hover:text-teal-300"
+                      ? "text-sky-400 group-hover:text-sky-300" 
+                      : "text-emerald-400 group-hover:text-emerald-300"
                   } transition-colors duration-300`}>
                     ${Number(transaction.amount).toFixed(2)}
                   </div>
