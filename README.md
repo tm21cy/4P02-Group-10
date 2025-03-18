@@ -84,8 +84,8 @@ Each team member contributed equally to planning, development, and testing. Spri
 Explore the project on GitHub: [AccuTrack Repository](https://github.com/tm21cy/4P02-Group-10)
 
 For more details, refer to:
-- [Project Proposal](4P02%20Group%2010%20Project%20Proposal.pdf)
-- [Release Planning Document](4P02%20Group%2010%20Release%20Planning%20Document.pdf)
-- [Meeting Minutes](Meeting%20Minutes.pdf)
+- [Project Proposal](COSC 4P02 & SE Process/Checkpoint Documents/4P02 Group 10 Project Proposal.pdf)
+- [Release Planning Document](COSC 4P02 & SE Process/Checkpoint Documents/4P02 Group 10 Release Planning Document.pdf)
+- [Meeting Minutes](COSC 4P02 & SE Process/Meeting Minutes)
 
 ---
