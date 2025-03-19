@@ -4,7 +4,7 @@ import prismaDb from './prisma'
 
 /// POST ROUTES ///
 
-async function postNewIncome({ amount, description, tag, date, userId, deductFromInventory, inventoryItemId, inventoryQuantity }) {
+async function postNewIncome({ amount, description, tag, date, userId, deductFromInventory, inventoryItemId, inventoryQuantity, taxRate, taxAmount }) {
 	const resolvedDate = new Date(date)
 	if (isNaN(resolvedDate.getDate())) {
 		throw new Error("Date string is not properly formatted.")
@@ -18,13 +18,15 @@ async function postNewIncome({ amount, description, tag, date, userId, deductFro
 			userId,
 			deduct_from_inventory: deductFromInventory,
 			inventory_skuId: inventoryItemId,
-			inventory_qty: inventoryQuantity
+			inventory_qty: inventoryQuantity,
+			taxAmount,
+			taxRate
 		}
 	})
 	return result
 }
 
-async function postNewExpense({ amount, description, tag, date, userId }) {
+async function postNewExpense({ amount, description, tag, date, userId, taxRate, taxAmount }) {
 	const resolvedDate = new Date(date)
 	if (isNaN(resolvedDate.getDate())) {
 		throw new Error("Date string is not properly formatted.")
@@ -35,7 +37,9 @@ async function postNewExpense({ amount, description, tag, date, userId }) {
 			description,
 			tag,
 			date: resolvedDate,
-			userId
+			userId,
+			taxAmount,
+			taxRate
 		}
 	})
 	return result
@@ -68,18 +72,6 @@ async function postNewInventoryItem(skuId, userId, name, description, amount, un
 			amount,
 			unitPrice,
 			category
-		}
-	})
-}
-
-async function postNewSalesTax(userId, expenseId, taxRate, taxAmount, expenseFlag = 0) {
-	return prismaDb.salestax.create({
-		data: {
-			userId,
-			expenseId,
-			expenseFlag,
-			taxRate,
-			taxAmount
 		}
 	})
 }
@@ -174,7 +166,7 @@ async function getInventoryByUser(userId) {
 
 /// PATCH ROUTES ///
 
-async function patchExpenses(user, id, { amount, description, tag, date }) {
+async function patchExpenses(user, id, { amount, description, tag, date, taxRate, taxAmount }) {
 	console.log(id)
 	console.log(user)
 	const result = await prismaDb.expense.findFirst({
@@ -199,12 +191,14 @@ async function patchExpenses(user, id, { amount, description, tag, date }) {
 			amount,
 			description,
 			tag,
-			date: resolvedDate
+			date: resolvedDate,
+			taxRate,
+			taxAmount
 		}
 	})
 }
 
-async function patchIncome(user, id, { amount, description, tag, date }) {
+async function patchIncome(user, id, { amount, description, tag, date, taxRate, taxAmount }) {
 	console.log(id)
 	console.log(user)
 	const result = await prismaDb.income.findFirst({
@@ -229,7 +223,9 @@ async function patchIncome(user, id, { amount, description, tag, date }) {
 			amount,
 			description,
 			tag,
-			date: resolvedDate
+			date: resolvedDate,
+			taxRate,
+			taxAmount
 		}
 	})
 }
@@ -311,4 +307,4 @@ async function deleteInventoryItem(id) {
 
 /// FILE EXPORTS ///
 
-export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser, patchInventoryItemDetails, deleteInventoryItem, getValidInventoryTags, postNewSalesTax }
+export { postNewIncome, getIncome, postNewExpense, getExpenses, patchExpenses, deleteExpenses, patchIncome, deleteIncome, postNewTagIfNotExists, getInventoryItemBySkuId, getValidTags, getValidExpenseTags, postNewInventoryItem, patchInventoryAmountBuy, patchInventoryAmountSell, getInventoryByUser, patchInventoryItemDetails, deleteInventoryItem, getValidInventoryTags }

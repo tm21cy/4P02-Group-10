@@ -15,12 +15,6 @@ function ManageIncome() {
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
     
-    // Add state for inventory fields in edit mode
-    const [editInventoryData, setEditInventoryData] = useState({
-        deductFromInventory: false,
-        inventoryItemId: "",
-        inventoryQuantity: ""
-    });
 
     // Add state for sales tax fields
     const [editSalesTaxData, setEditSalesTaxData] = useState({
@@ -47,12 +41,6 @@ function ManageIncome() {
         setEditingIncome({
             ...income,
             amount: parseFloat(income.amount) || 0 // Ensure amount is a number
-        });
-        // Initialize inventory data when opening edit modal
-        setEditInventoryData({
-            deductFromInventory: false,
-            inventoryItemId: "",
-            inventoryQuantity: ""
         });
         // Initialize sales tax data
         setEditSalesTaxData({
@@ -91,8 +79,13 @@ function ManageIncome() {
                 amount: parseFloat(editingIncome.amount),
                 tag: editingIncome.tag === "Other" ? editingIncome.customTag : editingIncome.tag
             };
-            
-            await patchIncome(user.id, editingIncome.id, updatedIncome);
+            const taxRate = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxRate : 13
+            const taxAmount = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxAmount : 0
+            await patchIncome(user.id, editingIncome.id, {
+                ...updatedIncome,
+                taxRate,
+                taxAmount
+            });
             setMessage("Income updated successfully!");
             updateEntries(); // Refresh the list
             setEditingIncome(null);
@@ -324,65 +317,6 @@ function ManageIncome() {
                                             <div className="flex items-center space-x-2">
                                                 <input
                                                     type="checkbox"
-                                                    id="editDeductFromInventory"
-                                                    checked={editInventoryData.deductFromInventory}
-                                                    onChange={(e) => setEditInventoryData(prev => ({
-                                                        ...prev,
-                                                        deductFromInventory: e.target.checked
-                                                    }))}
-                                                    className="w-4 h-4 text-blue-500 bg-gray-800/50 border-gray-700 rounded"
-                                                />
-                                                <label htmlFor="editDeductFromInventory" className="text-sm font-medium text-gray-300">
-                                                    This income is tied to an inventory item
-                                                </label>
-                                            </div>
-
-                                            {editInventoryData.deductFromInventory && (
-                                                <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
-                                                    <h3 className="text-lg font-medium text-white">Inventory Details</h3>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                                Item ID
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                value={editInventoryData.inventoryItemId}
-                                                                onChange={(e) => setEditInventoryData(prev => ({
-                                                                    ...prev,
-                                                                    inventoryItemId: e.target.value
-                                                                }))}
-                                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
-                                                                placeholder="Enter inventory item ID"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                                Quantity Sold
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                min="1"
-                                                                value={editInventoryData.inventoryQuantity}
-                                                                onChange={(e) => setEditInventoryData(prev => ({
-                                                                    ...prev,
-                                                                    inventoryQuantity: e.target.value
-                                                                }))}
-                                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
-                                                                placeholder="Enter quantity"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <p className="text-sm text-gray-400">
-                                                        This will deduct the specified quantity from inventory
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="space-y-4 mb-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
                                                     id="editHasSalesTax"
                                                     checked={editSalesTaxData.hasSalesTax}
                                                     onChange={(e) => {
@@ -420,6 +354,7 @@ function ManageIncome() {
                                                                         taxRate: newRate,
                                                                         taxAmount: editingIncome.amount * (newRate / 100)
                                                                     }));
+                                                                    console.log(editSalesTaxData)
                                                                 }}
                                                                 className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
                                                                 placeholder="Enter tax rate"

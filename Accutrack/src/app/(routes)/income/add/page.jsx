@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getInventoryItemBySkuId, getValidTags, patchInventoryAmountSell, postNewIncome, postNewSalesTax, postNewTagIfNotExists } from "@/lib/db";
+import { getInventoryItemBySkuId, getValidTags, patchInventoryAmountSell, postNewIncome,postNewTagIfNotExists } from "@/lib/db";
 import { useUser } from "@clerk/nextjs";
 
 function AddIncome() {
@@ -137,10 +137,12 @@ function AddIncome() {
                 else await patchInventoryAmountSell(invItem.skuId, invItem.userId, inventoryData.inventoryQuantity)
             }
             
-            const income = await postNewIncome(updatedFormData);
-            if (salesTaxData.hasSalesTax) {
-                await postNewSalesTax(user.id, income.id, salesTaxData.taxRate, salesTaxData.taxAmount)
-            }
+            const income = await postNewIncome({
+                ...updatedFormData,
+                taxRate: salesTaxData.taxRate,
+                taxAmount: salesTaxData.taxAmount
+            });
+            
             setMessage("Income added successfully!");
             // Reset form data
             setFormData({
@@ -157,6 +159,12 @@ function AddIncome() {
                 inventoryItemId: "",
                 inventoryQuantity: ""
             });
+            // Reset sales tax data
+            setSalesTaxData({
+                hasSalesTax: false,
+                taxRate: 13, // Default to 13%
+                taxAmount: 0
+            })
         } catch (e) {
             console.log(e);
             setMessage("Error adding income.");

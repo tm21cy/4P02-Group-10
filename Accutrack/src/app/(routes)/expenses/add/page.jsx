@@ -5,7 +5,7 @@ import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { getValidExpenseTags, postNewExpense, postNewTagIfNotExists, getInventoryItemBySkuId, patchInventoryAmountBuy, postNewSalesTax } from "@/lib/db";
+import { getValidExpenseTags, postNewExpense, postNewTagIfNotExists, getInventoryItemBySkuId, patchInventoryAmountBuy } from "@/lib/db";
 
 // Page for adding new expenses
 function AddExpense() {
@@ -129,10 +129,11 @@ function AddExpense() {
                 }
                 else await patchInventoryAmountBuy(invItem.skuId, invItem.userId, parseInt(inventoryData.inventoryQuantity))
             }
-            const expense = await postNewExpense(updatedFormData);
-            if (salesTaxData.hasSalesTax) {
-                await postNewSalesTax(user.id, expense.id, salesTaxData.taxRate, salesTaxData.taxAmount, 1)
-            }
+            const expense = await postNewExpense({
+                ...updatedFormData,
+                taxAmount: salesTaxData.taxAmount,
+                taxRate: salesTaxData.taxRate
+            });
             setMessage("Expense added successfully!");
             // Reset form data
             setFormData({
@@ -149,6 +150,12 @@ function AddExpense() {
                 inventoryItemId: "",
                 inventoryQuantity: ""
             });
+            // Reset sales tax data
+            setSalesTaxData({
+                hasSalesTax: false,
+                taxRate: 13, // Default to 13%
+                taxAmount: 0
+            })
         } catch (e) {
             console.log(e);
             setMessage("Error adding expense.");
