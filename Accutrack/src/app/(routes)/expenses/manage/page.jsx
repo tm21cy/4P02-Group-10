@@ -13,7 +13,7 @@ function ManageExpenses() {
     const [editingExpense, setEditingExpense] = useState(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
-    
+
 
     // Add state for sales tax fields
     const [editSalesTaxData, setEditSalesTaxData] = useState({
@@ -138,6 +138,7 @@ function ManageExpenses() {
                                                     <th className="text-center p-5 text-gray-400 font-medium">Date</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Description</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Amount</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Tax</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Category</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
                                                 </tr>
@@ -148,11 +149,12 @@ function ManageExpenses() {
                                                         <td className="p-5 text-gray-300 text-center">{expense.date.toISOString().split("T")[0]}</td>
                                                         <td className="p-5 text-gray-300 text-center">{expense.description}</td>
                                                         <td className="p-5 text-teal-300 text-center">${expense.amount || "0.00"}</td>
+                                                        <td className="p-5 text-blue-400 font-medium text-center">${expense.taxAmount > 0 ? `${parseFloat(expense.taxAmount).toFixed(2)} (${expense.taxRate}%)` : "0.00"}</td>
                                                         <td className="p-5 flex justify-center">
                                                             <span className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center
                                                                 ${expense.tag === "Bills" ? 'bg-teal-500/10 text-teal-400 ring-1 ring-teal-400/30' :
-                                                                expense.tag === "Food" ? 'bg-orange-500/10 text-orange-400 ring-1 ring-orange-400/30' :
-                                                                'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30'}`}>
+                                                                    expense.tag === "Food" ? 'bg-orange-500/10 text-orange-400 ring-1 ring-orange-400/30' :
+                                                                        'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30'}`}>
                                                                 {expense.tag}
                                                             </span>
                                                         </td>
@@ -190,8 +192,8 @@ function ManageExpenses() {
                                                     </div>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium
                                                         ${expense.tag === "Bills" ? 'bg-teal-500/20 text-teal-300' :
-                                                        expense.tag === "Food" ? 'bg-orange-500/20 text-orange-300' :
-                                                        'bg-purple-500/20 text-purple-300'}`}>
+                                                            expense.tag === "Food" ? 'bg-orange-500/20 text-orange-300' :
+                                                                'bg-purple-500/20 text-purple-300'}`}>
                                                         {expense.tag}
                                                     </span>
                                                 </div>

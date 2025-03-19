@@ -141,6 +141,7 @@ function ManageIncome() {
                                                     <th className="text-center p-5 text-gray-400 font-medium">Date</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Description</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Amount</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Tax</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Category</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
                                                 </tr>
@@ -151,6 +152,7 @@ function ManageIncome() {
                                                         <td className="p-5 text-gray-300 text-center">{income.date.toISOString().split("T")[0]}</td>
                                                         <td className="p-5 text-gray-300 text-center">{income.description}</td>
                                                         <td className="p-5 text-blue-400 font-medium text-center">${income.amount || "0.00"}</td>
+                                                        <td className="p-5 text-blue-400 font-medium text-center">${income.taxAmount > 0 ? `${parseFloat(income.taxAmount).toFixed(2)} (${income.taxRate}%)` : "0.00"}</td>
                                                         <td className="p-5 flex justify-center">
                                                             <span className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center
                                                                 ${income.tag === "Salary" ? 'bg-green-500/10 text-green-400 ring-1 ring-green-400/30' :

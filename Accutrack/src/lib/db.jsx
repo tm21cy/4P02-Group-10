@@ -85,7 +85,9 @@ async function getIncome(user) {
 			date: true,
 			description: true,
 			amount: true,
-			tag: true
+			tag: true,
+			taxRate: true,
+			taxAmount: true
 		},
 		where: {
 			userId: user
@@ -100,7 +102,9 @@ async function getExpenses(user) {
 			date: true,
 			description: true,
 			amount: true,
-			tag: true
+			tag: true,
+			taxRate: true,
+			taxAmount: true
 		},
 		where: {
 			userId: user
