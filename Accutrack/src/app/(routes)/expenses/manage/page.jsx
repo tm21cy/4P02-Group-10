@@ -35,17 +35,22 @@ function ManageExpenses() {
     }
 
     const handleEdit = (expense) => {
+        const parsedAmount = parseFloat(expense.amount) || 0;
+        const existingTaxRate = expense.taxAmount > 0 ? expense.taxRate : 13;
+        const computedTaxAmount = parsedAmount * (existingTaxRate / 100);
+
         setEditingExpense({
             ...expense,
-            amount: parseFloat(expense.amount) || 0 // Ensure amount is a number
+            amount: parsedAmount,
         });
-        // Initialize sales tax data
+
         setEditSalesTaxData({
-            hasSalesTax: false,
-            taxRate: 13,
-            taxAmount: 0
+            hasSalesTax: expense.taxAmount > 0,
+            taxRate: existingTaxRate,
+            taxAmount: expense.taxAmount > 0 ? computedTaxAmount : 0
         });
     };
+
 
     const handleDelete = (id) => {
         deleteExpenses(user.id, id).then(() => {

@@ -38,17 +38,22 @@ function ManageIncome() {
     }
     // Functions for editing/deleting/saving
     const handleEdit = (income) => {
+        const parsedAmount = parseFloat(income.amount) || 0;
+        const existingTaxRate = income.taxAmount > 0 ? income.taxRate : 13;
+        const computedTaxAmount = parsedAmount * (existingTaxRate / 100);
+
         setEditingIncome({
             ...income,
-            amount: parseFloat(income.amount) || 0 // Ensure amount is a number
+            amount: parsedAmount
         });
-        // Initialize sales tax data
+
         setEditSalesTaxData({
-            hasSalesTax: false,
-            taxRate: 13,
-            taxAmount: 0
+            hasSalesTax: income.taxAmount > 0,
+            taxRate: existingTaxRate,
+            taxAmount: income.taxAmount > 0 ? computedTaxAmount : 0
         });
     };
+
 
     const handleDelete = (id) => {
         deleteIncome(user.id, id).then(() => {
