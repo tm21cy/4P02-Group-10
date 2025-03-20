@@ -1,5 +1,6 @@
 export function generateTransactionsSummary(transactions, type) {
   const total = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
+  const totalTax = transactions.reduce((sum, t) => sum + Number(t.taxAmount || 0), 0);
   const categorySummary = summarizeByCategory(transactions);
 
   return {
@@ -10,9 +11,11 @@ export function generateTransactionsSummary(transactions, type) {
       category: t.category,
       amount: t.amount,
       description: t.description,
-      tax: t.tax || 0
+      taxAmount: Number(t.taxAmount || 0),
+      taxRate: t.taxRate
     })),
     total,
+    totalTax,
     categorySummary,
     dateRange: {
       start: transactions[0]?.date,

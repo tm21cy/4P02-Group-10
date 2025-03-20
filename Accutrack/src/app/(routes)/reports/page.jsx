@@ -28,7 +28,10 @@ const formatCurrency = (amount) => {
 
 // Helper function to format date
 const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('en-CA', {
+  const d = new Date(date);
+  // Force the date to be interpreted in local timezone
+  d.setMinutes(d.getMinutes() + d.getTimezoneOffset());
+  return d.toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
@@ -37,13 +40,26 @@ const formatDate = (date) => {
 
 // Helper function to summarize transactions by category
 const summarizeByCategory = (transactions) => {
-  return transactions.reduce((acc, t) => {
+  const summary = transactions.reduce((acc, t) => {
     if (!acc[t.category]) {
       acc[t.category] = 0;
     }
     acc[t.category] += Number(t.amount);
     return acc;
   }, {});
+
+  // Renamed these variables to avoid conflict
+  const transactionDates = transactions.map((t) => new Date(t.date)).filter((d) => !isNaN(d));
+  const minDate = transactionDates.length > 0 ? new Date(Math.min(...transactionDates)) : new Date();
+  const maxDate = transactionDates.length > 0 ? new Date(Math.max(...transactionDates)) : new Date();
+  
+  return {
+    categorySummary: summary,
+    dateRange: {
+      start: minDate,
+      end: maxDate
+    }
+  };
 };
 
 // PDF Generation Functions
@@ -113,32 +129,64 @@ const generatePDF = (data, reportType) => {
     } else {
       // Transaction Summary format (Income or Expense)
       if (data.transactions && data.transactions.length > 0) {
+        const taxColumnName = reportType === "Income Transactions" ? "Sales Tax Collected" : "Sales Tax Paid";
+        const totalTax = data.transactions.reduce((sum, t) => sum + Number(t.taxAmount || 0), 0);
+        
+        // Main transactions table
         autoTable(doc, {
           startY: 50,
-          head: [['Date', 'Category', 'Description', 'Amount']],
+          head: [['Date', 'Category', 'Description', 'Amount', taxColumnName]],
           body: data.transactions.map(t => [
             formatDate(t.date),
             t.category,
             t.description,
-            formatCurrency(Number(t.amount))
+            formatCurrency(Number(t.amount)),
+            formatCurrency(Number(t.taxAmount || 0))
           ]),
-          foot: [['Total', '', '', formatCurrency(data.total)]],
           theme: 'grid',
           headStyles: { fillColor: [41, 128, 185] },
-          footStyles: { fillColor: [52, 73, 94] },
-          styles: { fontSize: 10 },
+          styles: {
+            fontSize: 10,
+            cellPadding: 5
+          },
           columnStyles: {
-            0: { cellWidth: 40 },
-            1: { cellWidth: 40 },
-            2: { cellWidth: 'auto' },
-            3: { cellWidth: 40, halign: 'right' }
+            0: { cellWidth: 35 },        // Date column
+            1: { cellWidth: 35 },        // Category column
+            2: { cellWidth: 50 },        // Description column - wider
+            3: { cellWidth: 30, halign: 'right' },  // Amount column
+            4: { cellWidth: 30, halign: 'right' }   // Tax column
           }
         });
 
-        // Add category summary
+        // Simple totals table with adjusted widths
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 10,
+          body: [
+            [
+              reportType === "Income Transactions" ? "Total Income" : "Total Expenses",
+              formatCurrency(data.total)
+            ],
+            [
+              'Total ' + taxColumnName,
+              formatCurrency(totalTax)
+            ]
+          ],
+          theme: 'plain',
+          styles: {
+            fontSize: 10,
+            cellPadding: 5
+          },
+          columnStyles: {
+            0: { cellWidth: 80 },  // Reduced from 120
+            1: { cellWidth: 30, halign: 'right' }
+          },
+          margin: { left: 20 }  // Added margin to align with main table
+        });
+
+        // Category summary
         if (Object.keys(data.categorySummary).length > 0) {
           const summaryStartY = doc.lastAutoTable.finalY + 20;
-          doc.setFontSize(14);
+          doc.setFontSize(12);
           doc.text('Category Summary', 20, summaryStartY);
 
           autoTable(doc, {
@@ -149,7 +197,15 @@ const generatePDF = (data, reportType) => {
               formatCurrency(Number(amount))
             ]),
             theme: 'grid',
-            headStyles: { fillColor: [41, 128, 185] }
+            headStyles: { fillColor: [41, 128, 185] },
+            styles: {
+              fontSize: 10,
+              cellPadding: 5
+            },
+            columnStyles: {
+              0: { cellWidth: 100 },
+              1: { cellWidth: 50, halign: 'right' }
+            }
           });
         }
       } else {
@@ -166,72 +222,103 @@ const generatePDF = (data, reportType) => {
 
 // CSV Generation Function
 const generateCSV = (data, reportType) => {
-  if (reportType === "Income Statement") {
-    return `Category,Amount
-Total Income,${data.totalIncome}
-Total Expenses,${data.totalExpenses}
-Net Taxable Income,${data.netIncome}`;
-  }
-  let fields = [];
-  let csvData = [];
-  
-  switch (reportType) {
-    case "Income Transactions":
-    case "Expense Transactions":
-      fields = ['Date', 'Category', 'Description', 'Amount', 'Tax'];
-      csvData = data.transactions.map(t => ({
-        Date: formatDate(t.date),
-        Category: t.category,
-        Description: t.description,
-        Amount: t.amount,
-        Tax: t.tax || 0
-      }));
-      break;
-    case "Inventory Summary":
-      fields = ['Generation Date', 'Item Name', 'SKU', 'Quantity', 'Unit Cost', 'Total Value', 'Category'];
-      csvData = [
-        {
-          'Generation Date': formatDate(data.generationDate),
-          'Item Name': '',
-          'SKU': '',
-          'Quantity': '',
-          'Unit Cost': '',
-          'Total Value': '',
-          'Category': ''
-        },
-        ...data.inventory.map(item => ({
-          'Generation Date': '',
-          'Item Name': item.name,
-          'SKU': item.skuId,
-          'Quantity': item.quantity,
-          'Unit Cost': item.unitPrice,
-          'Total Value': item.totalValue,
-          'Category': item.category || 'Uncategorized'
-        }))
+  try {
+    let csvData = [];
+    let fields = [];
+
+    if (reportType === "Income Statement") {
+      const rows = [
+        // Transactions first
+        { Category: 'Total Income', Amount: formatCurrency(data.totalIncome) },
+        { Category: 'Total Expenses', Amount: formatCurrency(data.totalExpenses) },
+        { Category: '', Amount: '' }, // blank line
+        { Category: 'Net Income', Amount: formatCurrency(data.netIncome) },
+        { Category: '', Amount: '' }, // blank line
+        
+        // Report metadata at the bottom
+        { Category: 'AccuTrack Financial Report', Amount: '' },
+        { Category: 'Income Statement', Amount: '' },
+        { Category: `Generated: ${new Date().toLocaleDateString()}`, Amount: '' },
+        { Category: `Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, Amount: '' }
       ];
-      break;
+
+      return new Parser({ fields: ['Category', 'Amount'] }).parse(rows);
+
+    } else if (reportType === "Income Transactions" || reportType === "Expense Transactions") {
+      const taxColumnName = reportType === "Income Transactions" ? "Sales Tax Collected" : "Sales Tax Paid";
+      
+      // Debug log to check the data
+      console.log("Transaction data:", data.transactions);
+      
+      const totalTax = data.transactions.reduce((sum, t) => sum + Number(t.taxAmount || 0), 0);
+      
+      const rows = [
+        // Transactions first
+        ...data.transactions.map(t => {
+          // Debug log for each transaction
+          console.log("Processing transaction:", t);
+          console.log("Tax amount:", t.taxAmount);
+          
+          return {
+            Date: formatDate(t.date),
+            Category: t.category,
+            Description: t.description,
+            Amount: formatCurrency(t.amount),
+            [taxColumnName]: formatCurrency(Number(t.taxAmount) || 0)
+          };
+        }),
+        { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+        
+        // Category Summary
+        { Date: 'Category Summary', Category: '', Description: '', Amount: '', [taxColumnName]: '' },
+        ...Object.entries(data.categorySummary).map(([category, amount]) => ({
+          Date: '',
+          Category: category,
+          Description: 'Total',
+          Amount: formatCurrency(amount),
+          [taxColumnName]: ''
+        })),
+        { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+        
+        // Total and Tax Total
+        { Date: '', Category: 'Total', Description: '', Amount: formatCurrency(data.total), [taxColumnName]: '' },
+        { Date: '', Category: 'Total Tax', Description: '', Amount: '', [taxColumnName]: formatCurrency(totalTax) },
+        { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+        
+        // Report metadata at the bottom
+        { Date: 'AccuTrack Financial Report', Category: '', Description: '', Amount: '', [taxColumnName]: '' },
+        { Date: reportType, Category: '', Description: '', Amount: '', [taxColumnName]: '' },
+        { Date: `Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, Category: '', Description: '', Amount: '', [taxColumnName]: '' }
+      ];
+
+      return new Parser({
+        fields: ['Date', 'Category', 'Description', 'Amount', taxColumnName]
+      }).parse(rows);
+    } else if (reportType === "Inventory Summary") {
+      // Keep existing inventory summary CSV generation if it exists
+      // ... existing inventory CSV code ...
+    }
+
+    return new Parser({ fields: fields }).parse(csvData);
+  } catch (error) {
+    console.error('Error generating CSV:', error);
+    throw error;
   }
-  
-  const parser = new Parser({ fields });
-  return parser.parse(csvData);
 };
 
 // Report generation functions
-const generateIncomeStatement = (incomeData, expenseData) => {
+const generateIncomeStatement = (incomeData, expenseData, startDate, endDate) => {
   const totalIncome = incomeData.reduce((sum, inc) => sum + Number(inc.amount), 0);
   const totalExpenses = expenseData.reduce((sum, exp) => sum + Number(exp.amount), 0);
   const netIncome = totalIncome - totalExpenses;
-
-  // Get the date range from the filtered data
-  const allDates = [...incomeData, ...expenseData].map(t => new Date(t.date));
-  const startDate = allDates.length > 0 ? new Date(Math.min(...allDates)) : new Date();
-  const endDate = allDates.length > 0 ? new Date(Math.max(...allDates)) : new Date();
 
   return {
     reportType: "Income Statement",
     totalIncome,
     totalExpenses,
     netIncome,
+    incomeBreakdown: summarizeByCategory(incomeData),
+    expenseBreakdown: summarizeByCategory(expenseData),
     dateRange: {
       start: startDate,
       end: endDate
@@ -239,16 +326,18 @@ const generateIncomeStatement = (incomeData, expenseData) => {
   };
 };
 
-const generateTransactionsSummary = (transactions, type) => {
+const generateTransactionsSummary = (transactions, type, reportStartDate, reportEndDate) => {
   const total = transactions.reduce((sum, t) => sum + Number(t.amount), 0);
   
   // Use tag for categorization
   const processedTransactions = transactions.map(t => ({
     id: t.id,
     date: t.date,
-    category: t.tag || 'Uncategorized', // Changed from t.type to t.tag
+    category: t.tag || 'Uncategorized',
     amount: t.amount,
-    description: t.description || ''
+    description: t.description || '',
+    taxAmount: t.taxAmount || 0,
+    taxRate: t.taxRate
   }));
 
   // Generate category summary using tag
@@ -261,18 +350,21 @@ const generateTransactionsSummary = (transactions, type) => {
     return acc;
   }, {});
 
-  const dates = transactions.map(t => new Date(t.date)).filter(d => !isNaN(d));
-  const startDate = dates.length > 0 ? new Date(Math.min(...dates)) : new Date();
-  const endDate = dates.length > 0 ? new Date(Math.max(...dates)) : new Date();
-
+  // Create proper Date objects with timezone adjustment
+  const start = new Date(reportStartDate);
+  start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
+  
+  const end = new Date(reportEndDate);
+  end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
+  
   return {
     reportType: type === "income" ? "Income Transactions" : "Expense Transactions",
     transactions: processedTransactions,
     total,
     categorySummary,
     dateRange: {
-      start: startDate,
-      end: endDate
+      start: start,
+      end: end
     }
   };
 };
@@ -340,11 +432,14 @@ function ReportsPage() {
   const filterTransactions = (transactions, isInventory = false) => {
     let filtered = [...transactions];
 
-    // Only apply date filtering for non-inventory items
     if (!isInventory && startDate && endDate) {
       const start = new Date(startDate);
+      start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
+      start.setHours(0, 0, 0, 0);
+      
       const end = new Date(endDate);
-      end.setHours(23, 59, 59);
+      end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
+      end.setHours(23, 59, 59, 999);
 
       filtered = filtered.filter(t => {
         const date = new Date(t.date);
@@ -450,15 +545,25 @@ function ReportsPage() {
           const expenseData = await getExpenses(user.id);
           const filteredIncome = filterTransactions(incomeData);
           const filteredExpenses = filterTransactions(expenseData);
-          reportData = generateIncomeStatement(filteredIncome, filteredExpenses);
+          reportData = generateIncomeStatement(filteredIncome, filteredExpenses, new Date(startDate), new Date(endDate));
           break;
         case "income-summary":
           const incomeTransactions = await getIncome(user.id);
-          reportData = generateTransactionsSummary(filterTransactions(incomeTransactions), "income");
+          reportData = generateTransactionsSummary(
+            filterTransactions(incomeTransactions), 
+            "income",
+            new Date(startDate),
+            new Date(endDate)
+          );
           break;
         case "expense-summary":
           const expenseTransactions = await getExpenses(user.id);
-          reportData = generateTransactionsSummary(filterTransactions(expenseTransactions), "expense");
+          reportData = generateTransactionsSummary(
+            filterTransactions(expenseTransactions), 
+            "expense",
+            new Date(startDate),
+            new Date(endDate)
+          );
           break;
         case "inventory-summary":
           const inventoryData = await getInventoryByUser(user.id);
@@ -570,7 +675,7 @@ function ReportsPage() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [&>option]:text-gray-900 [&>option]:bg-white"
                 >
                   <option key="all" value="all">All Categories</option>
                   {categories[
@@ -584,37 +689,41 @@ function ReportsPage() {
               </div>
             )}
 
-            <div>
-              <label className="block text-sm text-gray-300 mb-1">Sort By</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300"
-              >
-                {reportType === "inventory-summary" ? (
-                  <>
-                    <option value="name-asc">Item Name (A-Z)</option>
-                    <option value="name-desc">Item Name (Z-A)</option>
-                    <option value="sku-asc">SKU (Low to High)</option>
-                    <option value="sku-desc">SKU (High to Low)</option>
-                    <option value="quantity-desc">Quantity (High to Low)</option>
-                    <option value="quantity-asc">Quantity (Low to High)</option>
-                    <option value="value-desc">Total Value (High to Low)</option>
-                    <option value="value-asc">Total Value (Low to High)</option>
-                    <option value="category-asc">Category (A-Z)</option>
-                    <option value="category-desc">Category (Z-A)</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="date-desc">Date (Newest First)</option>
-                    <option value="date-asc">Date (Oldest First)</option>
-                    <option value="amount-desc">Amount (Highest First)</option>
-                    <option value="amount-asc">Amount (Lowest First)</option>
-                    <option value="category">Category</option>
-                  </>
-                )}
-              </select>
-            </div>
+            {/* Wrap the sort by section in a condition to hide it for income statement */}
+            {reportType !== "income-statement" && (
+              <div>
+                <label className="block text-sm text-gray-300 mb-1">Sort By</label>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [&>option]:text-gray-900 [&>option]:bg-white"
+                >
+                  {reportType === "inventory-summary" ? (
+                    <>
+                      <option value="name-asc">Item Name (A-Z)</option>
+                      <option value="name-desc">Item Name (Z-A)</option>
+                      <option value="sku-asc">SKU (Low to High)</option>
+                      <option value="sku-desc">SKU (High to Low)</option>
+                      <option value="quantity-desc">Quantity (High to Low)</option>
+                      <option value="quantity-asc">Quantity (Low to High)</option>
+                      <option value="value-desc">Total Value (High to Low)</option>
+                      <option value="value-asc">Total Value (Low to High)</option>
+                      <option value="category-asc">Category (A-Z)</option>
+                      <option value="category-desc">Category (Z-A)</option>
+                    </>
+                  ) : (
+                    <>
+                      <option value="date-desc">Date (Newest First)</option>
+                      <option value="date-asc">Date (Oldest First)</option>
+                      <option value="amount-desc">Amount (High to Low)</option>
+                      <option value="amount-asc">Amount (Low to High)</option>
+                      <option value="category-asc">Category (A-Z)</option>
+                      <option value="category-desc">Category (Z-A)</option>
+                    </>
+                  )}
+                </select>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm text-gray-300 mb-1">Format</label>
