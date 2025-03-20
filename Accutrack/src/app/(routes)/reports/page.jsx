@@ -126,6 +126,101 @@ const generatePDF = (data, reportType) => {
       } else {
         doc.text('No inventory items found.', 20, 60);
       }
+    } else if (reportType === "Sales Tax Report") {
+      // Summary Table
+      autoTable(doc, {
+        startY: 50,
+        body: [
+          ['Total Sales Tax Collected:', formatCurrency(data.totalTaxCollected)],
+          ['Total Sales Tax Paid:', formatCurrency(data.totalTaxPaid)],
+          ['Net Sales Tax Remittance:', formatCurrency(data.netTaxRemittance)]
+        ],
+        theme: 'plain',
+        styles: {
+          fontSize: 10,
+          cellPadding: 3
+        },
+        columnStyles: {
+          0: { cellWidth: 80 },
+          1: { cellWidth: 30, halign: 'right' }
+        }
+      });
+
+      // Income Transactions Table
+      if (data.taxableTransactions.income.length > 0) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 8,
+          head: [
+            [{ content: 'Sales Tax Collected from Income Transactions', colSpan: 5 }],
+            ['Date', 'Description', 'Amount', 'Tax Rate', 'Tax Collected']
+          ],
+          body: data.taxableTransactions.income.map(t => [
+            formatDate(t.date),
+            t.description,
+            formatCurrency(Number(t.amount)),
+            t.taxRate + '%',
+            formatCurrency(Number(t.taxAmount))
+          ]),
+          theme: 'grid',
+          headStyles: { 
+            fillColor: [41, 128, 185],
+            halign: 'center',
+            fontSize: 8,
+            cellPadding: 2,
+            minCellHeight: 6
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 4,
+            overflow: 'linebreak'
+          },
+          columnStyles: {
+            0: { cellWidth: 35 },
+            1: { cellWidth: 70 },
+            2: { cellWidth: 25, halign: 'right' },
+            3: { cellWidth: 20, halign: 'right' },
+            4: { cellWidth: 25, halign: 'right' }
+          }
+        });
+      }
+
+      // Expense Transactions Table
+      if (data.taxableTransactions.expenses.length > 0) {
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 8,
+          head: [
+            [{ content: 'Sales Tax Paid on Expense Transactions', colSpan: 5 }],
+            ['Date', 'Description', 'Amount', 'Tax Rate', 'Tax Paid']
+          ],
+          body: data.taxableTransactions.expenses.map(t => [
+            formatDate(t.date),
+            t.description,
+            formatCurrency(Number(t.amount)),
+            t.taxRate + '%',
+            formatCurrency(Number(t.taxAmount))
+          ]),
+          theme: 'grid',
+          headStyles: { 
+            fillColor: [41, 128, 185],
+            halign: 'center',
+            fontSize: 8,
+            cellPadding: 2,
+            minCellHeight: 6
+          },
+          styles: {
+            fontSize: 9,
+            cellPadding: 4,
+            overflow: 'linebreak'
+          },
+          columnStyles: {
+            0: { cellWidth: 35 },
+            1: { cellWidth: 70 },
+            2: { cellWidth: 25, halign: 'right' },
+            3: { cellWidth: 20, halign: 'right' },
+            4: { cellWidth: 25, halign: 'right' }
+          }
+        });
+      }
     } else {
       // Transaction Summary format (Income or Expense)
       if (data.transactions && data.transactions.length > 0) {
@@ -144,70 +239,78 @@ const generatePDF = (data, reportType) => {
             formatCurrency(Number(t.taxAmount || 0))
           ]),
           theme: 'grid',
-          headStyles: { fillColor: [41, 128, 185] },
+          headStyles: { 
+            fillColor: [41, 128, 185],
+            fontSize: 8
+          },
           styles: {
-            fontSize: 10,
-            cellPadding: 5
+            fontSize: 8,
+            cellPadding: 2
           },
           columnStyles: {
-            0: { cellWidth: 35 },        // Date column
-            1: { cellWidth: 35 },        // Category column
-            2: { cellWidth: 50 },        // Description column - wider
-            3: { cellWidth: 30, halign: 'right' },  // Amount column
-            4: { cellWidth: 30, halign: 'right' }   // Tax column
+            0: { cellWidth: 35 },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 50 },
+            3: { cellWidth: 30, halign: 'right' },
+            4: { cellWidth: 30, halign: 'right' }
           }
         });
 
-        // Simple totals table with adjusted widths
+        // Totals (with proper labeling)
         autoTable(doc, {
-          startY: doc.lastAutoTable.finalY + 10,
+          startY: doc.lastAutoTable.finalY + 4,
           body: [
             [
-              reportType === "Income Transactions" ? "Total Income" : "Total Expenses",
-              formatCurrency(data.total)
+              reportType === "Income Transactions" ? 'Total Income:' : 'Total Expenses:', 
+              '', 
+              '', 
+              formatCurrency(data.total),
+              ''
             ],
             [
-              'Total ' + taxColumnName,
+              reportType === "Income Transactions" ? 'Total Sales Tax Collected:' : 'Total Sales Tax Paid:', 
+              '', 
+              '', 
+              '',
               formatCurrency(totalTax)
             ]
           ],
           theme: 'plain',
           styles: {
             fontSize: 10,
-            cellPadding: 5
+            cellPadding: 2
           },
           columnStyles: {
-            0: { cellWidth: 80 },  // Reduced from 120
-            1: { cellWidth: 30, halign: 'right' }
-          },
-          margin: { left: 20 }  // Added margin to align with main table
+            0: { cellWidth: 35 },
+            1: { cellWidth: 35 },
+            2: { cellWidth: 50 },
+            3: { cellWidth: 30, halign: 'right' },
+            4: { cellWidth: 30, halign: 'right' }
+          }
         });
 
-        // Category summary
-        if (Object.keys(data.categorySummary).length > 0) {
-          const summaryStartY = doc.lastAutoTable.finalY + 20;
-          doc.setFontSize(12);
-          doc.text('Category Summary', 20, summaryStartY);
-
-          autoTable(doc, {
-            startY: summaryStartY + 10,
-            head: [['Category', 'Total']],
-            body: Object.entries(data.categorySummary).map(([category, amount]) => [
-              category,
-              formatCurrency(Number(amount))
-            ]),
-            theme: 'grid',
-            headStyles: { fillColor: [41, 128, 185] },
-            styles: {
-              fontSize: 10,
-              cellPadding: 5
-            },
-            columnStyles: {
-              0: { cellWidth: 100 },
-              1: { cellWidth: 50, halign: 'right' }
-            }
-          });
-        }
+        // Category Summary table (keeping the close spacing)
+        autoTable(doc, {
+          startY: doc.lastAutoTable.finalY + 4,
+          head: [['Category', 'Amount']],
+          body: Object.entries(data.categorySummary).map(([category, amount]) => [
+            category,
+            formatCurrency(amount)
+          ]),
+          theme: 'grid',
+          headStyles: { 
+            fillColor: [41, 128, 185],
+            fontSize: 8
+          },
+          styles: {
+            fontSize: 8,
+            cellPadding: 2
+          },
+          columnStyles: {
+            0: { cellWidth: 100 },
+            1: { cellWidth: 50, halign: 'right' }
+          }
+        });
       } else {
         doc.text('No transactions found for the selected period.', 20, 60);
       }
@@ -380,6 +483,58 @@ const generateCSV = (data, reportType) => {
       } else if (reportType === "Inventory Summary") {
         // Keep existing inventory summary CSV generation if it exists
         // ... existing inventory CSV code ...
+      } else if (reportType === "Sales Tax Report") {
+        const json2csvParser = new Parser({ header: false });
+        let csvData = [
+          // Summary section at the top
+          ['Summary'],
+          ['Total Sales Tax Collected:', '', '', '', formatCurrency(data.totalTaxCollected)],
+          ['Total Sales Tax Paid:', '', '', '', formatCurrency(data.totalTaxPaid)],
+          ['Net Sales Tax Remittance:', '', '', '', formatCurrency(data.netTaxRemittance)],
+          ['']
+        ];
+
+        // Add Income Transactions if they exist
+        if (data.taxableTransactions.income.length > 0) {
+          csvData = csvData.concat([
+            ['Sales Tax Collected from Income Transactions'],
+            ['Date', 'Description', 'Amount', 'Tax Rate', 'Tax Collected'],
+            ...data.taxableTransactions.income.map(t => [
+              formatDate(t.date),
+              t.description,
+              formatCurrency(Number(t.amount)),
+              t.taxRate + '%',
+              formatCurrency(Number(t.taxAmount))
+            ]),
+            [''] // blank line
+          ]);
+        }
+
+        // Add Expense Transactions if they exist
+        if (data.taxableTransactions.expenses.length > 0) {
+          csvData = csvData.concat([
+            ['Sales Tax Paid on Expense Transactions'],
+            ['Date', 'Description', 'Amount', 'Tax Rate', 'Tax Paid'],
+            ...data.taxableTransactions.expenses.map(t => [
+              formatDate(t.date),
+              t.description,
+              formatCurrency(Number(t.amount)),
+              t.taxRate + '%',
+              formatCurrency(Number(t.taxAmount))
+            ]),
+            [''] // blank line
+          ]);
+        }
+
+        // Add metadata at the bottom
+        csvData = csvData.concat([
+          ['AccuTrack Financial Report'],
+          ['Sales Tax Report'],
+          [`Generated: ${formatDate(new Date())}`],
+          [`Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`]
+        ]);
+
+        return json2csvParser.parse(csvData);
       }
 
       return new Parser({ fields: fields }).parse(csvData);
@@ -473,6 +628,47 @@ const generateInventorySummary = (inventoryData) => {
     inventory: processedInventory,
     total,
     generationDate
+  };
+};
+
+// Add this function alongside your other report generation functions
+const generateSalesTaxSummary = (incomeData, expenseData, startDate, endDate) => {
+  // Filter transactions with tax
+  const taxableIncome = incomeData.filter(inc => Number(inc.taxAmount) > 0);
+  const taxableExpenses = expenseData.filter(exp => Number(exp.taxAmount) > 0);
+
+  // Calculate totals
+  const totalTaxCollected = taxableIncome.reduce((sum, inc) => sum + Number(inc.taxAmount || 0), 0);
+  const totalTaxPaid = taxableExpenses.reduce((sum, exp) => sum + Number(exp.taxAmount || 0), 0);
+  const netTaxRemittance = totalTaxCollected - totalTaxPaid;
+
+  return {
+    reportType: "Sales Tax Report",
+    totalTaxCollected,
+    totalTaxPaid,
+    netTaxRemittance,
+    taxableTransactions: {
+      income: taxableIncome.map(inc => ({
+        date: inc.date,
+        type: 'Income',
+        description: inc.description,
+        amount: inc.amount,
+        taxAmount: Number(inc.taxAmount || 0),
+        taxRate: inc.taxRate
+      })),
+      expenses: taxableExpenses.map(exp => ({
+        date: exp.date,
+        type: 'Expense',
+        description: exp.description,
+        amount: exp.amount,
+        taxAmount: Number(exp.taxAmount || 0),
+        taxRate: exp.taxRate
+      }))
+    },
+    dateRange: {
+      start: startDate,
+      end: endDate
+    }
   };
 };
 
@@ -654,6 +850,16 @@ function ReportsPage() {
           let filteredInventory = filterTransactions(inventoryData, true);
           reportData = generateInventorySummary(filteredInventory);
           break;
+        case "sales-tax":
+          const taxIncomeData = await getIncome(user.id);
+          const taxExpenseData = await getExpenses(user.id);
+          reportData = generateSalesTaxSummary(
+            filterTransactions(taxIncomeData), 
+            filterTransactions(taxExpenseData), 
+            new Date(startDate), 
+            new Date(endDate)
+          );
+          break;
       }
 
       if (preview) {
@@ -707,6 +913,12 @@ function ReportsPage() {
                     title: "Inventory Summary",
                     description: "Detailed inventory status report",
                     icon: Package
+                  },
+                  {
+                    id: "sales-tax",
+                    title: "Sales Tax Report",
+                    description: "Detailed sales tax transaction report",
+                    icon: FileText
                   }
                 ].map((type) => (
                   <button
@@ -753,7 +965,7 @@ function ReportsPage() {
               )}
             </div>
 
-            {reportType !== "income-statement" && (
+            {reportType !== "income-statement" && reportType !== "sales-tax" && (
               <div>
                 <label className="block text-sm text-gray-300 mb-1">Category</label>
                 <select
@@ -773,8 +985,7 @@ function ReportsPage() {
               </div>
             )}
 
-            {/* Wrap the sort by section in a condition to hide it for income statement */}
-            {reportType !== "income-statement" && (
+            {reportType !== "income-statement" && reportType !== "sales-tax" && (
               <div>
                 <label className="block text-sm text-gray-300 mb-1">Sort By</label>
                 <select
