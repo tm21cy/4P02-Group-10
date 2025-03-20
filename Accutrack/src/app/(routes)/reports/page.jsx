@@ -223,83 +223,167 @@ const generatePDF = (data, reportType) => {
 // CSV Generation Function
 const generateCSV = (data, reportType) => {
   try {
-    let csvData = [];
-    let fields = [];
-
-    if (reportType === "Income Statement") {
-      const rows = [
-        // Transactions first
-        { Category: 'Total Income', Amount: formatCurrency(data.totalIncome) },
-        { Category: 'Total Expenses', Amount: formatCurrency(data.totalExpenses) },
-        { Category: '', Amount: '' }, // blank line
-        { Category: 'Net Income', Amount: formatCurrency(data.netIncome) },
-        { Category: '', Amount: '' }, // blank line
+    if (reportType === "Inventory Summary") {
+      const json2csvParser = new Parser({ header: false }); // Disable automatic headers
+      
+      const csvData = [
+        // Column headers
+        {
+          Name: 'Name',
+          SKU: 'SKU',
+          Category: 'Category',
+          Quantity: 'Quantity',
+          'Unit Price': 'Unit Price',
+          'Total Value': 'Total Value'
+        },
         
-        // Report metadata at the bottom
-        { Category: 'AccuTrack Financial Report', Amount: '' },
-        { Category: 'Income Statement', Amount: '' },
-        { Category: `Generated: ${new Date().toLocaleDateString()}`, Amount: '' },
-        { Category: `Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, Amount: '' }
-      ];
-
-      return new Parser({ fields: ['Category', 'Amount'] }).parse(rows);
-
-    } else if (reportType === "Income Transactions" || reportType === "Expense Transactions") {
-      const taxColumnName = reportType === "Income Transactions" ? "Sales Tax Collected" : "Sales Tax Paid";
-      
-      // Debug log to check the data
-      console.log("Transaction data:", data.transactions);
-      
-      const totalTax = data.transactions.reduce((sum, t) => sum + Number(t.taxAmount || 0), 0);
-      
-      const rows = [
-        // Transactions first
-        ...data.transactions.map(t => {
-          // Debug log for each transaction
-          console.log("Processing transaction:", t);
-          console.log("Tax amount:", t.taxAmount);
-          
-          return {
-            Date: formatDate(t.date),
-            Category: t.category,
-            Description: t.description,
-            Amount: formatCurrency(t.amount),
-            [taxColumnName]: formatCurrency(Number(t.taxAmount) || 0)
-          };
-        }),
-        { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
-        
-        // Category Summary
-        { Date: 'Category Summary', Category: '', Description: '', Amount: '', [taxColumnName]: '' },
-        ...Object.entries(data.categorySummary).map(([category, amount]) => ({
-          Date: '',
-          Category: category,
-          Description: 'Total',
-          Amount: formatCurrency(amount),
-          [taxColumnName]: ''
+        // Inventory Items
+        ...data.inventory.map(item => ({
+          Name: item.name,
+          SKU: item.skuId,
+          Category: item.category,
+          Quantity: item.quantity,
+          'Unit Price': formatCurrency(Number(item.unitPrice)),
+          'Total Value': formatCurrency(Number(item.totalValue))
         })),
-        { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
         
-        // Total and Tax Total
-        { Date: '', Category: 'Total', Description: '', Amount: formatCurrency(data.total), [taxColumnName]: '' },
-        { Date: '', Category: 'Total Tax', Description: '', Amount: '', [taxColumnName]: formatCurrency(totalTax) },
-        { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+        // Blank line
+        {
+          Name: '',
+          SKU: '',
+          Category: '',
+          Quantity: '',
+          'Unit Price': '',
+          'Total Value': ''
+        },
+        
+        // Total row
+        {
+          Name: 'Total Inventory Value',
+          SKU: '',
+          Category: '',
+          Quantity: '',
+          'Unit Price': '',
+          'Total Value': formatCurrency(Number(data.total))
+        },
+        
+        // Blank line before metadata
+        {
+          Name: '',
+          SKU: '',
+          Category: '',
+          Quantity: '',
+          'Unit Price': '',
+          'Total Value': ''
+        },
         
         // Report metadata at the bottom
-        { Date: 'AccuTrack Financial Report', Category: '', Description: '', Amount: '', [taxColumnName]: '' },
-        { Date: reportType, Category: '', Description: '', Amount: '', [taxColumnName]: '' },
-        { Date: `Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, Category: '', Description: '', Amount: '', [taxColumnName]: '' }
+        {
+          Name: 'AccuTrack Financial Report',
+          SKU: '',
+          Category: '',
+          Quantity: '',
+          'Unit Price': '',
+          'Total Value': ''
+        },
+        {
+          Name: 'Inventory Summary',
+          SKU: '',
+          Category: '',
+          Quantity: '',
+          'Unit Price': '',
+          'Total Value': ''
+        },
+        {
+          Name: 'Generated: ' + new Date().toLocaleDateString(),
+          SKU: '',
+          Category: '',
+          Quantity: '',
+          'Unit Price': '',
+          'Total Value': ''
+        }
       ];
 
-      return new Parser({
-        fields: ['Date', 'Category', 'Description', 'Amount', taxColumnName]
-      }).parse(rows);
-    } else if (reportType === "Inventory Summary") {
-      // Keep existing inventory summary CSV generation if it exists
-      // ... existing inventory CSV code ...
-    }
+      return json2csvParser.parse(csvData);
+    } else {
+      let csvData = [];
+      let fields = [];
 
-    return new Parser({ fields: fields }).parse(csvData);
+      if (reportType === "Income Statement") {
+        const rows = [
+          // Transactions first
+          { Category: 'Total Income', Amount: formatCurrency(data.totalIncome) },
+          { Category: 'Total Expenses', Amount: formatCurrency(data.totalExpenses) },
+          { Category: '', Amount: '' }, // blank line
+          { Category: 'Net Income', Amount: formatCurrency(data.netIncome) },
+          { Category: '', Amount: '' }, // blank line
+          
+          // Report metadata at the bottom
+          { Category: 'AccuTrack Financial Report', Amount: '' },
+          { Category: 'Income Statement', Amount: '' },
+          { Category: `Generated: ${new Date().toLocaleDateString()}`, Amount: '' },
+          { Category: `Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, Amount: '' }
+        ];
+
+        return new Parser({ fields: ['Category', 'Amount'] }).parse(rows);
+
+      } else if (reportType === "Income Transactions" || reportType === "Expense Transactions") {
+        const taxColumnName = reportType === "Income Transactions" ? "Sales Tax Collected" : "Sales Tax Paid";
+        
+        // Debug log to check the data
+        console.log("Transaction data:", data.transactions);
+        
+        const totalTax = data.transactions.reduce((sum, t) => sum + Number(t.taxAmount || 0), 0);
+        
+        const rows = [
+          // Transactions first
+          ...data.transactions.map(t => {
+            // Debug log for each transaction
+            console.log("Processing transaction:", t);
+            console.log("Tax amount:", t.taxAmount);
+            
+            return {
+              Date: formatDate(t.date),
+              Category: t.category,
+              Description: t.description,
+              Amount: formatCurrency(t.amount),
+              [taxColumnName]: formatCurrency(Number(t.taxAmount) || 0)
+            };
+          }),
+          { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+          
+          // Category Summary
+          { Date: 'Category Summary', Category: '', Description: '', Amount: '', [taxColumnName]: '' },
+          ...Object.entries(data.categorySummary).map(([category, amount]) => ({
+            Date: '',
+            Category: category,
+            Description: 'Total',
+            Amount: formatCurrency(amount),
+            [taxColumnName]: ''
+          })),
+          { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+          
+          // Total and Tax Total
+          { Date: '', Category: 'Total', Description: '', Amount: formatCurrency(data.total), [taxColumnName]: '' },
+          { Date: '', Category: 'Total Tax', Description: '', Amount: '', [taxColumnName]: formatCurrency(totalTax) },
+          { Date: '', Category: '', Description: '', Amount: '', [taxColumnName]: '' }, // blank line
+          
+          // Report metadata at the bottom
+          { Date: 'AccuTrack Financial Report', Category: '', Description: '', Amount: '', [taxColumnName]: '' },
+          { Date: reportType, Category: '', Description: '', Amount: '', [taxColumnName]: '' },
+          { Date: `Period: ${formatDate(data.dateRange.start)} to ${formatDate(data.dateRange.end)}`, Category: '', Description: '', Amount: '', [taxColumnName]: '' }
+        ];
+
+        return new Parser({
+          fields: ['Date', 'Category', 'Description', 'Amount', taxColumnName]
+        }).parse(rows);
+      } else if (reportType === "Inventory Summary") {
+        // Keep existing inventory summary CSV generation if it exists
+        // ... existing inventory CSV code ...
+      }
+
+      return new Parser({ fields: fields }).parse(csvData);
+    }
   } catch (error) {
     console.error('Error generating CSV:', error);
     throw error;
