@@ -9,22 +9,64 @@ describe("Dashboard Backend Automated Tests", () => {
     await prisma.income.deleteMany({ where: { userId: testUserId } });
     await prisma.expense.deleteMany({ where: { userId: testUserId } });
 
-    // Insert test income
     await prisma.income.createMany({
       data: [
-        { userId: testUserId, amount: 150.50, description: "Freelance Work", tag: "Work", date: new Date("2025-03-01") },
-        { userId: testUserId, amount: 300.75, description: "Consulting", tag: "Business", date: new Date("2025-03-05") },
+        {
+          userId: testUserId,
+          amount: 150.50,
+          taxAmount: 0,
+          taxRate: 0, 
+          description: "Freelance Work",
+          tag: "Work",
+          date: new Date("2025-03-01"),
+        },
+        {
+          userId: testUserId,
+          amount: 300.75,
+          taxAmount: 0,
+          taxRate: 0, 
+          description: "Consulting",
+          tag: "Business",
+          date: new Date("2025-03-05"),
+        },
       ],
     });
+    
+    
 
     // Insert test expenses
     await prisma.expense.createMany({
       data: [
-        { userId: testUserId, amount: 50.00, description: "T-shirt", tag: "Clothes", date: new Date("2025-03-16") },
-        { userId: testUserId, amount: 24.98, description: "Apples", tag: "Groceries", date: new Date("2025-03-17") },
-        { userId: testUserId, amount: 100.14, description: "Flowers", tag: "Miscellaneous", date: new Date("2025-03-17") },
+        {
+          userId: testUserId,
+          amount: 50.00,
+          taxRate: 0, 
+          taxAmount: 0, 
+          description: "T-shirt",
+          tag: "Clothes",
+          date: new Date("2025-03-16"),
+        },
+        {
+          userId: testUserId,
+          amount: 24.98,
+          taxRate: 0,
+          taxAmount: 0,
+          description: "Apples",
+          tag: "Groceries",
+          date: new Date("2025-03-17"),
+        },
+        {
+          userId: testUserId,
+          amount: 100.14,
+          taxRate: 0,
+          taxAmount: 0,
+          description: "Flowers",
+          tag: "Miscellaneous",
+          date: new Date("2025-03-17"),
+        },
       ],
     });
+    
   });
 
   afterAll(async () => {
