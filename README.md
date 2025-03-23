@@ -1,15 +1,15 @@
-# Minimalistic Accounting Web App
+# AccuTrack: Minimalistic Accounting Web App
 
 ## Overview
-The **Minimalistic Accounting Web App** is designed to provide small business owners with a streamlined and affordable solution for accounting and bookkeeping. By addressing the challenges of cost, complexity, and inefficiency found in existing solutions, our application delivers essential features like expense tracking, income management, inventory tracking, sales tax handling, and financial report generation.
+**AccuTrack** is a streamlined and affordable accounting solution tailored for small business owners. Designed to simplify financial management, AccuTrack helps businesses **track expenses, manage income, monitor inventory, handle sales tax, and generate key financial reports.** The project follows an **Agile Scrum development process**, ensuring continuous improvement through iterative sprints.
 
 ## Objectives
-- Offer small businesses an intuitive and cost-effective accounting tool.
-- Enable users to track income, expenses, inventory, and taxes.
-- Generate key financial reports to simplify financial management.
+- Provide small businesses with an **intuitive and cost-effective** accounting tool.
+- Enable users to **track income, expenses, inventory, and taxes** efficiently.
+- **Generate financial reports** to simplify financial decision-making.
 
 ## Features
-### Basic Features
+### Core Features
 - **Expense Management**: Track, categorize, and manage business expenses.
 - **Income Management**: Manage income and sales, adjust inventory, and calculate sales tax.
 - **Inventory Tracking**: Maintain inventory levels, manage stock, and track inventory value.
@@ -17,33 +17,38 @@ The **Minimalistic Accounting Web App** is designed to provide small business ow
 - **Financial Reports**: Generate income statements, expense reports, and sales tax reports.
 
 ### Advanced Features (Pro Users)
-- AI-powered insights for income trends, expense analysis, and forecasting.
+- **AI-powered insights** for income trends, expense analysis, and forecasting.
 
 ## Technical Stack
 ### Backend
-- **Languages/Frameworks**: TypeScript, Node.js, Express.js
-- **Database**: Prisma with PostgreSQL or CockroachDB
-- **Authentication**: Firebase (user authentication and cloud storage)
+- **Languages/Frameworks**: JavaScript, Node.js
+- **Database**: Prisma with PostgreSQL (self-hosted)
+- **Authentication**: Clerk (replacing Firebase for user authentication)
 
 ### Frontend
 - **Framework**: React
 - **Styling**: Tailwind CSS
 
-### Testing Frameworks
-- Jest (ts-jest)
-- Codecov for coverage reports
-
-### Tools
-- **Project Management**: Jira and Linear
+### Testing & Tools
+- **Testing Frameworks**: Jest
+- **Project Management**: Jira
 - **Version Control**: GitHub ([Repository Link](https://github.com/tm21cy/4P02-Group-10))
 
 ## Development Methodology
-We employ the **Scrum** methodology to ensure an iterative and incremental approach to software development. Weekly sprints are structured to deliver and test core functionalities while incorporating feedback.
+Our team employs the **Scrum** methodology, organizing work into sprints to develop and test core functionalities iteratively.
 
 ### Sprint Highlights
-1. **Sprint One** (Jan 21 - Feb 18): Develop foundational features including expense and income management.
-2. **Sprint Two** (Feb 18 - Mar 18): Implement inventory tracking, sales tax, and report generation.
-3. **Sprint Three** (Mar 18 - Apr 8): Add advanced features like AI insights and perform system-level testing.
+1. **Sprint One (Jan 21 - Feb 18)**: Developed foundational features including expense and income management.
+2. **Sprint Two (Feb 18 - Mar 18)**: Implemented inventory tracking, sales tax handling, and financial report generation.
+3. **Sprint Three (Mar 18 - Apr 8)**: Focuses on AI insights, system-level testing, and finalizing the presentation.
+
+## Sprint 2 Implementation Summary
+During Sprint 2, the team expanded the core functionalities by introducing **inventory tracking, sales tax calculations, and financial reports**. Key accomplishments:
+
+- **Inventory Management:** Users can add, track, and modify inventory, with automatic updates based on income and expense transactions.
+- **Sales Tax Handling:** Implemented a system to calculate and store sales tax rates, ensuring compliance with local regulations.
+- **Financial Reporting:** Enabled the generation of income and expense reports based on user-defined timeframes.
+- **Testing & Integration:** Conducted unit tests with Jest, validated CRUD operations, and integrated all new functionalities with the existing backend.
 
 ## User Stories
 1. **Expense Management**: CRUD operations for business expenses.
@@ -53,13 +58,13 @@ We employ the **Scrum** methodology to ensure an iterative and incremental appro
 5. **Inventory Management**: Track and manage inventory levels and values.
 6. **AI Insights (Pro Users)**: Provide AI-driven financial insights.
 
-## Team Members
-- **Sangmitra Madhusudan**
-- **Rouvin Rebello** (Product Owner)
-- **Anthony Colosimo**
-- **Tyler McDonald**
-- **Jacob Drobena**
-- **Skye Reid** (Scrum Master)
+## Team Members & Roles
+- **Rouvin Rebello** - *Product Owner, Backend Development*
+- **Skye Reid** - *Scrum Master, Frontend Development*
+- **Anthony Colosimo** - *Frontend Development*
+- **Sangmitra Madhusudan** - *Frontend Development*
+- **Tyler McDonald** - *Backend Development*
+- **Jacob Drobena** - *Backend Development*
 
 ## Project Timeline
 | Week | Objective |
@@ -73,12 +78,15 @@ We employ the **Scrum** methodology to ensure an iterative and incremental appro
 | Mar 30 | Finalize documentation and prepare presentations |
 | Apr 13 | Complete project and deliver presentations |
 
-## Contributions
-All team members contributed equally to the design, planning, and execution of the project. Specific contributions are documented in our release planning document.
+## Contributions & Documentation
+Each team member contributed equally to planning, development, and testing. Sprint progress, development updates, and backlog details are maintained in **Jira** and **GitHub**.
 
-## Repository
-Explore the project on GitHub: [Minimalistic Accounting Web App Repository](https://github.com/tm21cy/4P02-Group-10)
+Explore the project on GitHub: [AccuTrack Repository](https://github.com/tm21cy/4P02-Group-10)
+
+For more details, refer to:
+- [Project Proposal](COSC%204P02%20&%20SE%20Process/Checkpoint%20Documents/4P02%20Group%2010%20Project%20Proposal.pdf)
+- [Release Planning Document](COSC%204P02%20&%20SE%20Process/Checkpoint%20Documents/4P02%20Group%2010%20Release%20Planning%20Document.pdf)
+- [Meeting Minutes](COSC%204P02%20&%20SE%20Process/Meeting%20Minutes/)
+
 
 ---
-For more details, refer to the [Project Proposal](4P02%20Group%2010%20Project%20Proposal.pdf) and [Release Planning Document](4P02%20Group%2010%20Release%20Planning%20Document.pdf).
-

@@ -347,33 +347,36 @@ function Dashboard() {
             <p className="text-gray-400 text-center py-4">No recent transactions</p>
           ) : (
             <div className="space-y-4">
-              {transactions.map((transaction) => (
-                <div 
-                  key={transaction.id} 
-                  className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:border-white/20"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`p-3 rounded-xl ${
-                      transaction.type === "income" 
-                        ? "bg-sky-500/20 text-sky-400" 
-                        : "bg-emerald-500/20 text-emerald-400"
+              {transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5)
+                .map((transaction) => (
+                  <div 
+                    key={transaction.id} 
+                    className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:border-white/20"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`p-3 rounded-xl ${
+                        transaction.type === "income" 
+                          ? "bg-sky-500/20 text-sky-400" 
+                          : "bg-emerald-500/20 text-emerald-400"
+                      }`}>
+                        {transaction.type === "income" ? "+" : "-"}
+                      </div>
+                      <div>
+                        <p className="text-gray-200 font-medium">{transaction.description}</p>
+                        <p className="text-gray-400 text-sm">
+                          {new Date(transaction.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <div className={`text-lg font-bold ${
+                      transaction.type === "income" ? "text-sky-400" : "text-emerald-400"
                     }`}>
-                      {transaction.type === "income" ? "+" : "-"}
-                    </div>
-                    <div>
-                      <p className="text-gray-200 font-medium">{transaction.description}</p>
-                      <p className="text-gray-400 text-sm">
-                        {new Date(transaction.date).toLocaleDateString()}
-                      </p>
+                      ${Number(transaction.amount).toFixed(2)}
                     </div>
                   </div>
-                  <div className={`text-lg font-bold ${
-                    transaction.type === "income" ? "text-sky-400" : "text-emerald-400"
-                  }`}>
-                    ${Number(transaction.amount).toFixed(2)}
-                  </div>
-                </div>
-              ))}
+                ))}
             </div>
           )}
         </div>

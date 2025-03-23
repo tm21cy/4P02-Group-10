@@ -13,13 +13,7 @@ function ManageExpenses() {
     const [editingExpense, setEditingExpense] = useState(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
-    
-    // Add state for inventory fields in edit mode
-    const [editInventoryData, setEditInventoryData] = useState({
-        addToInventory: false,
-        inventoryItemId: "",
-        inventoryQuantity: ""
-    });
+
 
     // Add state for sales tax fields
     const [editSalesTaxData, setEditSalesTaxData] = useState({
@@ -41,23 +35,22 @@ function ManageExpenses() {
     }
 
     const handleEdit = (expense) => {
+        const parsedAmount = parseFloat(expense.amount) || 0;
+        const existingTaxRate = expense.taxAmount > 0 ? expense.taxRate : 13;
+        const computedTaxAmount = parsedAmount * (existingTaxRate / 100);
+
         setEditingExpense({
             ...expense,
-            amount: parseFloat(expense.amount) || 0 // Ensure amount is a number
+            amount: parsedAmount,
         });
-        // Initialize inventory data when opening edit modal
-        setEditInventoryData({
-            addToInventory: false,
-            inventoryItemId: "",
-            inventoryQuantity: ""
-        });
-        // Initialize sales tax data
+
         setEditSalesTaxData({
-            hasSalesTax: false,
-            taxRate: 13,
-            taxAmount: 0
+            hasSalesTax: expense.taxAmount > 0,
+            taxRate: existingTaxRate,
+            taxAmount: expense.taxAmount > 0 ? computedTaxAmount : 0
         });
     };
+
 
     const handleDelete = (id) => {
         deleteExpenses(user.id, id).then(() => {
@@ -88,8 +81,13 @@ function ManageExpenses() {
                 amount: parseFloat(editingExpense.amount),
                 tag: editingExpense.tag === "Other" ? editingExpense.customTag : editingExpense.tag
             };
-            
-            await patchExpenses(user.id, editingExpense.id, updatedExpense);
+            const taxRate = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxRate : 13
+            const taxAmount = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxAmount : 0
+            await patchExpenses(user.id, editingExpense.id, {
+                ...updatedExpense,
+                taxRate,
+                taxAmount
+            });
             setMessage("Expense updated successfully!");
             updateEntries(); // Refresh the list
             setEditingExpense(null);
@@ -145,6 +143,7 @@ function ManageExpenses() {
                                                     <th className="text-center p-5 text-gray-400 font-medium">Date</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Description</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Amount</th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">Tax</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Category</th>
                                                     <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
                                                 </tr>
@@ -155,11 +154,12 @@ function ManageExpenses() {
                                                         <td className="p-5 text-gray-300 text-center">{expense.date.toISOString().split("T")[0]}</td>
                                                         <td className="p-5 text-gray-300 text-center">{expense.description}</td>
                                                         <td className="p-5 text-teal-300 text-center">${expense.amount || "0.00"}</td>
+                                                        <td className="p-5 text-blue-400 font-medium text-center">${expense.taxAmount > 0 ? `${parseFloat(expense.taxAmount).toFixed(2)} (${expense.taxRate}%)` : "0.00"}</td>
                                                         <td className="p-5 flex justify-center">
                                                             <span className={`px-3 py-1.5 rounded-full text-xs font-medium inline-flex items-center
                                                                 ${expense.tag === "Bills" ? 'bg-teal-500/10 text-teal-400 ring-1 ring-teal-400/30' :
-                                                                expense.tag === "Food" ? 'bg-orange-500/10 text-orange-400 ring-1 ring-orange-400/30' :
-                                                                'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30'}`}>
+                                                                    expense.tag === "Food" ? 'bg-orange-500/10 text-orange-400 ring-1 ring-orange-400/30' :
+                                                                        'bg-purple-500/10 text-purple-400 ring-1 ring-purple-400/30'}`}>
                                                                 {expense.tag}
                                                             </span>
                                                         </td>
@@ -197,8 +197,8 @@ function ManageExpenses() {
                                                     </div>
                                                     <span className={`px-3 py-1 rounded-full text-xs font-medium
                                                         ${expense.tag === "Bills" ? 'bg-teal-500/20 text-teal-300' :
-                                                        expense.tag === "Food" ? 'bg-orange-500/20 text-orange-300' :
-                                                        'bg-purple-500/20 text-purple-300'}`}>
+                                                            expense.tag === "Food" ? 'bg-orange-500/20 text-orange-300' :
+                                                                'bg-purple-500/20 text-purple-300'}`}>
                                                         {expense.tag}
                                                     </span>
                                                 </div>
@@ -269,65 +269,6 @@ function ManageExpenses() {
                                 <div className="flex items-center space-x-2">
                                     <input
                                         type="checkbox"
-                                        id="editAddToInventory"
-                                        checked={editInventoryData.addToInventory}
-                                        onChange={(e) => setEditInventoryData(prev => ({
-                                            ...prev,
-                                            addToInventory: e.target.checked
-                                        }))}
-                                        className="w-4 h-4 text-teal-500 bg-gray-800/50 border-gray-700 rounded"
-                                    />
-                                    <label htmlFor="editAddToInventory" className="text-sm font-medium text-gray-300">
-                                        This expense adds to inventory
-                                    </label>
-                                </div>
-
-                                {editInventoryData.addToInventory && (
-                                    <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
-                                        <h3 className="text-lg font-medium text-white">Inventory Details</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                    Item ID
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={editInventoryData.inventoryItemId}
-                                                    onChange={(e) => setEditInventoryData(prev => ({
-                                                        ...prev,
-                                                        inventoryItemId: e.target.value
-                                                    }))}
-                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
-                                                    placeholder="Enter inventory item ID"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                    Quantity
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    value={editInventoryData.inventoryQuantity}
-                                                    onChange={(e) => setEditInventoryData(prev => ({
-                                                        ...prev,
-                                                        inventoryQuantity: e.target.value
-                                                    }))}
-                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
-                                                    placeholder="Enter quantity"
-                                                />
-                                            </div>
-                                        </div>
-                                        <p className="text-sm text-gray-400">
-                                            This will update the inventory quantity for the specified item
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                            <div className="space-y-4 mb-4">
-                                <div className="flex items-center space-x-2">
-                                    <input
-                                        type="checkbox"
                                         id="editHasSalesTax"
                                         checked={editSalesTaxData.hasSalesTax}
                                         onChange={(e) => {
@@ -365,6 +306,7 @@ function ManageExpenses() {
                                                             taxRate: newRate,
                                                             taxAmount: editingExpense.amount * (newRate / 100)
                                                         }));
+                                                        console.log(editSalesTaxData)
                                                     }}
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
                                                     placeholder="Enter tax rate"

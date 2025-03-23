@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { getInventoryItemBySkuId, getValidTags, patchInventoryAmountSell, postNewIncome, postNewSalesTax, postNewTagIfNotExists } from "@/lib/db";
+import { getInventoryItemBySkuId, getValidTags, patchInventoryAmountSell, postNewIncome,postNewTagIfNotExists } from "@/lib/db";
 import { useUser } from "@clerk/nextjs";
 
 function AddIncome() {
@@ -137,10 +137,12 @@ function AddIncome() {
                 else await patchInventoryAmountSell(invItem.skuId, invItem.userId, inventoryData.inventoryQuantity)
             }
             
-            const income = await postNewIncome(updatedFormData);
-            if (salesTaxData.hasSalesTax) {
-                await postNewSalesTax(user.id, income.id, salesTaxData.taxRate, salesTaxData.taxAmount)
-            }
+            const income = await postNewIncome({
+                ...updatedFormData,
+                taxRate: salesTaxData.taxRate,
+                taxAmount: salesTaxData.taxAmount
+            });
+            
             setMessage("Income added successfully!");
             // Reset form data
             setFormData({
@@ -157,6 +159,12 @@ function AddIncome() {
                 inventoryItemId: "",
                 inventoryQuantity: ""
             });
+            // Reset sales tax data
+            setSalesTaxData({
+                hasSalesTax: false,
+                taxRate: 13, // Default to 13%
+                taxAmount: 0
+            })
         } catch (e) {
             console.log(e);
             setMessage("Error adding income.");
@@ -177,7 +185,7 @@ function AddIncome() {
                                 </svg>
                             </div>
                         </div>
-                        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-blue-600 bg-clip-text text-transparent">
                             Add New Income
                         </h1>
                         <p className="text-gray-400 text-xl max-w-2xl mx-auto">
@@ -317,7 +325,7 @@ function AddIncome() {
                                         type="date"
                                         required
                                         name="date"
-                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
+                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white [color-scheme:dark]"
                                         onChange={handleChange}
                                         value={formData.date}
                                     />

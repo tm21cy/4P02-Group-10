@@ -5,7 +5,7 @@ import Header from "../../../_components/Header";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { postNewInventoryItem, postNewTagIfNotExists } from "@/lib/db";
+import { postNewExpense, postNewInventoryItem, postNewTagIfNotExists } from "@/lib/db";
 
 function AddInventory() {
     const { isSignedIn, user, isLoaded } = useUser();
@@ -18,9 +18,16 @@ function AddInventory() {
         category: "",
         customCategory: "",
         addAsExpense: false,
-        date: new Date().toISOString().split("T")[0]
+        date: new Date().toISOString().split("T")[0],
+        purchasePrice: 0,
+        hasSalesTax: false,
+        taxRate: 13, // default
+        taxAmount: 0
     });
-
+    const formatAmount = (amount) => {
+        const num = parseFloat(amount);
+        return isNaN(num) ? "0.00" : num.toFixed(2);
+    };
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -61,7 +68,31 @@ function AddInventory() {
         if (formData.customCategory.length > 0) category = formData.customCategory
         if (formData.customCategory.length > 0) await postNewTagIfNotExists(formData.customCategory, user.id, 2)
         await postNewInventoryItem(parseInt(formData.itemId), user.id, formData.name, formData.description, parseInt(formData.quantity), parseFloat(formData.unitPrice), category)
-        return setMessage("Added inventory item!")
+        if (formData.addAsExpense) await postNewExpense({
+            amount: formData.quantity * formData.purchasePrice,
+            description: `Purchase of ${formData.quantity} inventory items, SKU ${formData.itemId}`,
+            tag: "Inventory",
+            date: formData.date,
+            userId: user.id,
+            taxRate: formData.taxRate,
+            taxAmount: formData.taxAmount
+        })
+        setMessage("Added inventory item!")
+        setFormData({
+            itemId: "",
+            name: "",
+            description: "",
+            quantity: "",
+            unitPrice: "",
+            category: "",
+            customCategory: "",
+            addAsExpense: false,
+            date: new Date().toISOString().split("T")[0],
+            purchasePrice: 0,
+            hasSalesTax: false,
+            taxRate: 13, // default
+            taxAmount: 0
+        })
     };
 
     return (
@@ -77,7 +108,7 @@ function AddInventory() {
                                 </svg>
                             </div>
                         </div>
-                        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+                        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
                             Add New Inventory Item
                         </h1>
                         <p className="text-gray-400 text-xl max-w-2xl mx-auto">
@@ -220,19 +251,103 @@ function AddInventory() {
                                 </div>
 
                                 {formData.addAsExpense && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                                            Purchase Date
-                                        </label>
-                                        <input
-                                            type="date"
-                                            name="date"
-                                            required
-                                            className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
-                                            onChange={handleChange}
-                                            value={formData.date}
-                                        />
-                                    </div>
+                                    <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                Purchase Date
+                                            </label>
+                                            <input
+                                                type="date"
+                                                name="date"
+                                                required
+                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                                onChange={handleChange}
+                                                value={formData.date}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                Purchase Price
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="purchasePrice"
+                                                required
+                                                step="0.01"
+                                                min="0"
+                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                                placeholder="0.00"
+                                                onChange={handleChange}
+                                                value={formData.purchasePrice}
+                                            />
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <input
+                                                type="checkbox"
+                                                id="hasSalesTax"
+                                                checked={formData.hasSalesTax}
+                                                onChange={(e) => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        hasSalesTax: e.target.checked,
+                                                        taxAmount: e.target.checked ? ((formData.purchasePrice * formData.quantity) * (prev.taxRate / 100)) : 0
+                                                    }));
+                                                }}
+                                                className="w-4 h-4 text-blue-500 bg-gray-800/50 border-gray-700 rounded"
+                                            />
+                                            <label htmlFor="hasSalesTax" className="text-sm font-medium text-gray-300">
+                                                Sales tax was charged
+                                            </label>
+                                        </div>
+                                        {formData.hasSalesTax && (
+                                            <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                                                <h3 className="text-lg font-medium text-white">Sales Tax Details</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Tax Rate (%)
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            max="100"
+                                                            step="0.1"
+                                                            value={formData.taxRate}
+                                                            onChange={(e) => {
+                                                                const newRate = parseFloat(e.target.value) || 0;
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    taxRate: newRate,
+                                                                    taxAmount: (formData.quantity * formData.purchasePrice) * (newRate / 100)
+                                                                }));
+                                                            }}
+                                                            className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+                                                            placeholder="Enter tax rate"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                            Tax Amount
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            value={formatAmount(formData.taxAmount)}
+                                                            readOnly
+                                                            className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white cursor-not-allowed"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="mt-2 flex justify-between text-sm">
+                                                    <span className="text-gray-300">Subtotal:</span>
+                                                    <span className="text-white">${formatAmount(formData.purchasePrice * formData.quantity)}</span>
+                                                </div>
+                                                <div className="flex justify-between text-sm font-medium">
+                                                    <span className="text-gray-300">Total with Tax:</span>
+                                                    <span className="text-white">${formatAmount(parseFloat(formData.purchasePrice * formData.quantity) + formData.taxAmount)}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>                                    
                                 )}
 
                                 <div className="flex justify-end gap-4 pt-4">
