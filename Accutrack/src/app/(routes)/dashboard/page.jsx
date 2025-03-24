@@ -58,8 +58,21 @@ function Dashboard() {
 
   const fetchData = async () => {
     try {
-      const incomeData = await getIncome(user.id);
-      const expenseData = await getExpenses(user.id);
+      const incomeData = (await getIncome(user.id)).map((item) => ({
+        ...item,
+        amount: Number(item.amount),
+        taxRate: Number(item.taxRate),
+        taxAmount: Number(item.taxAmount),
+        type: "income",
+      }));
+      
+      const expenseData = (await getExpenses(user.id)).map((item) => ({
+        ...item,
+        amount: Number(item.amount),
+        taxRate: Number(item.taxRate),
+        taxAmount: Number(item.taxAmount),
+        type: "expense",
+      }));
   
       // Process data for graphs
       processGraphData(incomeData, expenseData);
@@ -350,33 +363,63 @@ function Dashboard() {
               {transactions
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .slice(0, 5)
-                .map((transaction) => (
-                  <div 
-                    key={transaction.id} 
-                    className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:border-white/20"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-xl ${
-                        transaction.type === "income" 
-                          ? "bg-sky-500/20 text-sky-400" 
-                          : "bg-emerald-500/20 text-emerald-400"
-                      }`}>
-                        {transaction.type === "income" ? "+" : "-"}
+                .map((transaction) => {
+                  const type = transaction.type || "inventory"; // fallback default if missing
+                  
+                  console.log("🎯 Transaction Debug:");
+                  console.log("  → Description:", transaction.description);
+                  console.log("  → Amount:", transaction.amount);
+                  console.log("  → Type:", type);
+
+                  console.log("Transaction:", transaction);
+
+                  // Match button colors and correct symbols
+                  let bgColor = "bg-white/10";
+                  let textColor = "text-white";
+                  let symbol = "?";
+
+                  if (type === "income") {
+                    bgColor = "bg-blue-500/10";
+                    textColor = "text-blue-200";
+                    symbol = "+";
+                  } else if (type === "expense") {
+                    bgColor = "bg-teal-500/10";
+                    textColor = "text-teal-200";
+                    symbol = "-";
+                  } else if (type === "inventory") {
+                    bgColor = "bg-purple-500/10";
+                    textColor = "text-purple-200";
+                    symbol = "📦"; // or just leave empty string
+                  }
+                  
+                  // Final values debug
+                  console.log("  → Resolved bgColor:", bgColor);
+                  console.log("  → Resolved textColor:", textColor);
+                  console.log("  → Resolved symbol:", symbol);
+                  console.log("———");
+
+                  return (
+                    <div
+                      key={transaction.id}
+                      className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:border-white/20"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`p-3 rounded-xl ${bgColor} ${textColor}`}>
+                          {symbol}
+                        </div>
+                        <div>
+                          <p className="text-gray-200 font-medium">{transaction.description}</p>
+                          <p className="text-gray-400 text-sm">
+                            {new Date(transaction.date).toLocaleDateString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-gray-200 font-medium">{transaction.description}</p>
-                        <p className="text-gray-400 text-sm">
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </p>
+                      <div className={`text-lg font-bold ${textColor}`}>
+                        ${Number(transaction.amount).toFixed(2)}
                       </div>
                     </div>
-                    <div className={`text-lg font-bold ${
-                      transaction.type === "income" ? "text-sky-400" : "text-emerald-400"
-                    }`}>
-                      ${Number(transaction.amount).toFixed(2)}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
             </div>
           )}
         </div>
