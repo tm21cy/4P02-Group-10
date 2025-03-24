@@ -212,11 +212,11 @@ function Dashboard() {
               <Button
               key={range}
               onClick={() => setSelectedRange(range)}
-              className={`text-xs px-4 py-2 rounded-full transition-all duration-200 ${
-                selectedRange === range
+              className={`relative text-xs px-4 py-2 rounded-full transition-all duration-200 font-semibold
+                ${selectedRange === range
                   ? "bg-blue-500/30 text-blue-200 border border-blue-400/30 shadow-lg shadow-blue-500/20"
-                  : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"
-              }`}
+                  : "bg-gray-800/40 text-gray-300 hover:bg-gray-700/50 border border-gray-700/30"}
+              `}
             >
               {range}
             </Button>
@@ -250,7 +250,16 @@ function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={graphData.areaChart}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                <XAxis dataKey="date" stroke="#9CA3AF" />
+                <XAxis dataKey="date" stroke="#9CA3AF"
+                tick={{ fontSize: 12 }} 
+                tickFormatter={(str) => {
+                      const date = new Date(str);
+                      const mm = String(date.getMonth() + 1).padStart(2, '0');
+                      const dd = String(date.getDate()).padStart(2, '0');
+                      const yy = String(date.getFullYear()).slice(-2);
+                      return `${mm}/${dd}/${yy}`;
+                }}
+                />
                 <YAxis stroke="#9CA3AF" />
                 <Tooltip 
                   cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
@@ -292,6 +301,10 @@ function Dashboard() {
                   stroke="#9CA3AF"
                   dy={10}
                   tick={{ fontSize: 12 }}
+                  tickFormatter={(str) => {
+                    const [year, month] = str.split("-");
+                    return `${month}/${year.slice(-2)}`;
+                  }}
                 />
                 <YAxis stroke="#9CA3AF" />
                 {graphData.barChart.length > 0 && (
