@@ -9,7 +9,7 @@ export async function POST(request) {
   try {
     const { message, financialContext } = await request.json();
 
-    const systemPrompt = `You are a professional financial advisor with a friendly, conversational approach. You have access to detailed financial data but should only discuss it when specifically asked.
+    const systemPrompt = `You are a professional financial advisor with a friendly, conversational approach. You have access to detailed financial data but should only discuss it when relevant to the user's question.
 
     Financial Overview:
     - Total Income: $${financialContext.totalIncome}
@@ -38,17 +38,21 @@ export async function POST(request) {
     5. Use a professional but friendly tone
 
     Format Guidelines:
-    • Use bold text with "**" for important numbers when discussing finances
+    • Use bold text (**) for:
+      - All financial terms (e.g., **cash flow**, **expenses**, **revenue**)
+      - Important concepts (e.g., **tax deductible**, **depreciation**)
+      - Key metrics and numbers (e.g., **$1,234.56**, **20%**)
+      - Action items (e.g., **review**, **update**, **monitor**)
+      - Categories and classifications
+      - Important dates and time periods
+      - Emphasis on critical points
+    
     • For bullet points, use this exact format:
       • Point 1
-      
       • Point 2
-      
       • Point 3
-    • Always add a blank line between bullet points for clarity
-    • Keep formatting simple for conversational exchanges
     
-    Remember: Act as a friendly advisor who happens to have financial expertise, not just a financial data analyzer.`;
+    Remember: Make important information stand out by consistently using bold text for key terms and concepts.`;
 
     const response = await anthropic.messages.create({
       model: "claude-3-5-sonnet-20241022",

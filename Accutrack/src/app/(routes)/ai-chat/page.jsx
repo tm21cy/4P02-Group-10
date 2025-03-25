@@ -6,6 +6,23 @@ import { useUser } from "@clerk/nextjs";
 import { getIncome, getExpenses, getInventoryByUser, getSalesTax } from "@/lib/db";
 import { IconSend, IconRobot, IconUser } from "@tabler/icons-react";
 
+// Custom components for ReactMarkdown
+const components = {
+  p: ({children}) => <p className="text-gray-100 mb-2">{children}</p>,
+  strong: ({children}) => <strong className="text-sky-300 font-semibold">{children}</strong>,
+  ul: ({children}) => (
+    <div className="space-y-1 my-2 text-gray-100">
+      {children}
+    </div>
+  ),
+  li: ({children}) => (
+    <div className="flex text-gray-100">
+      <span className="mr-2 text-purple-300">•</span>
+      <span>{children}</span>
+    </div>
+  ),
+};
+
 function AIChatPage() {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
@@ -182,17 +199,23 @@ function AIChatPage() {
                         {message.role === 'user' ? (
                           <p className="text-white">{message.content}</p>
                         ) : (
-                          <div className="text-white prose prose-invert prose-sm max-w-none">
-                            <ReactMarkdown
+                          <div className="prose dark:prose-invert max-w-none text-gray-100">
+                            <ReactMarkdown 
                               components={{
-                                h2: ({children}) => <h2 className="text-xl font-bold mb-2 mt-4 text-purple-300">{children}</h2>,
+                                ...components,
+                                p: ({children}) => <p className="text-gray-100 mb-2">{children}</p>,
                                 strong: ({children}) => <strong className="text-sky-300 font-semibold">{children}</strong>,
-                                ul: ({children}) => <ul className="list-disc pl-4 space-y-1 my-2">{children}</ul>,
-                                ol: ({children}) => <ol className="list-decimal pl-4 space-y-1 my-2">{children}</ol>,
-                                blockquote: ({children}) => (
-                                  <blockquote className="border-l-4 border-purple-500/50 pl-4 my-2 italic">{children}</blockquote>
+                                ul: ({children}) => (
+                                  <div className="space-y-1 my-2 text-gray-100">
+                                    {children}
+                                  </div>
                                 ),
-                                p: ({children}) => <p className="mb-2 leading-relaxed">{children}</p>
+                                li: ({children}) => (
+                                  <div className="flex text-gray-100">
+                                    <span className="mr-2 text-purple-300">•</span>
+                                    <span>{children}</span>
+                                  </div>
+                                ),
                               }}
                             >
                               {message.content}
