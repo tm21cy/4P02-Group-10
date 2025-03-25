@@ -11,7 +11,7 @@ const components = {
   p: ({children}) => <p className="text-gray-100 mb-2">{children}</p>,
   strong: ({children}) => <strong className="text-sky-300 font-semibold">{children}</strong>,
   ul: ({children}) => (
-    <div className="space-y-1 my-2 text-gray-100">
+    <div className="space-y-4 my-2 text-gray-100">
       {children}
     </div>
   ),
@@ -206,7 +206,7 @@ function AIChatPage() {
                                 p: ({children}) => <p className="text-gray-100 mb-2">{children}</p>,
                                 strong: ({children}) => <strong className="text-sky-300 font-semibold">{children}</strong>,
                                 ul: ({children}) => (
-                                  <div className="space-y-1 my-2 text-gray-100">
+                                  <div className="space-y-4 my-2 text-gray-100">
                                     {children}
                                   </div>
                                 ),
