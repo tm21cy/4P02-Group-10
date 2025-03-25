@@ -1,7 +1,16 @@
 "use client";
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, Fragment} from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from "@clerk/nextjs";
+import {
+  Dialog,
+  DialogPanel,
+  DialogTitle,
+  DialogDescription,
+  Transition,
+  TransitionChild,
+} from '@headlessui/react'; //npm install @headlessui/react @tabler/icons-react @clerk/nextjs
+import { Button } from '@/components/ui/button';
 import {
   IconChartPie,
   IconBoxSeam,
@@ -35,6 +44,7 @@ function useInView(options = {}) {
 function Hero() {
   const router = useRouter();
   const { isSignedIn } = useUser();
+  const [activeFeature, setActiveFeature] = useState(null);
 
   const features = [
     {
@@ -127,6 +137,7 @@ function Hero() {
           {features.map((feature, index) => (
             <div
               key={index}
+              onClick={() => setActiveFeature(feature)}
               className={`p-6 rounded-2xl bg-gray-800/20 backdrop-blur-sm border border-gray-700/50 
                 hover:border-gray-600 transition-all group animate-fadeIn opacity-0 hover:bg-gray-800/40
                 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/10 cursor-pointer`}
@@ -146,6 +157,71 @@ function Hero() {
             </div>
           ))}
         </div>
+
+        {/* Feature Popup Modal */}
+        <Transition appear show={!!activeFeature} as={Fragment}>
+          <Dialog as="div" className="relative z-50" onClose={() => setActiveFeature(null)}>
+            <TransitionChild
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
+            </TransitionChild>
+
+            <div className="fixed inset-0 flex items-center justify-center p-4">
+              <TransitionChild
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <DialogPanel className={"w-full max-w-md rounded-2xl bg-gray-900 border border-gray-700/50 p-6 text-white shadow-xl"}>
+                  {activeFeature && (
+                    <>
+                      {/* Does this need a exit button? */}
+
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-3 rounded-full bg-blue-500/20 text-blue-300">{activeFeature.icon}</div>
+                        <DialogTitle 
+                          className="text-lg font-bold">{activeFeature.title}
+                        </DialogTitle>
+                      </div>
+
+                      <DialogDescription 
+                        className="text-gray-400 mb-4">
+                        {activeFeature.description}
+                      </DialogDescription>
+
+                      {/* Placeholder for dynamic feature logic */}
+                      <div className="text-gray-400 mb-4">
+                        Maybe some more words or a picture?
+                      </div>
+
+                    
+                      <div className="flex justify-center mt-4">
+                      <Button
+                        onClick={() => router.push(isSignedIn ? '/dashboard' : '/sign-up')}
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:opacity-90 transition-all duration-200"
+                      >
+                        Start Using {activeFeature.title}
+                      </Button>
+                    </div>
+                    </>
+                  )}
+                </DialogPanel>
+              </TransitionChild>
+            </div>
+          </Dialog>
+        </Transition> 
+
 
         {/* Showcase Section */}
         <div className="mt-32 space-y-32">
