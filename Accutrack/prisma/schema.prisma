@@ -18,8 +18,8 @@ model income {
   inventory_qty         Int?
   inventory_skuId       Int?
   tagName               String?
-  taxAmount             Decimal  @default(0)
-  taxRate               Decimal  @default(0)
+  taxRate     Decimal @default(0)
+  taxAmount   Decimal @default(0)
 }
 
 model expense {
@@ -30,8 +30,8 @@ model expense {
   tag         String?
   date        DateTime
   tagName     String?
-  taxAmount   Decimal  @default(0)
-  taxRate     Decimal  @default(0)
+  taxRate     Decimal @default(0)
+  taxAmount   Decimal @default(0)
 }
 
 model tag {
