@@ -3,8 +3,15 @@
 import React from "react";
 import Link from "next/link";
 import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
+import { useSubscriptionStore } from "@/lib/store";
+import { IconCrown } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { useUser } from "@clerk/nextjs";
 
 export default function Footer() {
+  const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
+  const { isSignedIn } = useUser();
+
   return (
     <footer className="bg-[#0f1729] text-gray-300 py-12 px-6 mt-10 w-full border-t border-gray-800/20">
       <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-16 text-center md:text-left">
@@ -38,6 +45,17 @@ export default function Footer() {
             <p className="text-gray-500 hover:text-gray-400 transition-all duration-300">
               1812 Sir Issac Brock Way, St. Catharines, ON - L2S3A1
             </p>
+            {isSignedIn && isSubscribed && (
+              <p className="flex items-center justify-center md:justify-start gap-3">
+                <Link 
+                  href="/subscription" 
+                  className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-all duration-300"
+                >
+                  <IconCrown className="w-4 h-4" />
+                  Manage Pro Subscription
+                </Link>
+              </p>
+            )}
           </div>
         </div>
 

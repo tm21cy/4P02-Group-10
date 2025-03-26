@@ -4,7 +4,10 @@ import ReactMarkdown from 'react-markdown';
 import Header from "../../_components/Header";
 import { useUser } from "@clerk/nextjs";
 import { getIncome, getExpenses, getInventoryByUser, getSalesTax } from "@/lib/db";
-import { IconSend, IconRobot, IconUser } from "@tabler/icons-react";
+import { IconSend, IconRobot, IconUser, IconCrown } from "@tabler/icons-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { useSubscriptionStore } from "@/lib/store";
 
 // Custom components for ReactMarkdown
 const components = {
@@ -28,6 +31,7 @@ function AIChatPage() {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
+  const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -136,15 +140,29 @@ function AIChatPage() {
         <div className="max-w-4xl lg:max-w-6xl mx-auto">
           {/* Title Section with enhanced styling */}
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-6 transition-transform hover:scale-105 duration-300">
-              <div className="bg-purple-500/20 p-5 rounded-full ring-2 ring-purple-500/30">
-                <IconRobot className="h-14 w-14 text-purple-400" />
+            <div className="flex justify-center items-center gap-4 flex-col">
+              <div className="flex justify-center mb-6 transition-transform hover:scale-105 duration-300">
+                <div className="bg-purple-500/20 p-5 rounded-full ring-2 ring-purple-500/30">
+                  <IconRobot className="h-14 w-14 text-purple-400" />
+                </div>
               </div>
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+                Financial AI Assistant
+              </h1>
+              <p className="text-gray-400 mt-3 text-lg">Get personalized financial insights and advice</p>
+              
+              {isSubscribed && (
+                <Link href="/subscription">
+                  <Button 
+                    variant="outline" 
+                    className="mt-4 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all duration-200"
+                  >
+                    <IconCrown className="w-4 h-4 mr-2" />
+                    Manage Pro Subscription
+                  </Button>
+                </Link>
+              )}
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 via-pink-500 to-blue-500 bg-clip-text text-transparent">
-              Financial AI Assistant
-            </h1>
-            <p className="text-gray-400 mt-3 text-lg">Get personalized financial insights and advice</p>
           </div>
 
           {/* Enhanced Chat Container */}
@@ -274,4 +292,4 @@ function AIChatPage() {
   );
 }
 
-export default AIChatPage; 
+export default AIChatPage;

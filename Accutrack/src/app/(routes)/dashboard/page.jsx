@@ -25,6 +25,9 @@ import {
   Legend
 } from 'recharts';
 import Link from "next/link";
+import PricingModal from '@/components/PricingModal';
+import { useSubscriptionStore } from '@/lib/store';
+import { useRouter } from 'next/navigation';
 
 const dateRanges = [
   "Week to Date",
@@ -48,6 +51,9 @@ function Dashboard() {
     totalExpenses: 0,
     netCashFlow: 0
   });
+  const [isPricingOpen, setIsPricingOpen] = useState(false);
+  const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -306,7 +312,10 @@ function Dashboard() {
 
       {/* Action Buttons */}
       <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Link href="/ai-chat" className="block group">
+        <div 
+          onClick={() => isSubscribed ? router.push('/ai-chat') : setIsPricingOpen(true)} 
+          className="block group cursor-pointer"
+        >
           <div className="group backdrop-blur-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 p-6 rounded-2xl shadow-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
             <div className="flex flex-col h-full">
               <div className="flex items-center gap-3 mb-3 group-hover:scale-105 transition-transform duration-200">
@@ -318,7 +327,7 @@ function Dashboard() {
               <p className="text-xs text-purple-400 mt-auto">Premium Feature</p>
             </div>
           </div>
-        </Link>
+        </div>
 
         <Link href="/transactions" className="block group">
           <div className="h-full backdrop-blur-xl bg-gradient-to-br from-sky-500/10 to-blue-500/10 p-6 rounded-2xl shadow-xl border border-sky-500/20 hover:border-sky-500/40 transition-all duration-300">
@@ -383,6 +392,11 @@ function Dashboard() {
           )}
         </div>
       </div>
+
+      <PricingModal 
+        isOpen={isPricingOpen}
+        onClose={() => setIsPricingOpen(false)}
+      />
 
       <Footer />
     </div>    

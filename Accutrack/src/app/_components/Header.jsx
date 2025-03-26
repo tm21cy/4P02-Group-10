@@ -5,10 +5,12 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useUser, UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
+import { useSubscriptionStore } from '@/lib/store'
 
 export default function Header() {
     const { user, isSignedIn } = useUser();
     const [menuOpen, setMenuOpen] = useState(false);
+    const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -18,18 +20,23 @@ export default function Header() {
         <div className='p-5 flex justify-between items-center shadow-lg bg-[#1c2230] backdrop-blur-sm z-40 relative'>
             {/* Logo */}
             <Link href="/" className="flex flex-row items-center gap-3 group">
-                <svg 
-                    width="36" 
-                    height="36" 
-                    viewBox="0 0 24 24" 
+                <div className="relative">
+                    <svg 
+                        width="36" 
+                        height="36" 
+                        viewBox="0 0 24 24" 
                         className="text-blue-500 transform transition-transform duration-500 ease-out group-hover:rotate-180"
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2"
-                >
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                </svg>
-                <span className='bg-white bg-clip-text text-transparent font-black text-3xl tracking-tight relative group-hover:tracking-wide transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-500 group-hover:after:w-full after:transition-all after:duration-300'>AccuTrack</span>
+                        fill="none" 
+                        stroke="currentColor" 
+                        strokeWidth="2"
+                    >
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                    
+                </div>
+                <span className='bg-white bg-clip-text text-transparent font-black text-3xl tracking-tight relative group-hover:tracking-wide transition-all duration-300 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-blue-500 group-hover:after:w-full after:transition-all after:duration-300'>
+                    AccuTrack {isSignedIn && isSubscribed && <span className="text-xs align-top text-purple-400">PRO</span>}
+                </span>
             </Link>
 
             {/* Hamburger Icon */}
@@ -127,5 +134,5 @@ export default function Header() {
             </div>
         </div>
     );
-} 
+}
 
