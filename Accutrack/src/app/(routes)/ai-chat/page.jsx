@@ -150,18 +150,6 @@ function AIChatPage() {
                 Financial AI Assistant
               </h1>
               <p className="text-gray-400 mt-3 text-lg">Get personalized financial insights and advice</p>
-              
-              {isSubscribed && (
-                <Link href="/subscription">
-                  <Button 
-                    variant="outline" 
-                    className="mt-4 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all duration-200"
-                  >
-                    <IconCrown className="w-4 h-4 mr-2" />
-                    Manage Pro Subscription
-                  </Button>
-                </Link>
-              )}
             </div>
           </div>
 
