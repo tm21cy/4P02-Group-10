@@ -4,15 +4,19 @@ import { useRouter } from "next/navigation";
 import Header from "../../_components/Header";
 import { useSubscriptionStore } from "@/lib/store";
 import { IconCrown, IconAlertCircle } from "@tabler/icons-react";
+import { useUser } from "@clerk/nextjs";
 
 export default function SubscriptionPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
+  const { user } = useUser();
   const setSubscribed = useSubscriptionStore((state) => state.setSubscribed);
-  const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
+  const isSubscribed = useSubscriptionStore((state) => 
+    state.subscriptions[user?.id] || false
+  );
 
   const handleCancel = () => {
-    setSubscribed(false);
+    setSubscribed(user.id, false);
     router.push('/dashboard');
   };
 

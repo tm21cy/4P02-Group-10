@@ -10,7 +10,9 @@ import { useSubscriptionStore } from '@/lib/store'
 export default function Header() {
     const { user, isSignedIn } = useUser();
     const [menuOpen, setMenuOpen] = useState(false);
-    const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
+    const isSubscribed = useSubscriptionStore((state) => 
+        state.subscriptions[user?.id] || false
+    );
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);

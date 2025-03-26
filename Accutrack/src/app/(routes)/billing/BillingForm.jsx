@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSubscriptionStore } from "@/lib/store";
+import { useUser } from "@clerk/nextjs";
 
 export default function BillingForm() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function BillingForm() {
   });
 
   const setSubscribed = useSubscriptionStore((state) => state.setSubscribed);
+  const { user } = useUser();
 
   useEffect(() => {
     try {
@@ -34,7 +36,8 @@ export default function BillingForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSubscribed(true);
+    if (!user?.id) return;
+    setSubscribed(user.id, true);
     const billingInfo = {
       ...formData,
       planType: plan,

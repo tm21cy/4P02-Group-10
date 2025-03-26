@@ -52,7 +52,9 @@ function Dashboard() {
     netCashFlow: 0
   });
   const [isPricingOpen, setIsPricingOpen] = useState(false);
-  const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
+  const isSubscribed = useSubscriptionStore((state) => 
+    state.subscriptions[user?.id] || false
+  );
   const router = useRouter();
 
   useEffect(() => {
