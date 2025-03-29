@@ -13,7 +13,7 @@ function ManageExpenses() {
     const [editingExpense, setEditingExpense] = useState(null);
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
-
+    const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
 
     // Add state for sales tax fields
     const [editSalesTaxData, setEditSalesTaxData] = useState({
@@ -30,7 +30,10 @@ function ManageExpenses() {
 
     const updateEntries = () => {
         getExpenses(user.id).then(data => {
-            setExpenses(data)
+            const sortedData = [...data].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+            setExpenses(sortedData)
         })
     }
 
@@ -104,6 +107,47 @@ function ManageExpenses() {
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
 
+    // Add these new sorting functions
+    const sortData = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+
+        const sortedData = [...expenses].sort((a, b) => {
+            if (key === 'amount' || key === 'taxAmount') {
+                return direction === 'ascending' 
+                    ? parseFloat(a[key]) - parseFloat(b[key])
+                    : parseFloat(b[key]) - parseFloat(a[key]);
+            }
+            if (key === 'date') {
+                return direction === 'ascending'
+                    ? new Date(a[key]) - new Date(b[key])
+                    : new Date(b[key]) - new Date(a[key]);
+            }
+            return direction === 'ascending'
+                ? a[key].toString().localeCompare(b[key].toString())
+                : b[key].toString().localeCompare(a[key].toString());
+        });
+        setExpenses(sortedData);
+    };
+
+    const clearSort = () => {
+        setSortConfig({ key: 'date', direction: 'descending' });
+        const sortedData = [...expenses].sort((a, b) => 
+            new Date(b.date) - new Date(a.date)
+        );
+        setExpenses(sortedData);
+    };
+
+    const getSortIndicator = (key) => {
+        if (sortConfig.key === key) {
+            return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+        }
+        return '';
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-teal-900">
             <Header />
@@ -112,11 +156,24 @@ function ManageExpenses() {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-8 pt-20">
                         <h1 className="text-3xl font-bold text-white tracking-tight">Manage Expenses</h1>
-                        <Link href="/expenses">
-                            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
-                                Back
+                        <div className="flex gap-2">
+                            <Link href="/expenses/add">
+                                <Button className="bg-teal-600 text-white hover:bg-teal-700 transition-all">
+                                    Add Expense
+                                </Button>
+                            </Link>
+                            <Button 
+                                onClick={clearSort}
+                                className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all"
+                            >
+                                Reset Sort
                             </Button>
-                        </Link>
+                            <Link href="/expenses">
+                                <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                    Back
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
@@ -140,12 +197,24 @@ function ManageExpenses() {
                                         <table className="w-full">
                                             <thead>
                                                 <tr className="border-b border-white/10">
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Date</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Description</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Amount</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Tax</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Category</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
+                                                    <th onClick={() => sortData('date')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Date {getSortIndicator('date')}
+                                                    </th>
+                                                    <th onClick={() => sortData('description')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Description {getSortIndicator('description')}
+                                                    </th>
+                                                    <th onClick={() => sortData('amount')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Amount {getSortIndicator('amount')}
+                                                    </th>
+                                                    <th onClick={() => sortData('taxAmount')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Tax {getSortIndicator('taxAmount')}
+                                                    </th>
+                                                    <th onClick={() => sortData('tag')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Category {getSortIndicator('tag')}
+                                                    </th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">
+                                                        Actions
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -262,7 +331,7 @@ function ManageExpenses() {
                                     type="date"
                                     value={editingExpense.date}
                                     onChange={e => setEditingExpense({ ...editingExpense, date: e.target.value })}
-                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white text-white [color-scheme:dark]"
                                 />
                             </div>
                             <div className="space-y-4 mb-4">

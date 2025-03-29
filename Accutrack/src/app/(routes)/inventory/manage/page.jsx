@@ -14,6 +14,7 @@ function ManageInventory() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("")
     const [tags, setTags] = useState([])
+    const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' });
 
     useEffect(() => {
             console.log(`isLoaded: ${isLoaded}`)
@@ -29,7 +30,10 @@ function ManageInventory() {
             setTags(filtered)
         })
         getInventoryByUser(user.id).then(data => {
-            setInventory(data)
+            const sortedData = [...data].sort((a, b) => 
+                a.name.toString().localeCompare(b.name.toString())
+            );
+            setInventory(sortedData);
         })
     }
 
@@ -54,6 +58,41 @@ function ManageInventory() {
         setEditingItem(null)
     };
 
+    const sortData = (key) => {
+        let direction = 'ascending';
+        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+            direction = 'descending';
+        }
+        setSortConfig({ key, direction });
+
+        const sortedData = [...inventory].sort((a, b) => {
+            if (key === 'unitPrice' || key === 'amount') {
+                return direction === 'ascending' 
+                    ? parseFloat(a[key]) - parseFloat(b[key])
+                    : parseFloat(b[key]) - parseFloat(a[key]);
+            }
+            return direction === 'ascending'
+                ? a[key].toString().localeCompare(b[key].toString())
+                : b[key].toString().localeCompare(a[key].toString());
+        });
+        setInventory(sortedData);
+    };
+
+    const clearSort = () => {
+        setSortConfig({ key: 'name', direction: 'ascending' });
+        const sortedData = [...inventory].sort((a, b) => 
+            a.name.toString().localeCompare(b.name.toString())
+        );
+        setInventory(sortedData);
+    };
+
+    const getSortIndicator = (key) => {
+        if (sortConfig.key === key) {
+            return sortConfig.direction === 'ascending' ? ' ↑' : ' ↓';
+        }
+        return '';
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900">
             <Header />
@@ -62,11 +101,24 @@ function ManageInventory() {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex justify-between items-center mb-8 pt-20">
                         <h1 className="text-3xl font-bold text-white tracking-tight">Manage Inventory</h1>
-                        <Link href="/inventory">
-                            <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
-                                Back
+                        <div className="flex gap-2">
+                            <Link href="/inventory/add">
+                                <Button className="bg-purple-600 text-white hover:bg-purple-700 transition-all">
+                                    Add Item
+                                </Button>
+                            </Link>
+                            <Button 
+                                onClick={clearSort}
+                                className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all"
+                            >
+                                Reset Sort
                             </Button>
-                        </Link>
+                            <Link href="/inventory">
+                                <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                    Back
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="bg-white/5 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/10">
@@ -91,12 +143,24 @@ function ManageInventory() {
                                         <table className="w-full">
                                             <thead>
                                                 <tr className="border-b border-white/10">
-                                                    <th className="text-center p-5 text-gray-400 font-medium">ID</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Name</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Category</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Quantity</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Unit Price</th>
-                                                    <th className="text-center p-5 text-gray-400 font-medium">Actions</th>
+                                                    <th onClick={() => sortData('skuId')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        ID {getSortIndicator('skuId')}
+                                                    </th>
+                                                    <th onClick={() => sortData('name')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Name {getSortIndicator('name')}
+                                                    </th>
+                                                    <th onClick={() => sortData('category')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Category {getSortIndicator('category')}
+                                                    </th>
+                                                    <th onClick={() => sortData('amount')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Quantity {getSortIndicator('amount')}
+                                                    </th>
+                                                    <th onClick={() => sortData('unitPrice')} className="text-center p-5 text-gray-400 font-medium cursor-pointer hover:text-white">
+                                                        Unit Price {getSortIndicator('unitPrice')}
+                                                    </th>
+                                                    <th className="text-center p-5 text-gray-400 font-medium">
+                                                        Actions
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody>

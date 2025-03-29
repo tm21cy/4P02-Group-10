@@ -205,7 +205,7 @@ function TransactionsPage() {
                         {transaction.description}
                       </p>
                       <p className="text-gray-400 text-sm">
-                        {new Date(transaction.date).toLocaleDateString()}
+                        {new Date(transaction.date).toISOString().split('T')[0]}
                       </p>
                     </div>
                   </div>
