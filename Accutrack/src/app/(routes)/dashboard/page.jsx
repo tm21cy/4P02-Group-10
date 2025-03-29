@@ -4,13 +4,14 @@ import Header from "../../_components/Header"; // Import the Header component
 import Footer from "../../_components/Footer"; // Import the Footer component
 import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
-import { getIncome, getExpenses } from "@/lib/db";
+import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db";
 import {
   IconMessageChatbot,
   IconClipboardList,
   IconFileText,
   IconCrown,
   IconChevronDown,
+  IconRobot
 } from "@tabler/icons-react";
 import {
   LineChart,
@@ -34,8 +35,7 @@ const dateRanges = [
   "Month to Date",
   "Year to Date",
   "Last 3 Months",
-  "Last 6 Months",
-  "Whole Year"
+  "Last 6 Months"
 ];
 
 function Dashboard() {
@@ -56,6 +56,8 @@ function Dashboard() {
     state.subscriptions[user?.id] || false
   );
   const router = useRouter();
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [inventoryValue, setInventoryValue] = useState(0);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
@@ -63,12 +65,29 @@ function Dashboard() {
     fetchData();
   }, [isLoaded, user, selectedRange]);  
   
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+    fetchRecentTransactions();
+  }, [isLoaded, user]);
+
+  useEffect(() => {
+    if (!isLoaded || !user) return;
+    fetchInventoryStats();
+  }, [isLoaded, user]);
 
   const fetchData = async () => {
     try {
       const incomeData = await getIncome(user.id);
       const expenseData = await getExpenses(user.id);
-  
+
+      // Combine and prepare transactions data with proper type mapping
+      const combinedTransactions = [
+        ...incomeData.map(inc => ({ ...inc, type: 'income' })),
+        ...expenseData.map(exp => ({ ...exp, type: 'expense' }))
+      ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      setTransactions(combinedTransactions);
+
       // Process data for graphs
       processGraphData(incomeData, expenseData);
   
@@ -78,13 +97,16 @@ function Dashboard() {
   
       switch(selectedRange) {
         case "Week to Date":
-          cardStartDate.setDate(today.getDate() - 7);
+          cardStartDate = new Date(today);
+          cardStartDate.setDate(today.getDate() - 6); // Last 7 days including today
+          cardStartDate.setHours(0, 0, 0, 0); // Start of the day
           break;
         case "Month to Date":
-          cardStartDate.setMonth(today.getMonth() - 1);
+          // Set to first day of current month
+          cardStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
           break;
         case "Year to Date":
-          cardStartDate.setFullYear(today.getFullYear() - 1);
+          cardStartDate = new Date(today.getFullYear(), 0, 1); // Start of current year
           break;
         case "Last 3 Months":
           cardStartDate.setMonth(today.getMonth() - 3);
@@ -92,11 +114,8 @@ function Dashboard() {
         case "Last 6 Months":
           cardStartDate.setMonth(today.getMonth() - 6);
           break;
-        case "Whole Year":
-          cardStartDate = new Date(today.getFullYear(), 0, 1); // Start of current year
-          break;
         default:
-          cardStartDate.setMonth(today.getMonth() - 1);
+          cardStartDate = new Date(today.getFullYear(), today.getMonth(), 1);
       }
   
       const incomeSum = incomeData.reduce((sum, inc) => {
@@ -124,6 +143,38 @@ function Dashboard() {
     }
   };
   
+  const fetchRecentTransactions = async () => {
+    try {
+      const incomeData = await getIncome(user.id);
+      const expenseData = await getExpenses(user.id);
+
+      const combined = [
+        ...incomeData.map(inc => ({ ...inc, type: 'income', date: new Date(inc.date) })),
+        ...expenseData.map(exp => ({ ...exp, type: 'expense', date: new Date(exp.date) }))
+      ]
+      .sort((a, b) => b.date - a.date) // Sort in descending order (newest first)
+      .map(transaction => ({
+        ...transaction,
+        date: transaction.date.toISOString() // Convert back to ISO string for display
+      }));
+
+      setRecentTransactions(combined);
+    } catch (error) {
+      console.error("Error fetching recent transactions:", error);
+    }
+  };
+
+  const fetchInventoryStats = async () => {
+    try {
+      const inventory = await getInventoryByUser(user.id);
+      const totalValue = inventory.reduce((sum, item) => {
+        return sum + (Number(item.unitPrice) * Number(item.amount));
+      }, 0);
+      setInventoryValue(totalValue);
+    } catch (error) {
+      console.error("Error fetching inventory stats:", error);
+    }
+  };
 
   const processGraphData = (incomeData, expenseData) => {
     const today = new Date();
@@ -131,24 +182,26 @@ function Dashboard() {
     
     switch(selectedRange) {
       case "Week to Date":
-        startDate.setDate(today.getDate() - 7);
+        startDate = new Date(today);
+        startDate.setDate(today.getDate() - 6);
+        startDate.setHours(0, 0, 0, 0);
         break;
       case "Month to Date":
-        startDate.setMonth(today.getMonth() - 1);
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
         break;
       case "Year to Date":
-        startDate.setFullYear(today.getFullYear() - 1);
+        startDate = new Date(today.getFullYear(), 0, 1);
         break;
       case "Last 3 Months":
+        startDate = new Date(today);
         startDate.setMonth(today.getMonth() - 3);
         break;
       case "Last 6 Months":
+        startDate = new Date(today);
         startDate.setMonth(today.getMonth() - 6);
-      case "Whole Year":
-        startDate = new Date(today.getFullYear(), 0, 1); // Start of current year
         break;
       default:
-        startDate.setMonth(today.getMonth() - 1);
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
     }
 
     // Create daily data points for area chart
@@ -199,7 +252,7 @@ function Dashboard() {
       {/* Welcome Banner */}
       <div className="max-w-7xl mx-auto mt-8 px-4">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pt-20">
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-sky-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-white tracking-tight">
             Dashboard
           </h1>
           <div className="flex gap-2 flex-wrap">
@@ -222,7 +275,7 @@ function Dashboard() {
       </div>
 
       {/* Cards Section */}
-      <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="max-w-7xl mx-auto mt-8 px-4 grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 transition-all duration-200 hover:border-white/20">
           <h3 className="text-lg font-bold text-gray-200">Total Income</h3>
           <p className="text-3xl font-bold text-sky-400">${cardsData.totalIncome.toFixed(2)}</p>
@@ -234,6 +287,10 @@ function Dashboard() {
         <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 transition-all duration-200 hover:border-white/20">
           <h3 className="text-lg font-bold text-gray-200">Net Cash Flow</h3>
           <p className="text-3xl font-bold text-emerald-400">${cardsData.netCashFlow.toFixed(2)}</p>
+        </div>
+        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10 transition-all duration-200 hover:border-white/20">
+          <h3 className="text-lg font-bold text-gray-200">Inventory Value</h3>
+          <p className="text-3xl font-bold text-purple-400">${inventoryValue.toFixed(2)}</p>
         </div>
       </div>
 
@@ -320,9 +377,9 @@ function Dashboard() {
         >
           <div className="group backdrop-blur-xl bg-gradient-to-br from-purple-500/10 to-blue-500/10 p-6 rounded-2xl shadow-xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
             <div className="flex flex-col h-full">
-              <div className="flex items-center gap-3 mb-3 group-hover:scale-105 transition-transform duration-200">
-                <IconMessageChatbot className="h-8 w-8 text-purple-400" />
-                <IconCrown className="h-4 w-4 text-amber-400" />
+              <div className="flex items-center gap-3 mb-3">
+              <IconRobot className="h-8 w-8 text-purple-400 group-hover:scale-105 transition-transform duration-200" />
+              <IconCrown className="h-4 w-4 text-amber-400 group-hover:scale-105 transition-transform duration-200" />
               </div>
               <h2 className="text-xl font-bold text-white mb-2">AI Assistant</h2>
               <p className="text-gray-400 text-sm mb-2">Get AI-powered financial insights</p>
@@ -352,46 +409,43 @@ function Dashboard() {
         </Link>
       </div>
 
-      {/* Recent Transactions List */}
-      <div className="max-w-7xl mx-auto px-4 mt-8 mb-12">
-        <div className="backdrop-blur-xl bg-white/5 p-6 rounded-2xl shadow-xl border border-white/10">
-          <h2 className="text-xl font-bold text-gray-200 mb-6">Recent Activity</h2>
-          {transactions.length === 0 ? (
-            <p className="text-gray-400 text-center py-4">No recent transactions</p>
-          ) : (
-            <div className="space-y-4">
-              {transactions
-                .sort((a, b) => new Date(b.date) - new Date(a.date))
-                .slice(0, 5)
-                .map((transaction) => (
-                  <div 
-                    key={transaction.id} 
-                    className="flex justify-between items-center p-4 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:border-white/20"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-xl ${
-                        transaction.type === "income" 
-                          ? "bg-sky-500/20 text-sky-400" 
-                          : "bg-emerald-500/20 text-emerald-400"
-                      }`}>
-                        {transaction.type === "income" ? "+" : "-"}
-                      </div>
-                      <div>
-                        <p className="text-gray-200 font-medium">{transaction.description}</p>
-                        <p className="text-gray-400 text-sm">
-                          {new Date(transaction.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <div className={`text-lg font-bold ${
-                      transaction.type === "income" ? "text-sky-400" : "text-emerald-400"
-                    }`}>
-                      ${Number(transaction.amount).toFixed(2)}
-                    </div>
+      {/* Recent Transactions */}
+      <div className="max-w-7xl mx-auto mt-8 px-4">
+        <div className="backdrop-blur-xl bg-white/5 p-8 rounded-2xl shadow-xl border border-white/10 mb-8">
+          <h2 className="text-2xl font-bold text-gray-200 mb-6">Recent Transactions</h2>
+          {recentTransactions.slice(0, 5).map((transaction) => (
+            <div 
+              key={transaction.id} 
+              className="flex justify-between items-center p-5 backdrop-blur-sm bg-white/5 rounded-xl border border-white/10 transition-all duration-300 hover:border-white/20 group mb-4 last:mb-0"
+            >
+              <div className="flex items-center gap-5">
+                <div className={`p-3 rounded-xl ${
+                  transaction.type === "income" 
+                    ? "bg-sky-500/20 text-sky-400" 
+                    : "bg-emerald-500/20 text-emerald-400"
+                } transition-all duration-300 group-hover:scale-110`}>
+                  <div className="text-lg font-medium">
+                    {transaction.type === "income" ? "+" : "-"}
                   </div>
-                ))}
+                </div>
+                <div>
+                  <p className="text-white font-medium text-lg group-hover:text-blue-400 transition-colors duration-300">
+                    {transaction.description}
+                  </p>
+                  <p className="text-gray-400 text-sm">
+                    {new Date(transaction.date).toISOString().split('T')[0]}
+                  </p>
+                </div>
+              </div>
+              <div className={`text-xl font-semibold ${
+                transaction.type === "income" 
+                  ? "text-sky-400 group-hover:text-sky-300" 
+                  : "text-emerald-400 group-hover:text-emerald-300"
+              } transition-colors duration-300`}>
+                ${Number(transaction.amount).toFixed(2)}
+              </div>
             </div>
-          )}
+          ))}
         </div>
       </div>
 
@@ -401,7 +455,10 @@ function Dashboard() {
       />
 
       <Footer />
-    </div>    
+    </div>  
+    
+    
+    
   );
 }
 
