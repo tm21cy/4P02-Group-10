@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
+import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -22,8 +23,8 @@ function AddExpense() {
     // Separate state for inventory fields
     const [inventoryData, setInventoryData] = useState({
         addToInventory: false,
-        inventoryItemId: 0,
-        inventoryQuantity: 0
+        inventoryItemId: "",
+        inventoryQuantity: ""
     });
 
     // Add state for sales tax
@@ -112,6 +113,15 @@ function AddExpense() {
         setLoading(true);
         setMessage("");
 
+        // Validate inventory fields if checkbox is checked
+        if (inventoryData.addToInventory) {
+            if (!inventoryData.inventoryItemId || !inventoryData.inventoryQuantity) {
+                setLoading(false);
+                setMessage("Please fill in both Item ID and Quantity for inventory.");
+                return;
+            }
+        }
+
         const updatedFormData = {
             ...formData,
             userId: user.id,
@@ -184,25 +194,42 @@ function AddExpense() {
                         </p>
                     </div>
                     <div className="w-full max-w-2xl">
+                        <div className="mb-4 flex justify-end">
+                            <Link href="/expenses">
+                                <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                    Back
+                                </Button>
+                            </Link>
+                        </div>
                         <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-8">
                             <form className="space-y-6" onSubmit={handleSubmit}>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">Amount</label>
+                                    
                                     <input
-                                        type="number"
-                                        step="0.01"
+                                        type="text"
+                                        required
                                         name="amount"
+                                        inputMode="decimal"
+                                        pattern="^\d*\.?\d{0,2}$"
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                         placeholder="0.00"
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                setFormData(prev => ({ ...prev, amount: value }));
+                                            }
+                                        }}
                                         value={formData.amount}
                                     />
+
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">Description</label>
                                     <input
                                         type="text"
                                         name="description"
+                                        required
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                         placeholder="What was this expense for?"
                                         onChange={handleChange}
@@ -231,12 +258,21 @@ function AddExpense() {
                                                     Item ID
                                                 </label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     name="inventoryItemId"
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                                     placeholder="Enter inventory item ID"
-                                                    onChange={handleChange}
-                                                    value={inventoryData.inventoryItemId || ""}
+                                                    required={inventoryData.addToInventory}
+                                                    onChange={e => {
+                                                        const value = e.target.value;
+                                                        if (/^\d*$/.test(value)) {
+                                                            setInventoryData(prev => ({
+                                                                ...prev,
+                                                                inventoryItemId: value
+                                                            }));
+                                                        }
+                                                    }}
+                                                    value={inventoryData.inventoryItemId}
                                                 />
                                             </div>
                                             <div>
@@ -244,13 +280,21 @@ function AddExpense() {
                                                     Quantity
                                                 </label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     name="inventoryQuantity"
-                                                    min="1"
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
                                                     placeholder="Enter quantity"
-                                                    onChange={handleChange}
-                                                    value={inventoryData.inventoryQuantity || ""}
+                                                    required={inventoryData.addToInventory}
+                                                    onChange={e => {
+                                                        const value = e.target.value;
+                                                        if (/^\d*$/.test(value)) {
+                                                            setInventoryData(prev => ({
+                                                                ...prev,
+                                                                inventoryQuantity: value
+                                                            }));
+                                                        }
+                                                    }}
+                                                    value={inventoryData.inventoryQuantity}
                                                 />
                                             </div>
                                         </div>
@@ -333,18 +377,20 @@ function AddExpense() {
                                                         Tax Rate (%)
                                                     </label>
                                                     <input
-                                                        type="number"
-                                                        min="0"
-                                                        max="100"
-                                                        step="0.1"
+                                                        type="text"
+                                                        inputMode="decimal"
+                                                        pattern="^\d*\.?\d{0,2}$"
                                                         value={salesTaxData.taxRate}
+                                                        required={salesTaxData.hasSalesTax}
                                                         onChange={(e) => {
-                                                            const newRate = parseFloat(e.target.value) || 0;
-                                                            setSalesTaxData(prev => ({
-                                                                ...prev,
-                                                                taxRate: newRate,
-                                                                taxAmount: formData.amount * (newRate / 100)
-                                                            }));
+                                                            const value = e.target.value;
+                                                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                                setSalesTaxData(prev => ({
+                                                                    ...prev,
+                                                                    taxRate: value,
+                                                                    taxAmount: formData.amount * (parseFloat(value) / 100)
+                                                                }));
+                                                            }
                                                         }}
                                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
                                                         placeholder="Enter tax rate"
@@ -391,6 +437,7 @@ function AddExpense() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }

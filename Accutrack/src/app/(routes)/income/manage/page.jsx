@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Header from "../../../_components/Header";
+import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -304,9 +305,7 @@ function ManageIncome() {
                     </div>
                 </div>
             </div>
-            <footer className="mt-auto py-6 text-center text-gray-400">
-                <p>&copy; 2024 AccuTrack. All rights reserved.</p>
-            </footer>
+            <Footer />
             {editingIncome && (
                             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
                                 <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
@@ -318,11 +317,18 @@ function ManageIncome() {
                                                 Amount
                                             </label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 step="0.01"
+                                                min="0"
                                                 value={editingIncome.amount}
-                                                onChange={e => setEditingIncome({ ...editingIncome, amount: parseFloat(e.target.value) })}
+                                                onChange={e => {
+                                                    const value = e.target.value;
+                                                    if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                        setEditingIncome({ ...editingIncome, amount: value });
+                                                    }
+                                                }}
                                                 className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                                placeholder="0.00"
                                             />
                                         </div>
                                         <div>
@@ -416,19 +422,22 @@ function ManageIncome() {
                                                                 Tax Rate (%)
                                                             </label>
                                                             <input
-                                                                type="number"
+                                                                type="text"
+                                                                inputMode="decimal"
+                                                                pattern="^\d*\.?\d{0,2}$"
+                                                                value={editSalesTaxData.taxRate}
+                                                                required={editSalesTaxData.hasSalesTax}
                                                                 min="0"
                                                                 max="100"
-                                                                step="0.1"
-                                                                value={editSalesTaxData.taxRate}
                                                                 onChange={(e) => {
-                                                                    const newRate = parseFloat(e.target.value) || 0;
-                                                                    setEditSalesTaxData(prev => ({
-                                                                        ...prev,
-                                                                        taxRate: newRate,
-                                                                        taxAmount: editingIncome.amount * (newRate / 100)
-                                                                    }));
-                                                                    console.log(editSalesTaxData)
+                                                                    const value = e.target.value;
+                                                                    if (/^\d*\.?\d{0,2}$/.test(value) && parseFloat(value) <= 100) {
+                                                                        setEditSalesTaxData(prev => ({
+                                                                            ...prev,
+                                                                            taxRate: value,
+                                                                            taxAmount: editingIncome.amount * (parseFloat(value) / 100)
+                                                                        }));
+                                                                    }
                                                                 }}
                                                                 className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
                                                                 placeholder="Enter tax rate"

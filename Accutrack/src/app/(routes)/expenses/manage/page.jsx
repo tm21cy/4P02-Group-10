@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Header from "../../../_components/Header";
+import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useClerk, useSession, useUser } from "@clerk/nextjs";
@@ -305,11 +306,18 @@ function ManageExpenses() {
                                     Amount
                                 </label>
                                 <input
-                                    type="number"
+                                    type="text"
                                     step="0.01"
+                                    min="0"
                                     value={editingExpense.amount}
-                                    onChange={e => setEditingExpense({ ...editingExpense, amount: parseFloat(e.target.value) })}
+                                    onChange={e => {
+                                        const value = e.target.value;
+                                        if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                            setEditingExpense({ ...editingExpense, amount: value });
+                                        }
+                                    }}
                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                    placeholder="0.00"
                                 />
                             </div>
                             <div>
@@ -334,6 +342,42 @@ function ManageExpenses() {
                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white text-white [color-scheme:dark]"
                                 />
                             </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Category
+                                </label>
+                                <select
+                                    name="tag"
+                                    required
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white mb-2"
+                                    onChange={e => setEditingExpense({ ...editingExpense, tag: e.target.value })}
+                                    value={editingExpense.tag}
+                                >
+                                    <option value="">Select a category</option>
+                                    <option value="Bills">Bills</option>
+                                    <option value="Food">Food</option>
+                                    <option value="Transportation">Transportation</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Other">+ Add Custom Category</option>
+                                </select>
+                            </div>
+                            {editingExpense.tag === "Other" && (
+                                <div className="space-y-2">
+                                    <input
+                                        type="text"
+                                        name="customTag"
+                                        required
+                                        placeholder="Enter custom category name"
+                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                        onChange={e => setEditingExpense({ ...editingExpense, customTag: e.target.value })}
+                                        value={editingExpense.customTag || ""}
+                                    />
+                                    <p className="text-sm text-gray-400">
+                                        This category will be saved for future use
+                                    </p>
+                                </div>
+                            )}
                             <div className="space-y-4 mb-4">
                                 <div className="flex items-center space-x-2">
                                     <input
@@ -363,23 +407,30 @@ function ManageExpenses() {
                                                     Tax Rate (%)
                                                 </label>
                                                 <input
-                                                    type="number"
-                                                    min="0"
-                                                    max="100"
-                                                    step="0.1"
+                                                    type="text"
+                                                    inputMode="decimal"
+                                                    pattern="^\d*\.?\d{0,2}$"
                                                     value={editSalesTaxData.taxRate}
+                                                    required={editSalesTaxData.hasSalesTax}
                                                     onChange={(e) => {
-                                                        const newRate = parseFloat(e.target.value) || 0;
-                                                        setEditSalesTaxData(prev => ({
-                                                            ...prev,
-                                                            taxRate: newRate,
-                                                            taxAmount: editingExpense.amount * (newRate / 100)
-                                                        }));
-                                                        console.log(editSalesTaxData)
+                                                        const value = e.target.value;
+                                                        if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                            setEditSalesTaxData(prev => ({
+                                                                ...prev,
+                                                                taxRate: value,
+                                                                taxAmount: editingExpense.amount * (parseFloat(value) / 100)
+                                                            }));
+                                                        }
+                                                        setMessage(""); // Clear any error message
                                                     }}
-                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+                                                    className={`w-full px-4 py-2 bg-gray-800/50 border rounded-lg text-white ${
+                                                        message ? 'border-red-500 focus:ring-red-500' : 'border-gray-700 focus:ring-teal-500'
+                                                    }`}
                                                     placeholder="Enter tax rate"
                                                 />
+                                                {message && (
+                                                    <p className="mt-2 text-sm text-red-400">{message}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -423,6 +474,7 @@ function ManageExpenses() {
                     </div>
                 </div>
             )}
+            <Footer />
         </div>
     );
 }

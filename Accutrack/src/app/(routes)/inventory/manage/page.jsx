@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
+import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -52,10 +53,19 @@ function ManageInventory() {
 
     const handleSave = async (e) => {
         e.preventDefault();
-        await patchInventoryItemDetails(editingItem.id, editingItem.skuId, user.id, editingItem.name, editingItem.description, editingItem.amount, editingItem.unitPrice, editingItem.category)
-        setMessage("Updated successfully!")
-        updateEntries()
-        setEditingItem(null)
+        await patchInventoryItemDetails(
+            editingItem.id,
+            editingItem.skuId,
+            user.id,
+            editingItem.name,
+            editingItem.description,
+            parseInt(editingItem.amount, 10), // Ensure amount is an integer
+            parseFloat(editingItem.unitPrice), // Ensure unitPrice is a float
+            editingItem.category
+        );
+        setMessage("Updated successfully!");
+        updateEntries();
+        setEditingItem(null);
     };
 
     const sortData = (key) => {
@@ -248,9 +258,7 @@ function ManageInventory() {
                     </div>
                 </div>
             </div>
-            <footer className="mt-auto py-6 text-center text-gray-400">
-                <p>&copy; 2024 AccuTrack. All rights reserved.</p>
-            </footer>
+            <Footer />
             {/* Edit Modal */}
             {editingItem && (
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -288,11 +296,16 @@ function ManageInventory() {
                                             Quantity
                                         </label>
                                         <input
-                                            type="number"
-                                            min="0"
+                                            type="text"
                                             value={editingItem.amount}
-                                            onChange={e => setEditingItem({ ...editingItem, quantity: parseFloat(e.target.value) })}
+                                            onChange={e => {
+                                                const value = e.target.value;
+                                                if (/^\d*$/.test(value)) {
+                                                    setEditingItem({ ...editingItem, amount: value });
+                                                }
+                                            }}
                                             className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                            placeholder="0"
                                         />
                                     </div>
 
@@ -301,12 +314,18 @@ function ManageInventory() {
                                             Unit Price
                                         </label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             step="0.01"
                                             min="0"
                                             value={editingItem.unitPrice}
-                                            onChange={e => setEditingItem({ ...editingItem, unitPrice: parseFloat(e.target.value) })}
+                                            onChange={e => {
+                                                const value = e.target.value;
+                                                if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                    setEditingItem({ ...editingItem, unitPrice: value });
+                                                }
+                                            }}
                                             className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                            placeholder="0.00"
                                         />
                                     </div>
                                 </div>

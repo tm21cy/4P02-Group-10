@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Header from "../../../_components/Header";
+import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
@@ -19,7 +20,7 @@ function AddInventory() {
         customCategory: "",
         addAsExpense: false,
         date: new Date().toISOString().split("T")[0],
-        purchasePrice: 0,
+        purchasePrice: "",
         hasSalesTax: false,
         taxRate: 13, // default
         taxAmount: 0
@@ -64,6 +65,12 @@ function AddInventory() {
             || formData.quantity.length == 0
             || (formData.category.length == 0 && formData.customCategory.length == 0)
         ) return setMessage("Missing fields - please fully fill out the form!")
+        
+        // Add validation for tax rate when sales tax is checked
+        if (formData.hasSalesTax && (!formData.taxRate || parseFloat(formData.taxRate) <= 0)) {
+            return setMessage("Please enter a valid tax rate!")
+        }
+
         let category = formData.category
         if (formData.customCategory.length > 0) category = formData.customCategory
         if (formData.customCategory.length > 0) await postNewTagIfNotExists(formData.customCategory, user.id, 2)
@@ -88,7 +95,7 @@ function AddInventory() {
             customCategory: "",
             addAsExpense: false,
             date: new Date().toISOString().split("T")[0],
-            purchasePrice: 0,
+            purchasePrice: "",
             hasSalesTax: false,
             taxRate: 13, // default
             taxAmount: 0
@@ -98,7 +105,7 @@ function AddInventory() {
     return (
         <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900">
             <Header />
-            <div className="container mx-auto p-4 pt-20">
+            <div className="container mx-auto p-4 pt-20 flex-grow">
                 <div className="mt-12 flex flex-col items-center">
                     <div className="text-center mb-16">
                         <div className="flex justify-center mb-6">
@@ -117,6 +124,13 @@ function AddInventory() {
                     </div>
 
                     <div className="w-full max-w-2xl">
+                        <div className="mb-4 flex justify-end">
+                            <Link href="/inventory">
+                                <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                    Back
+                                </Button>
+                            </Link>
+                        </div>
                         <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-8">
                             <form className="space-y-6" onSubmit={handleSubmit}>
                                 <div>
@@ -155,6 +169,7 @@ function AddInventory() {
                                     </label>
                                     <textarea
                                         name="description"
+                                        required
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                         placeholder="Enter item description"
                                         rows="3"
@@ -169,13 +184,20 @@ function AddInventory() {
                                             Quantity
                                         </label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             name="quantity"
                                             required
-                                            min="0"
                                             className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                             placeholder="0"
-                                            onChange={handleChange}
+                                            onChange={e => {
+                                                const value = e.target.value;
+                                                if (/^\d*$/.test(value)) {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        quantity: value
+                                                    }));
+                                                }
+                                            }}
                                             value={formData.quantity}
                                         />
                                     </div>
@@ -185,14 +207,20 @@ function AddInventory() {
                                             Unit Price
                                         </label>
                                         <input
-                                            type="number"
+                                            type="text"
                                             name="unitPrice"
                                             required
-                                            step="0.01"
-                                            min="0"
                                             className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                             placeholder="0.00"
-                                            onChange={handleChange}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        unitPrice: value
+                                                    }));
+                                                }
+                                            }}
                                             value={formData.unitPrice}
                                         />
                                     </div>
@@ -270,14 +298,21 @@ function AddInventory() {
                                                 Purchase Price
                                             </label>
                                             <input
-                                                type="number"
+                                                type="text"
                                                 name="purchasePrice"
                                                 required
-                                                step="0.01"
-                                                min="0"
                                                 className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
                                                 placeholder="0.00"
-                                                onChange={handleChange}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            purchasePrice: value,
+                                                            taxAmount: prev.hasSalesTax ? ((value * prev.quantity) * (prev.taxRate / 100)) : 0
+                                                        }));
+                                                    }
+                                                }}
                                                 value={formData.purchasePrice}
                                             />
                                         </div>
@@ -308,18 +343,20 @@ function AddInventory() {
                                                             Tax Rate (%)
                                                         </label>
                                                         <input
-                                                            type="number"
-                                                            min="0"
-                                                            max="100"
-                                                            step="0.1"
+                                                            type="text"
+                                                            inputMode="decimal"
+                                                            pattern="^\d*\.?\d{0,2}$"
+                                                            required={formData.hasSalesTax}
                                                             value={formData.taxRate}
                                                             onChange={(e) => {
-                                                                const newRate = parseFloat(e.target.value) || 0;
-                                                                setFormData(prev => ({
-                                                                    ...prev,
-                                                                    taxRate: newRate,
-                                                                    taxAmount: (formData.quantity * formData.purchasePrice) * (newRate / 100)
-                                                                }));
+                                                                const value = e.target.value;
+                                                                if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                                    setFormData(prev => ({
+                                                                        ...prev,
+                                                                        taxRate: value,
+                                                                        taxAmount: (formData.quantity * formData.purchasePrice) * (parseFloat(value) / 100)
+                                                                    }));
+                                                                }
                                                             }}
                                                             className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
                                                             placeholder="Enter tax rate"
@@ -375,8 +412,9 @@ function AddInventory() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }
 
-export default AddInventory; 
+export default AddInventory;

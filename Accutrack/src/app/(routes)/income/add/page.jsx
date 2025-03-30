@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
+import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getInventoryItemBySkuId, getValidTags, patchInventoryAmountSell, postNewIncome,postNewTagIfNotExists } from "@/lib/db";
@@ -21,8 +22,8 @@ function AddIncome() {
     // Separate state for inventory fields
     const [inventoryData, setInventoryData] = useState({
         deductFromInventory: false,
-        inventoryItemId: 0,
-        inventoryQuantity: 0
+        inventoryItemId: "",
+        inventoryQuantity: ""
     });
 
     // Add state for sales tax
@@ -179,7 +180,7 @@ function AddIncome() {
                 <div className="mt-12 flex flex-col items-center">
                     <div className="text-center mb-16">
                         <div className="flex justify-center mb-6">
-                            <div className="bg-blue-500/20 p-5 rounded-full ring-2 bg-blue-500/40">
+                            <div className="bg-blue-500/20 p-5 rounded-full ring-2 ring-blue-500/30">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-14 w-14 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
@@ -194,6 +195,13 @@ function AddIncome() {
                     </div>
 
                     <div className="w-full max-w-2xl">
+                        <div className="mb-4 flex justify-end">
+                            <Link href="/income">
+                                <Button className="bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-all">
+                                    Back
+                                </Button>
+                            </Link>
+                        </div>
                         <div className="bg-white/10 backdrop-blur-lg rounded-xl shadow-lg p-8">
                             <form className="space-y-6" onSubmit={handleSubmit}>
                                 <div>
@@ -201,13 +209,19 @@ function AddIncome() {
                                         Amount
                                     </label>
                                     <input
-                                        type="number"
-                                        step="0.01"
+                                        type="text"
                                         required
                                         name="amount"
+                                        inputMode="decimal"
+                                        pattern="^\d*\.?\d{0,2}$"
                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
                                         placeholder="0.00"
-                                        onChange={handleChange}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                setFormData(prev => ({ ...prev, amount: value }));
+                                            }
+                                        }}
                                         value={formData.amount}
                                     />
                                 </div>
@@ -250,12 +264,21 @@ function AddIncome() {
                                                     Item ID
                                                 </label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     name="inventoryItemId"
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
                                                     placeholder="Enter inventory item ID"
-                                                    onChange={handleChange}
-                                                    value={inventoryData.inventoryItemId || ""}
+                                                    required={inventoryData.deductFromInventory}
+                                                    onChange={e => {
+                                                        const value = e.target.value;
+                                                        if (/^\d*$/.test(value)) {
+                                                            setInventoryData(prev => ({
+                                                                ...prev,
+                                                                inventoryItemId: value
+                                                            }));
+                                                        }
+                                                    }}
+                                                    value={inventoryData.inventoryItemId}
                                                 />
                                             </div>
                                             <div>
@@ -263,13 +286,21 @@ function AddIncome() {
                                                     Quantity Sold
                                                 </label>
                                                 <input
-                                                    type="number"
+                                                    type="text"
                                                     name="inventoryQuantity"
-                                                    min="1"
                                                     className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
                                                     placeholder="Enter quantity"
-                                                    onChange={handleChange}
-                                                    value={inventoryData.inventoryQuantity || ""}
+                                                    required={inventoryData.deductFromInventory}
+                                                    onChange={e => {
+                                                        const value = e.target.value;
+                                                        if (/^\d*$/.test(value)) {
+                                                            setInventoryData(prev => ({
+                                                                ...prev,
+                                                                inventoryQuantity: value
+                                                            }));
+                                                        }
+                                                    }}
+                                                    value={inventoryData.inventoryQuantity}
                                                 />
                                             </div>
                                         </div>
@@ -360,18 +391,20 @@ function AddIncome() {
                                                         Tax Rate (%)
                                                     </label>
                                                     <input
-                                                        type="number"
-                                                        min="0"
-                                                        max="100"
-                                                        step="0.1"
+                                                        type="text"
+                                                        inputMode="decimal"
+                                                        pattern="^\d*\.?\d{0,2}$"
                                                         value={salesTaxData.taxRate}
+                                                        required={salesTaxData.hasSalesTax}
                                                         onChange={(e) => {
-                                                            const newRate = parseFloat(e.target.value) || 0;
-                                                            setSalesTaxData(prev => ({
-                                                                ...prev,
-                                                                taxRate: newRate,
-                                                                taxAmount: formData.amount * (newRate / 100)
-                                                            }));
+                                                            const value = e.target.value;
+                                                            if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                                                setSalesTaxData(prev => ({
+                                                                    ...prev,
+                                                                    taxRate: value,
+                                                                    taxAmount: formData.amount * (parseFloat(value) / 100)
+                                                                }));
+                                                            }
                                                         }}
                                                         className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
                                                         placeholder="Enter tax rate"
@@ -426,6 +459,7 @@ function AddIncome() {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }
