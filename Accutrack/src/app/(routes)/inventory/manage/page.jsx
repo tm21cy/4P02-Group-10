@@ -280,6 +280,23 @@ function ManageInventory() {
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-2">
+                                        Category
+                                    </label>
+                                    <select
+                                        value={editingItem.category}
+                                        onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
+                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
+                                    >
+                                        {tags.map(tag => {
+                                            return <option key={tag} value={tag}>
+                                                {tag}
+                                            </option>
+                                        })}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-300 mb-2">
                                         Description
                                     </label>
                                     <textarea
@@ -330,22 +347,6 @@ function ManageInventory() {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                                        Category
-                                    </label>
-                                    <select
-                                        value={editingItem.category}
-                                        onChange={e => setEditingItem({ ...editingItem, category: e.target.value })}
-                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 text-white"
-                                    >
-                                        {tags.map(tag => {
-                                            return <option key={tag} value={tag}>
-                                                {tag}
-                                            </option>
-                                        })}
-                                    </select>
-                                </div>
 
                                 <div className="flex justify-end gap-3 pt-6">
                                     <Button

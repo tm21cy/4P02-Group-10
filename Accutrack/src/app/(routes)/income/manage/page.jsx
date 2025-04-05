@@ -6,7 +6,7 @@ import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { deleteIncome, getIncome, patchIncome } from "@/lib/db";
+import { deleteIncome, getIncome, patchIncome, getValidTags } from "@/lib/db";
 
 // Page for viewing and editing income entries
 function ManageIncome() {
@@ -24,22 +24,28 @@ function ManageIncome() {
         taxAmount: 0
     });
 
-    const { isSignedIn, user, isLoaded } = useUser()
+    const [tags, setTags] = useState([]);
+
+    const { isSignedIn, user, isLoaded } = useUser();
 
     useEffect(() => {
-        if (!isLoaded) return console.error("User not loaded.")
-        if (!user) return console.error("No valid session.")
-        updateEntries()
-    }, [isLoaded, user])
+        if (!isLoaded) return console.error("User not loaded.");
+        if (!user) return console.error("No valid session.");
+        updateEntries();
+    }, [isLoaded, user]);
 
     const updateEntries = () => {
         getIncome(user.id).then(data => {
             const sortedData = [...data].sort((a, b) => 
                 new Date(b.date) - new Date(a.date)
             );
-            setIncomes(sortedData)
-        })
-    }
+            setIncomes(sortedData);
+        });
+        getValidTags(user.id).then(data => {
+            const filtered = data.map(e => e.name);
+            setTags(filtered);
+        });
+    };
 
     const sortData = (key) => {
         let direction = 'ascending';
@@ -99,38 +105,24 @@ function ManageIncome() {
         });
     };
 
-
     const handleDelete = (id) => {
         deleteIncome(user.id, id).then(() => {
-            updateEntries()
-        })
+            updateEntries();
+        });
     };
 
     const handleEditSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        // BACKEND INTEGRATION NOTE FOR TYLER:
-        // 1. Update the income table schema to include:
-        //    - deduct_from_inventory (boolean)
-        //    - inventory_item_id (string/uuid)
-        //    - inventory_quantity (integer)
-        // 2. Modify the updateIncome API endpoint to:
-        //    - Accept these new fields
-        //    - Update inventory quantities when deduct_from_inventory is true
-        //    - Add validation for inventory item existence
-        //    - Add validation for sufficient inventory quantity
-        // 3. Add inventory transaction logging for audit trail
-
         try {
-            // Only send the original income data to backend for now
             const updatedIncome = {
                 ...editingIncome,
                 amount: parseFloat(editingIncome.amount),
                 tag: editingIncome.tag === "Other" ? editingIncome.customTag : editingIncome.tag
             };
-            const taxRate = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxRate : 13
-            const taxAmount = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxAmount : 0
+            const taxRate = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxRate : 13;
+            const taxAmount = editSalesTaxData.hasSalesTax ? editSalesTaxData.taxAmount : 0;
             await patchIncome(user.id, editingIncome.id, {
                 ...updatedIncome,
                 taxRate,
@@ -146,7 +138,6 @@ function ManageIncome() {
         setLoading(false);
     };
 
-    // Add this helper function
     const formatAmount = (amount) => {
         const num = parseFloat(amount);
         return isNaN(num) ? "0.00" : num.toFixed(2);
@@ -258,7 +249,7 @@ function ManageIncome() {
                                         </table>
                                     </div>
 
-                                    {/* Card view for mobile screens */}
+                                    {/* Card view for mobile screens */} 
                                     <div className="md:hidden space-y-4">
                                         {incomes.map(income => (
                                             <div key={income.id} className="bg-gray-800/30 rounded-lg p-4 space-y-3">
@@ -307,184 +298,183 @@ function ManageIncome() {
             </div>
             <Footer />
             {editingIncome && (
-                            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                                <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
-                                    <h2 className="text-xl font-bold text-white mb-4">Edit Income</h2>
-                                    <form onSubmit={handleEditSubmit} className="space-y-4">
-                                        {/* Form fields for editing */}
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                Amount
-                                            </label>
-                                            <input
-                                                type="text"
-                                                step="0.01"
-                                                min="0"
-                                                value={editingIncome.amount}
-                                                onChange={e => {
-                                                    const value = e.target.value;
-                                                    if (/^\d*\.?\d{0,2}$/.test(value)) {
-                                                        setEditingIncome({ ...editingIncome, amount: value });
-                                                    }
-                                                }}
-                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
-                                                placeholder="0.00"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                Description
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={editingIncome.description}
-                                                onChange={e => setEditingIncome({ ...editingIncome, description: e.target.value })}
-                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                Date
-                                            </label>
-                                            <input
-                                                type="date"
-                                                value={editingIncome.date}
-                                                onChange={e => setEditingIncome({ ...editingIncome, date: e.target.value })}
-                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white text-white [color-scheme:dark]"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                Category
-                                            </label>
-                                            <select
-                                                name="tag"
-                                                required
-                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white mb-2"
-                                                onChange={e => setEditingIncome({ ...editingIncome, tag: e.target.value })}
-                                                value={editingIncome.tag}
-                                            >
-                                                <option value="">Select a category</option>
-                                                <option value="Salary">Salary</option>
-                                                <option value="Freelance">Freelance</option>
-                                                <option value="Investment">Investment</option>
-                                                <option value="Business">Business</option>
-                                                <option value="Rental">Rental Income</option>
-                                                <option value="Dividends">Dividends</option>
-                                                <option value="Commission">Commission</option>
-                                                <option value="Bonus">Bonus</option>
-                                                <option value="Royalties">Royalties</option>
-                                                <option value="Other">+ Add Custom Category</option>
-                                            </select>
-                                        </div>
-                                        {editingIncome.tag === "Other" && (
-                                            <div className="space-y-2">
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+                    <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
+                        <h2 className="text-xl font-bold text-white mb-4">Edit Income</h2>
+                        <form onSubmit={handleEditSubmit} className="space-y-4">
+                            {/* Form fields for editing */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Amount
+                                </label>
+                                <input
+                                    type="text"
+                                    step="0.01"
+                                    min="0"
+                                    value={editingIncome.amount}
+                                    onChange={e => {
+                                        const value = e.target.value;
+                                        if (/^\d*\.?\d{0,2}$/.test(value)) {
+                                            setEditingIncome({ ...editingIncome, amount: value });
+                                        }
+                                    }}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                    placeholder="0.00"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Category
+                                </label>
+                                <select
+                                    name="tag"
+                                    required
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white mb-2"
+                                    onChange={e => setEditingIncome({ ...editingIncome, tag: e.target.value })}
+                                    value={editingIncome.tag}
+                                >
+                                    <option value="">Select a category</option>
+                                    {tags.map(tag => (
+                                        <option key={tag} value={tag}>
+                                            {tag}
+                                        </option>
+                                    ))}
+                                    <option value="Other">+ Add Custom Category</option>
+                                </select>
+                            </div>
+                            {editingIncome.tag === "Other" && (
+                                <div className="space-y-2">
+                                    <input
+                                        type="text"
+                                        name="customTag"
+                                        required
+                                        placeholder="Enter custom category name"
+                                        className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
+                                        onChange={e => setEditingIncome({ ...editingIncome, customTag: e.target.value })}
+                                        value={editingIncome.customTag || ""}
+                                    />
+                                    <p className="text-sm text-gray-400">
+                                        This category will be saved for future use
+                                    </p>
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Description
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editingIncome.description}
+                                    onChange={e => setEditingIncome({ ...editingIncome, description: e.target.value })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editingIncome.date}
+                                    onChange={e => setEditingIncome({ ...editingIncome, date: e.target.value })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white text-white [color-scheme:dark]"
+                                />
+                            </div>
+                            
+                            <div className="space-y-4 mb-4">
+                                <div className="flex items-center space-x-2">
+                                    <input
+                                        type="checkbox"
+                                        id="editHasSalesTax"
+                                        checked={editSalesTaxData.hasSalesTax}
+                                        onChange={(e) => {
+                                            setEditSalesTaxData(prev => ({
+                                                ...prev,
+                                                hasSalesTax: e.target.checked,
+                                                taxAmount: e.target.checked ? (editingIncome.amount * (prev.taxRate / 100)) : 0
+                                            }));
+                                        }}
+                                        className="w-4 h-4 text-blue-500 bg-gray-800/50 border-gray-700 rounded"
+                                    />
+                                    <label htmlFor="editHasSalesTax" className="text-sm font-medium text-gray-300">
+                                        Sales tax was charged
+                                    </label>
+                                </div>
+
+                                {editSalesTaxData.hasSalesTax && (
+                                    <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
+                                        <h3 className="text-lg font-medium text-white">Sales Tax Details</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Tax Rate (%)
+                                                </label>
                                                 <input
                                                     type="text"
-                                                    name="customTag"
-                                                    required
-                                                    placeholder="Enter custom category name"
-                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 text-white"
-                                                    onChange={e => setEditingIncome({ ...editingIncome, customTag: e.target.value })}
-                                                    value={editingIncome.customTag || ""}
-                                                />
-                                                <p className="text-sm text-gray-400">
-                                                    This category will be saved for future use
-                                                </p>
-                                            </div>
-                                        )}
-                                        <div className="space-y-4 mb-4">
-                                            <div className="flex items-center space-x-2">
-                                                <input
-                                                    type="checkbox"
-                                                    id="editHasSalesTax"
-                                                    checked={editSalesTaxData.hasSalesTax}
+                                                    inputMode="decimal"
+                                                    pattern="^\d*\.?\d{0,2}$"
+                                                    value={editSalesTaxData.taxRate}
+                                                    required={editSalesTaxData.hasSalesTax}
+                                                    min="0"
+                                                    max="100"
                                                     onChange={(e) => {
-                                                        setEditSalesTaxData(prev => ({
-                                                            ...prev,
-                                                            hasSalesTax: e.target.checked,
-                                                            taxAmount: e.target.checked ? (editingIncome.amount * (prev.taxRate / 100)) : 0
-                                                        }));
+                                                        const value = e.target.value;
+                                                        if (/^\d*\.?\d{0,2}$/.test(value) && parseFloat(value) <= 100) {
+                                                            setEditSalesTaxData(prev => ({
+                                                                ...prev,
+                                                                taxRate: value,
+                                                                taxAmount: editingIncome.amount * (parseFloat(value) / 100)
+                                                            }));
+                                                        }
                                                     }}
-                                                    className="w-4 h-4 text-blue-500 bg-gray-800/50 border-gray-700 rounded"
+                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
+                                                    placeholder="Enter tax rate"
                                                 />
-                                                <label htmlFor="editHasSalesTax" className="text-sm font-medium text-gray-300">
-                                                    Sales tax was charged
-                                                </label>
                                             </div>
-
-                                            {editSalesTaxData.hasSalesTax && (
-                                                <div className="space-y-4 p-4 bg-gray-800/30 rounded-lg border border-gray-700">
-                                                    <h3 className="text-lg font-medium text-white">Sales Tax Details</h3>
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                                Tax Rate (%)
-                                                            </label>
-                                                            <input
-                                                                type="text"
-                                                                inputMode="decimal"
-                                                                pattern="^\d*\.?\d{0,2}$"
-                                                                value={editSalesTaxData.taxRate}
-                                                                required={editSalesTaxData.hasSalesTax}
-                                                                min="0"
-                                                                max="100"
-                                                                onChange={(e) => {
-                                                                    const value = e.target.value;
-                                                                    if (/^\d*\.?\d{0,2}$/.test(value) && parseFloat(value) <= 100) {
-                                                                        setEditSalesTaxData(prev => ({
-                                                                            ...prev,
-                                                                            taxRate: value,
-                                                                            taxAmount: editingIncome.amount * (parseFloat(value) / 100)
-                                                                        }));
-                                                                    }
-                                                                }}
-                                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white"
-                                                                placeholder="Enter tax rate"
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium text-gray-300 mb-2">
-                                                                Tax Amount
-                                                            </label>
-                                                            <input
-                                                                type="number"
-                                                                value={formatAmount(editSalesTaxData.taxAmount)}
-                                                                readOnly
-                                                                className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white cursor-not-allowed"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                    <div className="mt-2 flex justify-between text-sm">
-                                                        <span className="text-gray-300">Subtotal:</span>
-                                                        <span className="text-white">${formatAmount(editingIncome.amount)}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm font-medium">
-                                                        <span className="text-gray-300">Total with Tax:</span>
-                                                        <span className="text-white">${formatAmount(parseFloat(editingIncome.amount) + editSalesTaxData.taxAmount)}</span>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                                    Tax Amount
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={formatAmount(editSalesTaxData.taxAmount)}
+                                                    readOnly
+                                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white cursor-not-allowed"
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="flex justify-end gap-2 pt-4">
-                                            <Button
-                                                type="button"
-                                                onClick={() => setEditingIncome(null)}
-                                                className="bg-gray-700 text-white hover:bg-gray-600"
-                                            >
-                                                Cancel
-                                            </Button>
-                                            <Button
-                                                type="submit"
-                                                className="bg-teal-500 hover:bg-teal-600 text-white"
-                                            >
-                                                Save Changes
-                                            </Button>
+                                        <div className="mt-2 flex justify-between text-sm">
+                                            <span className="text-gray-300">Subtotal:</span>
+                                            <span className="text-white">${formatAmount(editingIncome.amount)}</span>
                                         </div>
-                                    </form>
-                                </div>
+                                        <div className="flex justify-between text-sm font-medium">
+                                            <span className="text-gray-300">Total with Tax:</span>
+                                            <span className="text-white">${formatAmount(parseFloat(editingIncome.amount) + editSalesTaxData.taxAmount)}</span>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                            <div className="flex justify-end gap-2 pt-4">
+                                <Button
+                                    type="button"
+                                    onClick={() => setEditingIncome(null)}
+                                    className="bg-gray-700 text-white hover:bg-gray-600"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    className="bg-teal-500 hover:bg-teal-600 text-white"
+                                >
+                                    Save Changes
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

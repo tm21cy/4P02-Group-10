@@ -13,11 +13,11 @@ export default function Footer() {
   const { isSignedIn } = useUser();
 
   return (
-    <footer className="bg-[#0f1729] text-gray-300 py-12 px-6 mt-10 w-full border-t border-gray-800/20">
-      <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-16 text-center md:text-left">
+    <footer className="bg-[#0f1729] text-gray-300 py-8 px-6 mt-8 w-full border-t border-gray-800/20">
+      <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
         
         {/* Left - Logo & Contact Info */}
-        <div className="flex flex-col items-center md:items-start space-y-8">
+        <div className="flex flex-col items-center md:items-start space-y-4">
           <div className="flex items-center gap-3 group cursor-pointer">
             <svg 
               width="42" 
@@ -66,7 +66,7 @@ export default function Footer() {
         </div>
 
         {/* Right - Social Media Icons */}
-        <div className="flex flex-col items-center md:items-end gap-6">
+        <div className="flex flex-col items-center md:items-end gap-4">
           <h3 className="text-blue-500 font-medium text-sm tracking-wide uppercase">Connect With Us</h3>
           <div className="flex gap-8">
             {[

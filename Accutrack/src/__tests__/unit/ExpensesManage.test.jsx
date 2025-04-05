@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor, act, fireEvent } from "@testing-library/react";
 import ExpensesManage from "@/app/(routes)/expenses/manage/page";
 import { useUser } from "@clerk/nextjs";
-import { getExpenses, patchIncome } from "@/lib/db";
+import { getExpenses, patchIncome, getValidExpenseTags } from "@/lib/db";
 import "@testing-library/jest-dom";
 
 // Mock Clerk authentication
@@ -15,7 +15,12 @@ jest.mock("@clerk/nextjs", () => ({
 jest.mock("@/lib/db", () => ({
     getExpenses: jest.fn(() => Promise.resolve([])),   // Ensure they return an array
     patchIncome: jest.fn(() => Promise.resolve()),   // Mock patchIncome function
-  }));
+    getValidExpenseTags: jest.fn(() => Promise.resolve([
+        { name: "Bills" },
+        { name: "Food" },
+        { name: "Other" }
+    ])),
+}));
 
 describe('Manage Expenses Component', () => {
     beforeEach(() => {
@@ -32,6 +37,13 @@ describe('Manage Expenses Component', () => {
         getExpenses.mockResolvedValueOnce([
             { id: 1, amount: 500, description: "Freelance", date: new Date("2024-03-11") },
           ]);
+
+        // Add mock data for expense tags
+        getValidExpenseTags.mockResolvedValueOnce([
+            { name: "Bills" },
+            { name: "Food" },
+            { name: "Other" }
+        ]);
     });
     
     it("renders Manage Expenses correctly", async () => {
