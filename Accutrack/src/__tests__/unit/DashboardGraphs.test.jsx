@@ -29,7 +29,7 @@ jest.mock("@tabler/icons-react", () => ({
   IconFileText: () => <div>FileTextIcon</div>,
   IconCrown: () => <div>CrownIcon</div>,
   IconChevronDown: () => <div>ChevronDownIcon</div>,
-  IconRobot: () => <div>RobotIcon</div>, // ✅ ADD THIS
+  IconRobot: () => <div>RobotIcon</div>, 
 }));
 
 
@@ -75,7 +75,7 @@ jest.mock("@clerk/nextjs", () => ({
 jest.mock("@/lib/db", () => ({
   getIncome: jest.fn(),
   getExpenses: jest.fn(),
-  getInventoryByUser: jest.fn(() => Promise.resolve([])), // <-- add this
+  getInventoryByUser: jest.fn(() => Promise.resolve([])), 
 }));
 
 
