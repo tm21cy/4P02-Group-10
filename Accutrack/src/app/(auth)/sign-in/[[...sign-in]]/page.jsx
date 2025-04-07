@@ -1,6 +1,11 @@
 import { SignIn } from "@clerk/nextjs";
 import React from "react";
 
+/**
+ * JSX template for authentication.
+ * Handles user authentication components and synchronizes auth state.
+ * @returns JSX component.
+ */
 export default function Page() {
     return (
         <section className="bg-white">

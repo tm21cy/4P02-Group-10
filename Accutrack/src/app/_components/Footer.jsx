@@ -5,10 +5,16 @@ import Link from "next/link";
 import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
 import { useSubscriptionStore } from "@/lib/store";
 import { IconCrown } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 
+/**
+ * JSX template for the common footer section across most pages.
+ * Includes page metadata, social media, and info about premium subscriptions.
+ * @returns JSX component.
+ */
+
 export default function Footer() {
+  // Statement management for logged in users and their premium subscriptions.
   const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
   const { isSignedIn } = useUser();
 
@@ -45,6 +51,7 @@ export default function Footer() {
             <p className="text-gray-500 hover:text-gray-400 transition-all duration-300">
               1812 Sir Issac Brock Way, St. Catharines, ON - L2S3A1
             </p>
+            {/* Management link for Pro Subscription, conditional on logged-in status. */}
             {isSignedIn && isSubscribed && (
               <p className="flex items-center justify-center md:justify-start gap-3">
                 <Link 

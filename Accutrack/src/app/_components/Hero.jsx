@@ -9,6 +9,7 @@ import {
   IconFileAnalytics,
 } from "@tabler/icons-react";
 
+// TODO: ADD COMMENTS
 function useInView(options = {}) {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef(null);
@@ -32,7 +33,13 @@ function useInView(options = {}) {
   return [ref, isInView];
 }
 
+/**
+ * JSX template for Hero section of the site.
+ * Serves some PNGs of functionality previews as well as feature descriptions.
+ * @returns JSX component.
+ */
 function Hero() {
+  // Page router initialization and state management for user authentication.
   const router = useRouter();
   const { isSignedIn } = useUser();
 

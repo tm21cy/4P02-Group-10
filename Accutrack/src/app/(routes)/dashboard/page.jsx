@@ -6,11 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useUser } from "@clerk/nextjs";
 import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db";
 import {
-  IconMessageChatbot,
   IconClipboardList,
   IconFileText,
   IconCrown,
-  IconChevronDown,
   IconRobot
 } from "@tabler/icons-react";
 import {
@@ -38,7 +36,13 @@ const dateRanges = [
   "Last 6 Months"
 ];
 
+/**
+ * JSX template for the user dashboard.
+ * Renders information about financial history, transactions, routing to management pages, and other useful data.
+ * @returns JSX component.
+ */
 function Dashboard() {
+  // State management for user authentication, the selected filter range, transactions, graphs, cards, subscriptions, routing, recent transactions, and inventory status.
   const { isSignedIn, user, isLoaded } = useUser();
   const [selectedRange, setSelectedRange] = useState("Month to Date");
   const [transactions, setTransactions] = useState([]);
@@ -59,22 +63,34 @@ function Dashboard() {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [inventoryValue, setInventoryValue] = useState(0);
 
+  /**
+   * On page load, render information about transactions in a certain range.
+   */
   useEffect(() => {
     if (!isLoaded || !user) return;
     console.log("Fetching new data for range: ", selectedRange);
     fetchData();
   }, [isLoaded, user, selectedRange]);  
-  
+
+  /**
+   * On page load, fetch recent transactions.
+   */
   useEffect(() => {
     if (!isLoaded || !user) return;
     fetchRecentTransactions();
   }, [isLoaded, user]);
 
+  /**
+ * On page load, render statistics and information about user inventory data.
+ */
   useEffect(() => {
     if (!isLoaded || !user) return;
     fetchInventoryStats();
   }, [isLoaded, user]);
 
+  /**
+   * Fetches and prepares state for user financial data.
+   */
   const fetchData = async () => {
     try {
       const incomeData = await getIncome(user.id);
@@ -143,6 +159,9 @@ function Dashboard() {
     }
   };
   
+  /**
+   * Grabs recent user transactions and renders them appropriately.
+   */
   const fetchRecentTransactions = async () => {
     try {
       const incomeData = await getIncome(user.id);
@@ -164,6 +183,9 @@ function Dashboard() {
     }
   };
 
+  /**
+   * Grabs inventory statistics from user inventory pool and renders them accordingly.
+   */
   const fetchInventoryStats = async () => {
     try {
       const inventory = await getInventoryByUser(user.id);
@@ -176,6 +198,11 @@ function Dashboard() {
     }
   };
 
+  /**
+   * Pre-processing for information to be passed to financial history graphs.
+   * @param {*} incomeData Data regarding the user's income activity.
+   * @param {*} expenseData Data regarding the user's expense activity.
+   */
   const processGraphData = (incomeData, expenseData) => {
     const today = new Date();
     let startDate = new Date();

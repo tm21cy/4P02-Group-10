@@ -1,19 +1,26 @@
 'use client'
 
 import React, { useState } from 'react'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { useUser, UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { useSubscriptionStore } from '@/lib/store'
 
+/**
+ * JSX template for the common header section across most pages.
+ * Includes logos, navigation, and viewport scaling.
+ * @returns JSX component.
+ */
+
 export default function Header() {
+    // State management for logged in users, hamburger menus, and user subscription status.
     const { user, isSignedIn } = useUser();
     const [menuOpen, setMenuOpen] = useState(false);
     const isSubscribed = useSubscriptionStore((state) => 
         state.subscriptions[user?.id] || false
     );
 
+    // Toggles the hamburger menu when pressed.
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };

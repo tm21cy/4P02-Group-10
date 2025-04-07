@@ -4,10 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import Header from "../../_components/Header";
 import Footer from "../../_components/Footer";
 import { useUser } from "@clerk/nextjs";
-import { getIncome, getExpenses, getInventoryByUser, getSalesTax } from "@/lib/db";
-import { IconSend, IconRobot, IconUser, IconCrown } from "@tabler/icons-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db";
+import { IconSend, IconRobot, IconUser } from "@tabler/icons-react";
 import { useSubscriptionStore } from "@/lib/store";
 
 // Custom components for ReactMarkdown
@@ -27,15 +25,28 @@ const components = {
   ),
 };
 
+/**
+ * JSX template for the premium AI chat functionality.
+ * Provides a connection to Claude via the Anthropic API that receives info about user finances and responds with prompt-tuned feedback.
+ * @returns JSX component.
+ */
 function AIChatPage() {
+  // State management for chat messages, the input message state, the page loading status, user authentication via Clerk, and ensuring users are subscribed.
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
   const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
 
+  /**
+   * Receives a message and forwards it to the Claude API.
+   * Ingests the user's financial data and uses it as context for Claude.
+   * @param {*} e Context for the input message.
+   * @returns The chat message received from Claude, or an error message if the API is faulty.
+   */
   const sendMessage = async (e) => {
     e.preventDefault();
+    // If the message is all whitespace, return.
     if (!inputMessage.trim()) return;
 
     setIsLoading(true);
@@ -101,6 +112,7 @@ function AIChatPage() {
           }))
       };
 
+      // Use internal API routing to receive and forward the message.
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -115,6 +127,7 @@ function AIChatPage() {
       // Add AI response to chat
       setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
     } catch (error) {
+      // If the response has an error code, send a default error message.
       console.error('Error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
