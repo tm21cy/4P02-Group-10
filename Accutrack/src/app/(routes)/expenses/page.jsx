@@ -1,5 +1,15 @@
 'use client'
-
+/**
+ *User Expenses Page
+ *extends header.jsx and footer.jsx
+ * 
+ * This component serves as the central interface for managing expenses
+ * in the AccuTrack application. It allows users to either view/edit existing
+ * expenses or add new expense records.
+ * 
+ * Notable Features:
+ * - Provides 2 actionable cards for managing expenses and adding new expenses.
+ */
 import React from "react";
 import Header from "../../_components/Header";
 import Footer from "../../_components/Footer";
