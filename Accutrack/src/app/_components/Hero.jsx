@@ -130,13 +130,13 @@ function Hero() {
             <br />
           </h1>
           
-          // Subheading with description
+          {/* Subheading with description */}
           <p className="text-gray-300 text-xl max-w-3xl mx-auto">
             AccuTrack brings intelligent financial tracking, automated tax management, 
             and real-time analytics together in one powerful platform.
           </p>
 
-          // conditional button rendering based on user authentication status
+          {/* conditional button rendering based on user authentication status */}
           <div className="flex justify-center gap-4">
             <button
               onClick={() => router.push(isSignedIn ? '/dashboard' : '/sign-up')}
