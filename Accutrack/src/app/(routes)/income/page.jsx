@@ -1,5 +1,15 @@
 'use client'
-
+/**
+ *User Income Page
+ *extends header.jsx and footer.jsx
+ * 
+ * This component serves as the central interface for managing Income
+ * in the AccuTrack application. It allows users to either view/edit existing
+ * Income or add new Income records.
+ * 
+ * Notable Features:
+ * - Provides 2 actionable cards for managing Income and adding new Income.
+ */
 import React from "react";
 import Header from "../../_components/Header";
 import Footer from "../../_components/Footer";
