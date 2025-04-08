@@ -1,16 +1,32 @@
 "use client";  // This forces the file to be a Client Component
+/**
+ *User Dashboard Page
+ *extends header.jsx and footer.jsx
+ * 
+ * 
+ * This component serves as the user dashboard for the AccuTrack application.
+ * It includes a financial summary including (Total Income, Total Expenses, Net Cash Flow and Incentory Value),
+ * graphs for trends and comparisons, and recent transactions.
+ * It also provides action buttons for navigating to different sections of the app (AI Assistant, Transactions, Reports).
+ * 
+ * Notable Features:
+ * - includes a header and footer for consistent navigation
+ * - Displays a summary of financial data (income, expenses, net cash flow, inventory value)
+ * - Interactive graphs for trends and monthly comparisons allowing users to visualize their financial data based on selected date ranges
+ * - Recent transactions list for all of the most recent transactions
+ */
 import React, { useEffect, useState } from "react"; // Import the React library
 import Header from "../../_components/Header"; // Import the Header component
 import Footer from "../../_components/Footer"; // Import the Footer component
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
-import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db";
+import { useUser } from "@clerk/nextjs"; // Authentication from Clerk
+import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db"; // Pulls from DB
 import {
   IconClipboardList,
   IconFileText,
   IconCrown,
   IconRobot
-} from "@tabler/icons-react";
+} from "@tabler/icons-react"; // Importing icons for features grid
 import {
   LineChart,
   Line,
@@ -22,11 +38,11 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend
-} from 'recharts';
+} from 'recharts'; // Importing icons for graphs
 import Link from "next/link";
-import PricingModal from '@/components/PricingModal';
-import { useSubscriptionStore } from '@/lib/store';
-import { useRouter } from 'next/navigation';
+import PricingModal from '@/components/PricingModal'; // Modal for pricing information
+import { useSubscriptionStore } from '@/lib/store'; // Storing state for subscription status
+import { useRouter } from 'next/navigation'; // Router for page navigation
 
 const dateRanges = [
   "Week to Date",
