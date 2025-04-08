@@ -1,11 +1,23 @@
 "use client";
-
+/**
+ *Footer Section
+ *
+ * This component serves as the footer for the AccuTrack application.
+ * It includes the logo, contact information, copyright notice, and social media links.
+ * 
+ * Notable Features:
+ * - Branding (logo + app name)
+ * - Contact information (email, phone, address)
+ * - Copyright information
+ * - Social media links (Instagram, Facebook, Twitter, LinkedIn)
+ * - Subscription management link for logged-in users
+ */
 import React from "react";
 import Link from "next/link";
-import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa";
-import { useSubscriptionStore } from "@/lib/store";
-import { IconCrown } from "@tabler/icons-react";
-import { useUser } from "@clerk/nextjs";
+import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa"; // Importing social media icons from react-icons library
+import { useSubscriptionStore } from "@/lib/store"; // Importing the subscription store for managing subscription state
+import { IconCrown } from "@tabler/icons-react"; 
+import { useUser } from "@clerk/nextjs";  // Importing the useUser hook from Clerk for user authentication
 
 /**
  * JSX template for the common footer section across most pages.
@@ -18,6 +30,7 @@ export default function Footer() {
   const isSubscribed = useSubscriptionStore((state) => state.isSubscribed);
   const { isSignedIn } = useUser();
 
+  // Footer component structure
   return (
     <footer className="bg-[#0f1729] text-gray-300 py-8 px-6 mt-8 w-full border-t border-gray-800/20">
       <div className="container mx-auto max-w-7xl grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
@@ -39,6 +52,7 @@ export default function Footer() {
             <h2 className="text-2xl font-bold text-white/90 group-hover:text-white tracking-tight transition-all duration-300">AccuTrack</h2>
           </div>
 
+          {/* Contact Details */}
           <div className="text-sm space-y-3 text-gray-400">
             <p className="flex items-center justify-center md:justify-start gap-3 hover:text-blue-400 transition-all duration-300">
               <span className="text-blue-500 font-medium">Email:</span>
@@ -51,6 +65,7 @@ export default function Footer() {
             <p className="text-gray-500 hover:text-gray-400 transition-all duration-300">
               1812 Sir Issac Brock Way, St. Catharines, ON - L2S3A1
             </p>
+
             {/* Management link for Pro Subscription, conditional on logged-in status. */}
             {isSignedIn && isSubscribed && (
               <p className="flex items-center justify-center md:justify-start gap-3">
