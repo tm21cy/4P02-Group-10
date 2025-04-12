@@ -47,11 +47,6 @@ export async function POST(request) {
       - Important dates and time periods
       - Emphasis on critical points
     
-    • For bullet points, use this exact format:
-      • Point 1
-      • Point 2
-      • Point 3
-    
     Remember: Make important information stand out by consistently using bold text for key terms and concepts.`;
 
     const response = await anthropic.messages.create({
