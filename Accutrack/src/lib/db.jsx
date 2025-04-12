@@ -118,9 +118,9 @@ async function getValidTags(userId) {
 			OR: [
 				{ userId: userId },
 				{ userId: "global" }
-			]
-		},
-		expenseTag: 0
+			],
+			expenseTag: 0
+		}
 	});
 }
 
