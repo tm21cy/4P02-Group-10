@@ -119,7 +119,8 @@ async function getValidTags(userId) {
 				{ userId: userId },
 				{ userId: "global" }
 			]
-		}
+		},
+		expenseTag: 0
 	});
 }
 
