@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSubscriptionStore } from "@/lib/store";
 import { useUser } from "@clerk/nextjs";
 import Footer from "@/app/_components/Footer";
-
+import React from "react";
 export default function BillingForm() {
   // State management for the page router, search parameters, page loading state, selected plan, selected price, billing form, subscription status, and user authentication status.
   const router = useRouter();
