@@ -1,7 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { MemoryRouter } from "react-router-dom";
 import Dashboard from "@/app/(routes)/dashboard/page";
 import { useUser } from "@clerk/nextjs";
 
@@ -22,23 +21,37 @@ jest.mock("@clerk/nextjs", () => ({
   })),
   UserButton: () => <div data-testid="user-button">Profile</div>,
 }));
+
+// Mock db calls
 jest.mock("@/lib/db", () => ({
-    getIncome: jest.fn(() => Promise.resolve([])),
-    getExpenses: jest.fn(() => Promise.resolve([])),
-  }));
-  
+  getIncome: jest.fn(() => Promise.resolve([])),
+  getExpenses: jest.fn(() => Promise.resolve([])),
+  getInventoryByUser: jest.fn(() => Promise.resolve([])),
+}));
+
+// Mock router
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+}));
+
 describe("Dashboard Navigation Links", () => {
   test("navigates to correct pages when links are rendered", async () => {
-    render(
-      <MemoryRouter>
-        <Dashboard />
-      </MemoryRouter>
-    );
+    render(<Dashboard />);
 
-    // Check for multiple links and ensure at least one exists
-    expect(screen.getAllByRole("link", { name: /inventory/i })[0]).toHaveAttribute("href", "/inventory");
-    expect(screen.getAllByRole("link", { name: /expenses/i })[0]).toHaveAttribute("href", "/expenses");
-    expect(screen.getAllByRole("link", { name: /income/i })[0]).toHaveAttribute("href", "/income");
-    expect(screen.getAllByRole("link", { name: /transactions/i })[0]).toHaveAttribute("href", "/transactions");
+    const inventoryLinks = await screen.findAllByRole("link", { name: /inventory/i });
+    const expensesLinks = await screen.findAllByRole("link", { name: /expenses/i });
+    const incomeLinks = await screen.findAllByRole("link", { name: /income/i });
+    const transactionsLinks = await screen.findAllByRole("link", { name: /transactions/i });
+
+    expect(inventoryLinks.some(link => link.getAttribute("href") === "/inventory")).toBe(true);
+    expect(expensesLinks.some(link => link.getAttribute("href") === "/expenses")).toBe(true);
+    expect(incomeLinks.some(link => link.getAttribute("href") === "/income")).toBe(true);
+    expect(transactionsLinks.some(link => link.getAttribute("href") === "/transactions")).toBe(true);
   });
 });

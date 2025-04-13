@@ -712,12 +712,13 @@ function ReportsPage() {
   const filterTransactions = (transactions, isInventory = false) => {
     let filtered = [...transactions];
 
-    if (!isInventory && startDate && endDate) {
-      const start = new Date(startDate);
+    if (!isInventory && (startDate || endDate)) {
+      // Handle null dates by using min/max possible dates
+      const start = startDate ? new Date(startDate) : new Date(0);
       start.setMinutes(start.getMinutes() + start.getTimezoneOffset());
       start.setHours(0, 0, 0, 0);
       
-      const end = new Date(endDate);
+      const end = endDate ? new Date(endDate) : new Date();
       end.setMinutes(end.getMinutes() + end.getTimezoneOffset());
       end.setHours(23, 59, 59, 999);
 
@@ -817,6 +818,24 @@ function ReportsPage() {
 
   const generateReport = async (preview = false) => {
     try {
+      // Add strict date validation for non-inventory reports
+      if (reportType !== "inventory-summary") {
+        // Check for null/empty dates
+        if (!startDate || !endDate) {
+          alert("Please select both start and end dates to generate the report.");
+          return;
+        }
+
+        // Validate date order
+        const effectiveStartDate = new Date(startDate);
+        const effectiveEndDate = new Date(endDate);
+        
+        if (effectiveStartDate > effectiveEndDate) {
+          alert("Start date cannot be after end date. Please adjust your date range.");
+          return;
+        }
+      }
+
       let reportData;
       
       switch (reportType) {
@@ -825,7 +844,12 @@ function ReportsPage() {
           const expenseData = await getExpenses(user.id);
           const filteredIncome = filterTransactions(incomeData);
           const filteredExpenses = filterTransactions(expenseData);
-          reportData = generateIncomeStatement(filteredIncome, filteredExpenses, new Date(startDate), new Date(endDate));
+          reportData = generateIncomeStatement(
+            filteredIncome, 
+            filteredExpenses, 
+            new Date(startDate),
+            new Date(endDate)
+          );
           break;
         case "income-summary":
           const incomeTransactions = await getIncome(user.id);
@@ -870,6 +894,25 @@ function ReportsPage() {
     } catch (error) {
       console.error("Error generating report:", error);
     }
+  };
+
+  // Add date validation on input change
+  const handleStartDateChange = (e) => {
+    const newStartDate = e.target.value;
+    if (endDate && new Date(newStartDate) > new Date(endDate)) {
+      alert("Start date cannot be after end date");
+      return;
+    }
+    setStartDate(newStartDate);
+  };
+
+  const handleEndDateChange = (e) => {
+    const newEndDate = e.target.value;
+    if (startDate && new Date(startDate) > new Date(newEndDate)) {
+      alert("End date cannot be before start date");
+      return;
+    }
+    setEndDate(newEndDate);
   };
 
   return (
@@ -948,7 +991,7 @@ function ReportsPage() {
                     <input
                       type="date"
                       value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
+                      onChange={handleStartDateChange}
                       className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [color-scheme:dark]"
                     />
                   </div>
@@ -957,7 +1000,7 @@ function ReportsPage() {
                     <input
                       type="date"
                       value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
+                      onChange={handleEndDateChange}
                       className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all duration-300 [color-scheme:dark]"
                     />
                   </div>

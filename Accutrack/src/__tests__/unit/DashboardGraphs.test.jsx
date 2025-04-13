@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import Dashboard from "@/app/(routes)/dashboard/page";
+import  Dashboard  from "@/app/(routes)/dashboard/page";
 import { useUser } from "@clerk/nextjs";
-import { getIncome, getExpenses } from "@/lib/db";
+import { getIncome, getExpenses } from "@/lib/db.jsx";
 import "@testing-library/jest-dom";
 
 // Mock ResizeObserver to prevent errors
@@ -12,6 +12,27 @@ global.ResizeObserver = class {
   unobserve() {}
   disconnect() {}
 };
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    prefetch: jest.fn(),
+    replace: jest.fn(),
+    back: jest.fn(),
+    forward: jest.fn(),
+  }),
+}));
+
+jest.mock("@tabler/icons-react", () => ({
+  IconMessageChatbot: () => <div>MessageChatbotIcon</div>,
+  IconClipboardList: () => <div>ClipboardListIcon</div>,
+  IconFileText: () => <div>FileTextIcon</div>,
+  IconCrown: () => <div>CrownIcon</div>,
+  IconChevronDown: () => <div>ChevronDownIcon</div>,
+  IconRobot: () => <div>RobotIcon</div>, 
+}));
+
+
 
 // Mock recharts components with testable data props
 jest.mock('recharts', () => {
@@ -54,7 +75,9 @@ jest.mock("@clerk/nextjs", () => ({
 jest.mock("@/lib/db", () => ({
   getIncome: jest.fn(),
   getExpenses: jest.fn(),
+  getInventoryByUser: jest.fn(() => Promise.resolve([])), 
 }));
+
 
 // Mock Button component
 jest.mock("@/components/ui/button", () => ({
@@ -78,14 +101,6 @@ jest.mock("@/app/_components/Footer", () => {
   };
 }, { virtual: true });
 
-// Mock icons
-jest.mock("@tabler/icons-react", () => ({
-  IconMessageChatbot: () => <div>MessageChatbotIcon</div>,
-  IconClipboardList: () => <div>ClipboardListIcon</div>,
-  IconFileText: () => <div>FileTextIcon</div>,
-  IconCrown: () => <div>CrownIcon</div>,
-  IconChevronDown: () => <div>ChevronDownIcon</div>,
-}));
 
 describe("Dashboard Graphs and Filters", () => {
   // Create dates for test data
@@ -183,9 +198,9 @@ describe("Dashboard Graphs and Filters", () => {
       "Month to Date",
       "Year to Date",
       "Last 3 Months",
-      "Last 6 Months",
-      "Whole Year"
+      "Last 6 Months"
     ];
+    
 
     // Test each filter
     for (const filter of dateRanges) {

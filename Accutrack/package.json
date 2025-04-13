@@ -13,8 +13,8 @@
     "test:backend": "jest --config=jest.backend.config.js --runInBand",
     "test:integration": "jest --config=jest.integration.config.js",
     "test:e2e": "concurrently --kill-others-on-fail \"npm run build:start\" \"wait-on http://localhost:3000 && npx playwright test\"",
-    "build:start": "npm run build && npm run start"
-  },
+    "test:subscription": "jest --config=jest.subscription.config.js"
+},
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
     "@clerk/nextjs": "^6.11.0",

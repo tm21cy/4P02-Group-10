@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSubscriptionStore } from "@/lib/store";
 import { useUser } from "@clerk/nextjs";
 import Footer from "@/app/_components/Footer";
+import React from "react";
+
 
 export default function BillingForm() {
   const router = useRouter();
@@ -68,10 +70,11 @@ export default function BillingForm() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Form fields */}
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1 block">
+              <label htmlFor="workEmail" className="text-gray-300 text-sm font-medium mb-1 block">
                 Work Email
               </label>
               <input
+                id="workEmail"
                 type="email"
                 required
                 value={formData.workEmail}
@@ -82,10 +85,11 @@ export default function BillingForm() {
             </div>
 
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1 block">
+              <label htmlFor="name" className="text-gray-300 text-sm font-medium mb-1 block">
                 Full Name
               </label>
               <input
+                id="name"
                 type="text"
                 required
                 value={formData.fullName}
@@ -96,10 +100,11 @@ export default function BillingForm() {
             </div>
 
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1 block">
+              <label htmlFor="company" className="text-gray-300 text-sm font-medium mb-1 block">
                 Company Name
               </label>
               <input
+                id="company"
                 type="text"
                 required
                 value={formData.companyName}
@@ -110,10 +115,11 @@ export default function BillingForm() {
             </div>
 
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1 block">
+              <label htmlFor="job" className="text-gray-300 text-sm font-medium mb-1 block">
                 Job Title
               </label>
               <input
+                id="job"
                 type="text"
                 required
                 value={formData.jobTitle}
@@ -124,10 +130,11 @@ export default function BillingForm() {
             </div>
 
             <div>
-              <label className="text-gray-300 text-sm font-medium mb-1 block">
+              <label htmlFor="phone" className="text-gray-300 text-sm font-medium mb-1 block">
                 Phone Number
               </label>
               <input
+                id="phone"
                 type="tel"
                 required
                 value={formData.phoneNumber}
