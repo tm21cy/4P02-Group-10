@@ -1,0 +1,52 @@
+{
+  "results": {
+    "tool": {
+      "name": "jest"
+    },
+    "summary": {
+      "tests": 3,
+      "passed": 3,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0,
+      "other": 0,
+      "start": 1744555631896,
+      "stop": 1744555633522
+    },
+    "tests": [
+      {
+        "name": "submits the form and redirects to /ai-chat",
+        "duration": 86,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\subscription\\SubscriptionFlow.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\subscription\\SubscriptionFlow.test.jsx"
+      },
+      {
+        "name": "renders monthly plan when query param is \"monthly\"",
+        "duration": 7,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\subscription\\SubscriptionFlow.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\subscription\\SubscriptionFlow.test.jsx"
+      },
+      {
+        "name": "renders annual plan when query param is \"annual\"",
+        "duration": 4,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\subscription\\SubscriptionFlow.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\subscription\\SubscriptionFlow.test.jsx"
+      }
+    ]
+  }
+}

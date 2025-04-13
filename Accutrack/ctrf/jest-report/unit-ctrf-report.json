@@ -1,0 +1,437 @@
+{
+  "results": {
+    "tool": {
+      "name": "jest"
+    },
+    "summary": {
+      "tests": 38,
+      "passed": 38,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0,
+      "other": 0,
+      "start": 1744555910436,
+      "stop": 1744555915935
+    },
+    "tests": [
+      {
+        "name": "Inventory Component renders Inventory Add correctly",
+        "duration": 61,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\InventoryAdd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\InventoryAdd.test.jsx > Inventory Component"
+      },
+      {
+        "name": "Dashboard Navigation Links navigates to correct pages when links are rendered",
+        "duration": 198,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardLinks.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardLinks.test.jsx > Dashboard Navigation Links"
+      },
+      {
+        "name": "Dashboard Component renders Dashboard correctly",
+        "duration": 21,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx > Dashboard Component"
+      },
+      {
+        "name": "Dashboard Component renders income and expenses data",
+        "duration": 29,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx > Dashboard Component"
+      },
+      {
+        "name": "Dashboard Component renders recent transactions",
+        "duration": 42,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx > Dashboard Component"
+      },
+      {
+        "name": "Dashboard Component renders the charts",
+        "duration": 31,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardFrontEnd.test.jsx > Dashboard Component"
+      },
+      {
+        "name": "Reports Component renders Reports Management correctly",
+        "duration": 27,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Reports.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Reports.test.jsx > Reports Component"
+      },
+      {
+        "name": "Reports Component generates a report after entering a date range and clicking the button",
+        "duration": 52,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Reports.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Reports.test.jsx > Reports Component"
+      },
+      {
+        "name": "Dashboard Graphs and Filters Graphs and totals update correctly for all filters",
+        "duration": 78,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardGraphs.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\DashboardGraphs.test.jsx > Dashboard Graphs and Filters"
+      },
+      {
+        "name": "Income Component renders Income Add correctly",
+        "duration": 33,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\IncomeAdd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\IncomeAdd.test.jsx > Income Component"
+      },
+      {
+        "name": "Inventory Component renders Inventory Management correctly",
+        "duration": 27,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Inventory.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Inventory.test.jsx > Inventory Component"
+      },
+      {
+        "name": "Manage Income Component renders Manage Income correctly",
+        "duration": 23,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\IncomeManage.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\IncomeManage.test.jsx > Manage Income Component"
+      },
+      {
+        "name": "Manage Income Component adds a new income and checks if it appears on the page",
+        "duration": 13,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\IncomeManage.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\IncomeManage.test.jsx > Manage Income Component"
+      },
+      {
+        "name": "Manage Expenses Component renders Manage Expenses correctly",
+        "duration": 22,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\ExpensesManage.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\ExpensesManage.test.jsx > Manage Expenses Component"
+      },
+      {
+        "name": "Manage Expenses Component adds a new expense and checks if it appears on the page",
+        "duration": 18,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\ExpensesManage.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\ExpensesManage.test.jsx > Manage Expenses Component"
+      },
+      {
+        "name": "Manage Inventory Component renders Manage Inventory correctly",
+        "duration": 28,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\InventoryManage.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\InventoryManage.test.jsx > Manage Inventory Component"
+      },
+      {
+        "name": "Manage Inventory Component adds a new inventory item and checks if it appears on the page",
+        "duration": 15,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\InventoryManage.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\InventoryManage.test.jsx > Manage Inventory Component"
+      },
+      {
+        "name": "Expenses Component renders Expense Add correctly",
+        "duration": 56,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\ExpensesAdd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\ExpensesAdd.test.jsx > Expenses Component"
+      },
+      {
+        "name": "Expenses Component renders Expense Management correctly",
+        "duration": 27,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Expenses.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Expenses.test.jsx > Expenses Component"
+      },
+      {
+        "name": "Income Component renders Income Management correctly",
+        "duration": 26,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Income.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Income.test.jsx > Income Component"
+      },
+      {
+        "name": "Sign-In Page renders the Sign-In form correctly",
+        "duration": 6,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx > Sign-In Page"
+      },
+      {
+        "name": "Sign-In Page displays the correct welcome message",
+        "duration": 2,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx > Sign-In Page"
+      },
+      {
+        "name": "Sign-In Page renders the email input field",
+        "duration": 1,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx > Sign-In Page"
+      },
+      {
+        "name": "Sign-In Page shows an error if an unregistered email is entered",
+        "duration": 24,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx > Sign-In Page"
+      },
+      {
+        "name": "Sign-In Page navigates to the code entry step when a valid email is entered",
+        "duration": 8,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignIn.test.jsx > Sign-In Page"
+      },
+      {
+        "name": "Sign-Up Page renders the Sign-Up form correctly",
+        "duration": 5,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx > Sign-Up Page"
+      },
+      {
+        "name": "Sign-Up Page displays the correct form title",
+        "duration": 4,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx > Sign-Up Page"
+      },
+      {
+        "name": "Sign-Up Page renders email and password input fields",
+        "duration": 9,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx > Sign-Up Page"
+      },
+      {
+        "name": "Sign-Up Page renders the continue button and it is visible",
+        "duration": 7,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUp.test.jsx > Sign-Up Page"
+      },
+      {
+        "name": "Header Component renders AccuTrack logo",
+        "duration": 5,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Header.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Header.test.jsx > Header Component"
+      },
+      {
+        "name": "Header Component shows Dashboard and Get Started when signed out",
+        "duration": 18,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Header.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Header.test.jsx > Header Component"
+      },
+      {
+        "name": "Header Component shows Dashboard, Expenses, Income, and Profile when signed in",
+        "duration": 3,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Header.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\Header.test.jsx > Header Component"
+      },
+      {
+        "name": "calls sign-in API with correct credentials",
+        "duration": 0,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignInBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignInBackEnd.test.jsx"
+      },
+      {
+        "name": "returns an error for incorrect credentials",
+        "duration": 6,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignInBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignInBackEnd.test.jsx"
+      },
+      {
+        "name": "returns an error when signing in with an unregistered email",
+        "duration": 0,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignInBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignInBackEnd.test.jsx"
+      },
+      {
+        "name": "calls sign-up API with correct credentials",
+        "duration": 1,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUpBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUpBackEnd.test.jsx"
+      },
+      {
+        "name": "returns an error for an already registered email",
+        "duration": 6,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUpBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUpBackEnd.test.jsx"
+      },
+      {
+        "name": "returns an error for weak password",
+        "duration": 1,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUpBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\unit\\SignUpBackEnd.test.jsx"
+      }
+    ]
+  }
+}

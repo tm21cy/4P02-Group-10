@@ -13,5 +13,14 @@ module.exports = {
     },
     setupFiles: ["dotenv/config"],
     setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // Include RTL matchers, etc.
-  };
+    
+    reporters: [
+      "default",
+      ["jest-ctrf-json-reporter", {
+        outputFile: "jest-report/subscription-ctrf-report.json"
+      }]
+    ],
+    
+};
+
   

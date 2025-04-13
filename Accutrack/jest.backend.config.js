@@ -9,6 +9,13 @@ module.exports = {
       "^@/(.*)$": "<rootDir>/src/$1",
     },
     setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-    testTimeout: 30000
+    testTimeout: 30000,
+
+    reporters: [
+      "default",
+      ["jest-ctrf-json-reporter", {
+        outputFile: "jest-report/backend-ctrf-report.json"
+      }]
+    ]
   };
   

@@ -11,5 +11,11 @@ export default {
       "^@/(.*)$": "<rootDir>/src/$1",
     },
     setupFiles: ["dotenv/config"], // Automatically load environment variables
+    reporters: [
+      "default",
+      ["jest-ctrf-json-reporter", {
+        outputFile: "jest-report/integration-ctrf-report.json"
+      }]
+    ]
   };
   

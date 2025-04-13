@@ -1,0 +1,41 @@
+{
+  "results": {
+    "tool": {
+      "name": "jest"
+    },
+    "summary": {
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0,
+      "other": 0,
+      "start": 1744556054179,
+      "stop": 1744556055569
+    },
+    "tests": [
+      {
+        "name": "Clerk Authentication - Sign Up should successfully create a new user",
+        "duration": 609,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\integration\\ClerkIntegration.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\integration\\ClerkIntegration.test.js > Clerk Authentication - Sign Up"
+      },
+      {
+        "name": "Clerk Authentication - Sign Up should fail for already registered email",
+        "duration": 144,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\integration\\ClerkIntegration.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\integration\\ClerkIntegration.test.js > Clerk Authentication - Sign Up"
+      }
+    ]
+  }
+}

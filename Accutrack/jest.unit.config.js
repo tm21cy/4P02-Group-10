@@ -12,5 +12,11 @@ module.exports = {
       "^.+\\.(js|jsx)$": "babel-jest" // Transform JSX and JS files with Babel
     },
     setupFilesAfterEnv: ["<rootDir>/jest.setup.js"], // Extra setup if needed
+    reporters: [
+      "default",
+      ["jest-ctrf-json-reporter", {
+        outputFile: "jest-report/unit-ctrf-report.json"
+      }]
+    ]
   };
   

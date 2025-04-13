@@ -1,0 +1,151 @@
+{
+  "results": {
+    "tool": {
+      "name": "jest"
+    },
+    "summary": {
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "pending": 0,
+      "skipped": 0,
+      "other": 0,
+      "start": 1744556000478,
+      "stop": 1744556005303
+    },
+    "tests": [
+      {
+        "name": "Dashboard Backend Automated Tests should calculate total income correctly",
+        "duration": 77,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx > Dashboard Backend Automated Tests"
+      },
+      {
+        "name": "Dashboard Backend Automated Tests should calculate total expenses correctly",
+        "duration": 68,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx > Dashboard Backend Automated Tests"
+      },
+      {
+        "name": "Dashboard Backend Automated Tests should calculate net cash flow correctly",
+        "duration": 67,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx > Dashboard Backend Automated Tests"
+      },
+      {
+        "name": "Dashboard Backend Automated Tests should retrieve the most recent transactions first",
+        "duration": 69,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\DashboardBackEnd.test.jsx > Dashboard Backend Automated Tests"
+      },
+      {
+        "name": "Manage Income Backend Automated Tests should create a new income entry",
+        "duration": 69,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx > Manage Income Backend Automated Tests"
+      },
+      {
+        "name": "Manage Income Backend Automated Tests should read income entries",
+        "duration": 66,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx > Manage Income Backend Automated Tests"
+      },
+      {
+        "name": "Manage Income Backend Automated Tests should update an income entry",
+        "duration": 196,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx > Manage Income Backend Automated Tests"
+      },
+      {
+        "name": "Manage Income Backend Automated Tests should delete an income entry",
+        "duration": 103,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\IncomeManageBackEnd.test.jsx > Manage Income Backend Automated Tests"
+      },
+      {
+        "name": "Manage Expenses Backend Automated Tests should create a new expense entry",
+        "duration": 79,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx > Manage Expenses Backend Automated Tests"
+      },
+      {
+        "name": "Manage Expenses Backend Automated Tests should read expense entries",
+        "duration": 74,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx > Manage Expenses Backend Automated Tests"
+      },
+      {
+        "name": "Manage Expenses Backend Automated Tests should update an expense entry",
+        "duration": 213,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx > Manage Expenses Backend Automated Tests"
+      },
+      {
+        "name": "Manage Expenses Backend Automated Tests should delete an expense entry",
+        "duration": 111,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\sangm\\OneDrive - Brock University\\4P02\\4P02-Group-10\\Accutrack\\src\\__tests__\\backend\\ExpensesManageBackEnd.test.jsx > Manage Expenses Backend Automated Tests"
+      }
+    ]
+  }
+}
