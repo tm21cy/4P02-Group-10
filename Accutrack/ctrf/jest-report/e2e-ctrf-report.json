@@ -1,0 +1,59 @@
+{
+    "results": {
+      "tool": {
+        "name": "playwright"
+      },
+      "summary": {
+        "tests": 4,
+        "passed": 4,
+        "failed": 0,
+        "pending": 0,
+        "skipped": 0,
+        "other": 0,
+        "start": 1744576796639,
+        "stop": 1744576807310
+      },
+      "tests": [
+        {
+          "name": "should display backend data on the frontend",
+          "duration": 4765,
+          "status": "passed",
+          "rawStatus": "passed",
+          "type": "unit",
+          "filePath": "C:\\Users\\careb\\Documents\\GitHub\\4P02-Group-10\\Accutrack\\src\\__tests__\\e2e\\DashboardE2E.test.js",
+          "retries": 0,
+          "suite": " >  > DashboardE2E.test.js > Dashboard E2E Test"
+        },
+        {
+          "name": "Manually add new income using add income page",
+          "duration": 8753,
+          "status": "passed",
+          "rawStatus": "passed",
+          "type": "unit",
+          "filePath": "C:\\Users\\careb\\Documents\\GitHub\\4P02-Group-10\\Accutrack\\src\\__tests__\\e2e\\IncomeE2E.test.js",
+          "retries": 0,
+          "suite": " >  > IncomeE2E.test.js > Income E2E Test"
+        },
+        {
+          "name": "Manually add new expense using add expense page",
+          "duration": 8762,
+          "status": "passed",
+          "rawStatus": "passed",
+          "type": "unit",
+          "filePath": "C:\\Users\\careb\\Documents\\GitHub\\4P02-Group-10\\Accutrack\\src\\__tests__\\e2e\\ExpenseE2E.test.js",
+          "retries": 0,
+          "suite": " >  > ExpenseE2E.test.js > Expense E2E Test"
+        },
+        {
+          "name": "Manually add new item using add item page",
+          "duration": 8885,
+          "status": "passed",
+          "rawStatus": "passed",
+          "type": "unit",
+          "filePath": "C:\\Users\\careb\\Documents\\GitHub\\4P02-Group-10\\Accutrack\\src\\__tests__\\e2e\\InventoryE2E.test.js",
+          "retries": 0,
+          "suite": " >  > InventoryE2E.test.js > Inventory E2E Test"
+        }
+      ]
+    }
+  }
