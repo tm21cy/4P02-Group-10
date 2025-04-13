@@ -1,23 +1,44 @@
 'use client'
-
+/**
+ * Header Section
+ *
+ * This component renders the top navigation bar of the AccuTrack app.
+ * Includes the logo, navigation links (Dashboard, Inventory, Expenses, Income)
+ * and user authentication buttons (Sign In, Sign Up), and user profile button/ clerk user buttons.
+ * Navigation links reduce to hamburger menu for mobile view
+ * 
+ * Notable Features:
+ * - Responsive design (hamburger menu for mobile)
+ * - User authentication (Sign In, Sign Up, User Profile)
+ * - Branding with animated logo and subscription badge
+ * - Clerk user button with sign-out functionality
+ */
 import React, { useState } from 'react'
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
-import { useUser, UserButton } from '@clerk/nextjs'
+import { useUser, UserButton } from '@clerk/nextjs' // Importing the Clerk auth tools for user status and profile menu
 import Link from 'next/link'
-import { useSubscriptionStore } from '@/lib/store'
+import { useSubscriptionStore } from '@/lib/store' // Importing the subscription store for managing subscription state
+
+/**
+ * JSX template for the common header section across most pages.
+ * Includes logos, navigation, and viewport scaling.
+ * @returns JSX component.
+ */
 
 export default function Header() {
-    const { user, isSignedIn } = useUser();
-    const [menuOpen, setMenuOpen] = useState(false);
+    // State management for logged in users, hamburger menus, and user subscription status.
+    const { user, isSignedIn } = useUser(); // Importing user authentication status and user object from Clerk
+    const [menuOpen, setMenuOpen] = useState(false); // State for managing the hamburger menu open/close status
     const isSubscribed = useSubscriptionStore((state) => 
         state.subscriptions[user?.id] || false
     );
 
+    // Toggles the hamburger menu when pressed.
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
 
+    // Header components
     return (
         <div className='p-5 flex justify-between items-center shadow-lg bg-[#1c2230] backdrop-blur-sm z-40 relative'>
             {/* Logo */}

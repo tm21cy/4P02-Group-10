@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../../../_components/Header";
 import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { postNewExpense, postNewInventoryItem, postNewTagIfNotExists } from "@/lib/db";
+import { postNewExpense, postNewInventoryItem, postNewTagIfNotExists, getValidInventoryTags } from "@/lib/db";
 
 function AddInventory() {
     const { isSignedIn, user, isLoaded } = useUser();
+    const [tags, setTags] = useState([]);
     const [formData, setFormData] = useState({
         itemId: "",
         name: "",
@@ -31,6 +32,14 @@ function AddInventory() {
     };
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        if (!isLoaded || !user) return;
+        getValidInventoryTags(user.id).then(data => {
+            const filtered = data.map(e => e.name);
+            setTags(filtered);
+        });
+    }, [isLoaded, user]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -238,11 +247,9 @@ function AddInventory() {
                                         value={formData.category}
                                     >
                                         <option value="">Select a category</option>
-                                        <option value="Raw Materials">Raw Materials</option>
-                                        <option value="Finished Goods">Finished Goods</option>
-                                        <option value="Work in Progress">Work in Progress</option>
-                                        <option value="Maintenance">Maintenance Items</option>
-                                        <option value="Office Supplies">Office Supplies</option>
+                                        {tags.map(tag => (
+                                            <option key={tag} value={tag}>{tag}</option>
+                                        ))}
                                         <option value="Other">+ Add Custom Category</option>
                                     </select>
 

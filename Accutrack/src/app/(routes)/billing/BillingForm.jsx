@@ -5,10 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSubscriptionStore } from "@/lib/store";
 import { useUser } from "@clerk/nextjs";
 import Footer from "@/app/_components/Footer";
-import React from "react";
-
 
 export default function BillingForm() {
+  // State management for the page router, search parameters, page loading state, selected plan, selected price, billing form, subscription status, and user authentication status.
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -25,6 +24,10 @@ export default function BillingForm() {
   const setSubscribed = useSubscriptionStore((state) => state.setSubscribed);
   const { user } = useUser();
 
+  /**
+   * On initial load, see if the search parameters have recommended a plan - fallback to monthly.
+   * Use this same information to set the billing amount.
+   */
   useEffect(() => {
     try {
       const planType = searchParams?.get('plan') || 'monthly';
@@ -37,16 +40,15 @@ export default function BillingForm() {
     }
   }, [searchParams]);
 
+  /**
+   * On submission, initializes a subscription with the appropriate user data.
+   * @param {*} e Context for the billing form.
+   * @returns A new subscription and a redirect to the premium AI chat page.
+   */
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!user?.id) return;
     setSubscribed(user.id, true);
-    const billingInfo = {
-      ...formData,
-      planType: plan,
-      subscriptionDate: new Date().toISOString(),
-    };
-    console.log('Billing info:', billingInfo);
     router.push('/ai-chat');
   };
 

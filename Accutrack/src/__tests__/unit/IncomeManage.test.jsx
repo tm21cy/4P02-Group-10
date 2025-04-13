@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, waitFor, act, fireEvent } from "@testing-library/react";
 import IncomeManage from "@/app/(routes)/income/manage/page";
 import { useUser } from "@clerk/nextjs";
-import { getIncome, patchIncome } from "@/lib/db";
+import { getIncome, patchIncome, getValidTags } from "@/lib/db";
 import "@testing-library/jest-dom";
 
 // Mock Clerk authentication
@@ -15,7 +15,12 @@ jest.mock("@clerk/nextjs", () => ({
 jest.mock("@/lib/db", () => ({
     getIncome: jest.fn(() => Promise.resolve([])),   // Ensure they return an array
     patchIncome: jest.fn(() => Promise.resolve()),   // Mock patchIncome function
-  }));
+    getValidTags: jest.fn(() => Promise.resolve([
+        { name: "Salary" },
+        { name: "Freelance" },
+        { name: "Investment" }
+    ]))
+}));
 
 describe('Manage Income Component', () => {
     beforeEach(() => {

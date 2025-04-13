@@ -1,5 +1,15 @@
 'use client'
-
+/**
+ *User Inventory Page
+ *extends header.jsx and footer.jsx
+ * 
+ * This component serves as the central interface for managing Inventory
+ * in the AccuTrack application. It allows users to either view/edit existing
+ * Inventory or add new Inventory records.
+ * 
+ * Notable Features:
+ * - Provides 2 actionable cards for managing Inventory and adding new Inventory.
+ */
 import React from "react";
 import Header from "../../_components/Header";
 import Footer from "../../_components/Footer";

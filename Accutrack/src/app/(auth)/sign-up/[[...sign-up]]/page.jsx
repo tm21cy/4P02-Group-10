@@ -1,6 +1,11 @@
 import { SignUp } from "@clerk/nextjs";
 import React from "react";  
 
+/**
+ * JSX template for authentication via new registrations.
+ * Similar to `sign-in/page.jsx`, but handles state for new users.
+ * @returns JSX component.
+ */
 export default function Page() {
     return (
         <section className="bg-white">

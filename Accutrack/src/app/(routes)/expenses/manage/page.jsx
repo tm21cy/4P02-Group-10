@@ -6,7 +6,7 @@ import Footer from "../../../_components/Footer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useClerk, useSession, useUser } from "@clerk/nextjs";
-import { deleteExpenses, getExpenses, patchExpenses } from "@/lib/db";
+import { deleteExpenses, getExpenses, getValidExpenseTags, patchExpenses } from "@/lib/db";
 
 function ManageExpenses() {
     const { isSignedIn, user, isLoaded } = useUser()
@@ -15,8 +15,8 @@ function ManageExpenses() {
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
     const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' });
+    const [tags, setTags] = useState([]);
 
-    // Add state for sales tax fields
     const [editSalesTaxData, setEditSalesTaxData] = useState({
         hasSalesTax: false,
         taxRate: 13, // Default to 13%
@@ -30,6 +30,10 @@ function ManageExpenses() {
     }, [isLoaded, user])
 
     const updateEntries = () => {
+        getValidExpenseTags(user.id).then(data => {
+            const filtered = data.map(e => e.name)
+            setTags(filtered)
+        })
         getExpenses(user.id).then(data => {
             const sortedData = [...data].sort((a, b) => 
                 new Date(b.date) - new Date(a.date)
@@ -55,7 +59,6 @@ function ManageExpenses() {
         });
     };
 
-
     const handleDelete = (id) => {
         deleteExpenses(user.id, id).then(() => {
             updateEntries()
@@ -66,20 +69,7 @@ function ManageExpenses() {
         e.preventDefault();
         setLoading(true);
 
-        // BACKEND INTEGRATION NOTE FOR TYLER:
-        // 1. Update the expenses table schema to include:
-        //    - add_to_inventory (boolean)
-        //    - inventory_item_id (string/uuid)
-        //    - inventory_quantity (integer)
-        // 2. Modify the updateExpense API endpoint to:
-        //    - Accept these new fields
-        //    - Update inventory quantities when add_to_inventory is true
-        //    - Add validation for inventory item existence
-        //    - Add inventory transaction logging
-        // 3. Consider adding a separate inventory_transactions table for tracking
-
         try {
-            // Only send the original expense data to backend for now
             const updatedExpense = {
                 ...editingExpense,
                 amount: parseFloat(editingExpense.amount),
@@ -102,13 +92,11 @@ function ManageExpenses() {
         setLoading(false);
     };
 
-    // Add this helper function
     const formatAmount = (amount) => {
         const num = parseFloat(amount);
         return isNaN(num) ? "0.00" : num.toFixed(2);
     };
 
-    // Add these new sorting functions
     const sortData = (key) => {
         let direction = 'ascending';
         if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -255,7 +243,6 @@ function ManageExpenses() {
                                         </table>
                                     </div>
 
-                                    {/* Card view for mobile screens */}
                                     <div className="md:hidden space-y-4">
                                         {expenses.map(expense => (
                                             <div key={expense.id} className="bg-gray-800/30 rounded-lg p-4 space-y-3">
@@ -300,7 +287,6 @@ function ManageExpenses() {
                     <div className="bg-gray-900 p-8 rounded-xl shadow-lg max-w-md w-full">
                         <h2 className="text-xl font-bold text-white mb-4">Edit Expense</h2>
                         <form onSubmit={handleEditSubmit} className="space-y-4">
-                            {/* Form fields for editing */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
                                     Amount
@@ -322,28 +308,6 @@ function ManageExpenses() {
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Description
-                                </label>
-                                <input
-                                    type="text"
-                                    value={editingExpense.description}
-                                    onChange={e => setEditingExpense({ ...editingExpense, description: e.target.value })}
-                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
-                                    Date
-                                </label>
-                                <input
-                                    type="date"
-                                    value={editingExpense.date}
-                                    onChange={e => setEditingExpense({ ...editingExpense, date: e.target.value })}
-                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white text-white [color-scheme:dark]"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-300 mb-2">
                                     Category
                                 </label>
                                 <select
@@ -354,12 +318,11 @@ function ManageExpenses() {
                                     value={editingExpense.tag}
                                 >
                                     <option value="">Select a category</option>
-                                    <option value="Bills">Bills</option>
-                                    <option value="Food">Food</option>
-                                    <option value="Transportation">Transportation</option>
-                                    <option value="Entertainment">Entertainment</option>
-                                    <option value="Healthcare">Healthcare</option>
-                                    <option value="Other">+ Add Custom Category</option>
+                                    {tags.map(tag => (
+                                        <option key={tag} value={tag}>
+                                            {tag}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                             {editingExpense.tag === "Other" && (
@@ -378,6 +341,30 @@ function ManageExpenses() {
                                     </p>
                                 </div>
                             )}
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Description
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editingExpense.description}
+                                    onChange={e => setEditingExpense({ ...editingExpense, description: e.target.value })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white"
+                                />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-sm font-medium text-gray-300 mb-2">
+                                    Date
+                                </label>
+                                <input
+                                    type="date"
+                                    value={editingExpense.date}
+                                    onChange={e => setEditingExpense({ ...editingExpense, date: e.target.value })}
+                                    className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg focus:ring-2 focus:ring-teal-500 text-white text-white [color-scheme:dark]"
+                                />
+                            </div>
                             <div className="space-y-4 mb-4">
                                 <div className="flex items-center space-x-2">
                                     <input

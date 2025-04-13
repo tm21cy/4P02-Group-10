@@ -1,18 +1,34 @@
 "use client";
+/**
+ * Home Page
+ * extends footer.jsx and header.jsx
+ *
+ * This component is the landing page for the AccuTrack application.
+ * It presents a welcoming section and highlights of core features.
+ * This page provides a visual showcases of noted functionality.
+ * 
+ * Notable Features:
+ * - Scroll-based animations for feature showcase
+ * - Feature grid with icons and descriptions
+ * - Interactive / animated UI using Tailwind CSS
+ */
 import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs"; // Authentication from Clerk
 import {
   IconChartPie,
   IconBoxSeam,
   IconReportMoney,
   IconFileAnalytics,
-} from "@tabler/icons-react";
+} from "@tabler/icons-react"; // Importing icons for features grid
 
+// Custom hook to observe if an element is in view using Intersection Observer API
+// This hook returns a ref to attach to the element and a boolean indicating if it's in view
 function useInView(options = {}) {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef(null);
 
+  // Set up the Intersection Observer
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
       setIsInView(entry.isIntersecting);
@@ -32,10 +48,17 @@ function useInView(options = {}) {
   return [ref, isInView];
 }
 
+/**
+ * JSX template for Hero section of the site.
+ * Serves some PNGs of functionality previews as well as feature descriptions.
+ * @returns JSX component.
+ */
 function Hero() {
+  // Page router initialization and state management for user authentication.
   const router = useRouter();
   const { isSignedIn } = useUser();
 
+  // Feature set for the grid display for a quick overview of the app (includes icons, titles, and descriptions)
   const features = [
     {
       icon: <IconChartPie className="h-6 w-6" />,
@@ -59,6 +82,7 @@ function Hero() {
     },
   ];
 
+  // Showcase items for the feature display section with detailed feature previews with screenshots
   const showcaseItems = [
     {
       image: "/dashboard.png",
@@ -82,6 +106,7 @@ function Hero() {
     }
   ];
 
+  // Generate gradient background and animated elements
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900">
       
@@ -97,7 +122,7 @@ function Hero() {
         <div className="absolute inset-0 bg-gradient-to-tr from-gray-900/50 to-gray-900/30 backdrop-blur-[2px]" />
       </div>
 
-      {/* Main Content */}
+      {/* Welcome heading */}
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 backdrop-blur-sm">
         <div className="text-center space-y-8 animate-fadeIn pt-10">
           <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-teal-400 to-purple-500 animate-gradient pb-2 leading-tight hover:scale-105 transition-transform duration-300">
@@ -105,11 +130,13 @@ function Hero() {
             <br />
           </h1>
           
+          {/* Subheading with description */}
           <p className="text-gray-300 text-xl max-w-3xl mx-auto">
             AccuTrack brings intelligent financial tracking, automated tax management, 
             and real-time analytics together in one powerful platform.
           </p>
 
+          {/* conditional button rendering based on user authentication status */}
           <div className="flex justify-center gap-4">
             <button
               onClick={() => router.push(isSignedIn ? '/dashboard' : '/sign-up')}

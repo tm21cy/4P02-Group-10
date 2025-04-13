@@ -1,18 +1,32 @@
 "use client";  // This forces the file to be a Client Component
+/**
+ *User Dashboard Page
+ *extends header.jsx and footer.jsx
+ * 
+ * 
+ * This component serves as the user dashboard for the AccuTrack application.
+ * It includes a financial summary including (Total Income, Total Expenses, Net Cash Flow and Incentory Value),
+ * graphs for trends and comparisons, and recent transactions.
+ * It also provides action buttons for navigating to different sections of the app (AI Assistant, Transactions, Reports).
+ * 
+ * Notable Features:
+ * - includes a header and footer for consistent navigation
+ * - Displays a summary of financial data (income, expenses, net cash flow, inventory value)
+ * - Interactive graphs for trends and monthly comparisons allowing users to visualize their financial data based on selected date ranges
+ * - Recent transactions list for all of the most recent transactions
+ */
 import React, { useEffect, useState } from "react"; // Import the React library
 import Header from "../../_components/Header"; // Import the Header component
 import Footer from "../../_components/Footer"; // Import the Footer component
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
-import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db";
+import { useUser } from "@clerk/nextjs"; // Authentication from Clerk
+import { getIncome, getExpenses, getInventoryByUser } from "@/lib/db"; // Pulls from DB
 import {
-  IconMessageChatbot,
   IconClipboardList,
   IconFileText,
   IconCrown,
-  IconChevronDown,
   IconRobot
-} from "@tabler/icons-react";
+} from "@tabler/icons-react"; // Importing icons for features grid
 import {
   LineChart,
   Line,
@@ -24,11 +38,11 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend
-} from 'recharts';
+} from 'recharts'; // Importing icons for graphs
 import Link from "next/link";
-import PricingModal from '@/components/PricingModal';
-import { useSubscriptionStore } from '@/lib/store';
-import { useRouter } from 'next/navigation';
+import PricingModal from '@/components/PricingModal'; // Modal for pricing information
+import { useSubscriptionStore } from '@/lib/store'; // Storing state for subscription status
+import { useRouter } from 'next/navigation'; // Router for page navigation
 
 const dateRanges = [
   "Week to Date",
@@ -38,7 +52,13 @@ const dateRanges = [
   "Last 6 Months"
 ];
 
+/**
+ * JSX template for the user dashboard.
+ * Renders information about financial history, transactions, routing to management pages, and other useful data.
+ * @returns JSX component.
+ */
 function Dashboard() {
+  // State management for user authentication, the selected filter range, transactions, graphs, cards, subscriptions, routing, recent transactions, and inventory status.
   const { isSignedIn, user, isLoaded } = useUser();
   const [selectedRange, setSelectedRange] = useState("Month to Date");
   const [transactions, setTransactions] = useState([]);
@@ -59,22 +79,34 @@ function Dashboard() {
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [inventoryValue, setInventoryValue] = useState(0);
 
+  /**
+   * On page load, render information about transactions in a certain range.
+   */
   useEffect(() => {
     if (!isLoaded || !user) return;
     console.log("Fetching new data for range: ", selectedRange);
     fetchData();
   }, [isLoaded, user, selectedRange]);  
-  
+
+  /**
+   * On page load, fetch recent transactions.
+   */
   useEffect(() => {
     if (!isLoaded || !user) return;
     fetchRecentTransactions();
   }, [isLoaded, user]);
 
+  /**
+ * On page load, render statistics and information about user inventory data.
+ */
   useEffect(() => {
     if (!isLoaded || !user) return;
     fetchInventoryStats();
   }, [isLoaded, user]);
 
+  /**
+   * Fetches and prepares state for user financial data.
+   */
   const fetchData = async () => {
     try {
       const incomeData = await getIncome(user.id);
@@ -143,6 +175,9 @@ function Dashboard() {
     }
   };
   
+  /**
+   * Grabs recent user transactions and renders them appropriately.
+   */
   const fetchRecentTransactions = async () => {
     try {
       const incomeData = await getIncome(user.id);
@@ -164,6 +199,9 @@ function Dashboard() {
     }
   };
 
+  /**
+   * Grabs inventory statistics from user inventory pool and renders them accordingly.
+   */
   const fetchInventoryStats = async () => {
     try {
       const inventory = await getInventoryByUser(user.id);
@@ -176,6 +214,11 @@ function Dashboard() {
     }
   };
 
+  /**
+   * Pre-processing for information to be passed to financial history graphs.
+   * @param {*} incomeData Data regarding the user's income activity.
+   * @param {*} expenseData Data regarding the user's expense activity.
+   */
   const processGraphData = (incomeData, expenseData) => {
     const today = new Date();
     let startDate = new Date();
